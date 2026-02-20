@@ -10,29 +10,42 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&display=swap" rel="stylesheet">
     <style>
+        .admin-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            min-height: 100vh;
+            padding-top: 100px;
+        }
+
         .admin-container {
-            padding: 4rem 2rem;
+            width: 100%;
             max-width: 1200px;
-            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1.5rem;
             margin-bottom: 3rem;
+            width: 100%;
         }
 
         .stat-card {
             background: var(--card-bg);
-            padding: 2rem;
+            padding: 2.5rem;
             border-radius: 20px;
             border: 1px solid hsla(0, 0%, 100%, 0.1);
             text-align: center;
         }
 
         .stat-card .value {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 600;
             display: block;
             margin-bottom: 0.5rem;
@@ -42,6 +55,7 @@
             font-size: 0.8rem;
             color: hsla(0, 0%, 100%, 0.5);
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .visitor-table {
@@ -51,6 +65,7 @@
             border-radius: 20px;
             overflow: hidden;
             border: 1px solid hsla(0, 0%, 100%, 0.1);
+            margin-top: 2rem;
         }
 
         .visitor-table th,
@@ -68,81 +83,101 @@
             color: hsla(0, 0%, 100%, 0.5);
         }
 
-        .visitor-table tr:last-child td {
-            border-bottom: none;
-        }
-
         .visitor-table td {
             font-size: 0.9rem;
         }
 
-        .badge-live {
+        .live-pulse {
+            width: 8px;
+            height: 8px;
             background: #44ff44;
-            color: black;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            margin-left: 0.5rem;
-            vertical-align: middle;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            box-shadow: 0 0 10px #44ff44;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+
+            100% {
+                opacity: 1;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div id="admin-login" class="auth-container"
-        style="display: flex; height: 100vh; justify-content: center; align-items: center;">
+    <nav class="navbar">
+        <div class="nav-container">
+            <span class="nav-logo">NUC7</span>
+            <div class="nav-links"><a href="index.html">Exit Admin</a></div>
+        </div>
+    </nav>
+
+    <div id="admin-login" class="admin-page" style="justify-content: center; padding-top: 0;">
         <div class="auth-card fade-in">
+            <button onclick="location.href='index.html'" class="close-btn" title="Cancel">&times;</button>
             <h2>Admin Login</h2>
-            <p>Enter administrative credentials</p>
+            <p>Accessing real-time production analytics</p>
             <form id="admin-form">
-                <input type="password" id="admin-pass" placeholder="Password" required>
-                <button type="submit" class="primary-btn">Unlock Stats</button>
+                <input type="password" id="admin-pass" placeholder="System Password" required>
+                <button type="submit" class="primary-btn">Unlock Records</button>
             </form>
             <div id="admin-error" class="status-msg" style="color: #ff4444;"></div>
         </div>
     </div>
 
-    <div id="admin-dashboard" class="admin-container" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
-            <h1>Admin Dashboard <span class="badge-live">LIVE</span></h1>
-            <button onclick="location.reload()" class="primary-btn"
-                style="width: auto; padding: 0.5rem 1.5rem; font-size: 0.8rem;">Logout</button>
-        </div>
+    <div id="admin-dashboard" class="admin-page" style="display: none;">
+        <div class="admin-container">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4rem; width: 100%;">
+                <h1 style="font-weight: 300;"><span class="live-pulse"></span>NUC7 Live Analytics</h1>
+                <button onclick="location.reload()" class="primary-btn" style="min-width: 120px;">Logout</button>
+            </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span class="value" id="stat-active">24</span>
-                <span class="label">Active Users</span>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="value" id="stat-active">--</span>
+                    <span class="label">Live Sessions</span>
+                </div>
+                <div class="stat-card">
+                    <span class="value" id="stat-views">--</span>
+                    <span class="label">Total Page Views</span>
+                </div>
+                <div class="stat-card">
+                    <span class="value" id="stat-reg">--</span>
+                    <span class="label">Total Registrations</span>
+                </div>
             </div>
-            <div class="stat-card">
-                <span class="value" id="stat-views">1,248</span>
-                <span class="label">Total Page Views</span>
-            </div>
-            <div class="stat-card">
-                <span class="value" id="stat-quiz">82%</span>
-                <span class="label">Quiz Pass Rate</span>
-            </div>
-            <div class="stat-card">
-                <span class="value" id="stat-leads">156</span>
-                <span class="label">Capture Rate</span>
-            </div>
-        </div>
 
-        <h3>Recent Activity</h3>
-        <table class="visitor-table">
-            <thead>
-                <tr>
-                    <th>Time</th>
-                    <th>Page Path</th>
-                    <th>Referrer</th>
-                    <th>Device</th>
-                </tr>
-            </thead>
-            <tbody id="visitor-log">
-                <!-- Data injected here -->
-            </tbody>
-        </table>
+            <h3
+                style="margin-top: 4rem; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; color: hsla(0,0%,100%,0.5); width: 100%; text-align: left;">
+                Real-Time Visitor Log</h3>
+            <table class="visitor-table">
+                <thead>
+                    <tr>
+                        <th>Time (UTC)</th>
+                        <th>Path</th>
+                        <th>Source</th>
+                        <th>System</th>
+                    </tr>
+                </thead>
+                <tbody id="visitor-log">
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 4rem; opacity: 0.5;">Establishing data
+                            link...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
@@ -151,54 +186,48 @@
         const adminLogin = document.getElementById('admin-login');
         const adminDash = document.getElementById('admin-dashboard');
 
+        let savedPass = '';
+
         adminForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const password = document.getElementById('admin-pass').value;
-
-            // In a real scenario, this calls /stats on the Bridge
-            // For demo, we verify the hash of 'nuc7!nuc7!'
-            const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
-            const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-
-            const targetHash = '89bb64ba4f317b2cbed50bfd930de5417ac0bd838695d3b121bfd7f62ba573aa';
-
-            if (hashHex === targetHash) {
-                adminLogin.style.display = 'none';
-                adminDash.style.display = 'block';
-                loadStats();
-                setInterval(loadStats, 5000); // Simulate real-time updates
-            } else {
-                adminError.textContent = 'Invalid Admin Credentials';
-            }
+            savedPass = document.getElementById('admin-pass').value;
+            await syncStats();
         });
 
-        function loadStats() {
-            const tbody = document.getElementById('visitor-log');
-            const pages = ['/', '/quiz.html', '/course.html', '/index.html'];
-            const referrers = ['Google', 'Direct', 'Twitter', 'Facebook', 'LinkedIn'];
+        async function syncStats() {
+            try {
+                const res = await fetch('https://nuc7-auth-bridge.alivirgo.workers.dev/stats', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: savedPass })
+                });
 
-            // Generate some random "real-time" data for demo
-            const now = new Date();
-            const logHtml = Array.from({ length: 8 }).map((_, i) => {
-                const time = new Date(now - (i * 120000)).toLocaleTimeString();
-                const path = pages[Math.floor(Math.random() * pages.length)];
-                const ref = referrers[Math.floor(Math.random() * referrers.length)];
-                return `
-                    <tr>
-                        <td>${time}</td>
-                        <td><code>${path}</code></td>
-                        <td>${ref}</td>
-                        <td>Chrome / Windows</td>
-                    </tr>
-                `;
-            }).join('');
+                if (res.ok) {
+                    const data = await res.json();
+                    adminLogin.style.display = 'none';
+                    adminDash.style.display = 'flex';
 
-            tbody.innerHTML = logHtml;
+                    document.getElementById('stat-active').textContent = data.activeUsers || 0;
+                    document.getElementById('stat-views').textContent = data.pageViews || 0;
+                    document.getElementById('stat-reg').textContent = data.totalRegistrations || 0;
 
-            // Pulse the "Active Users" to look real
-            const active = document.getElementById('stat-active');
-            const current = parseInt(active.textContent);
-            active.textContent = current + (Math.random() > 0.5 ? 1 : -1);
+                    const tbody = document.getElementById('visitor-log');
+                    tbody.innerHTML = data.hits.map(hit => `
+                        <tr>
+                            <td>${new Date(hit.timestamp).toLocaleTimeString()}</td>
+                            <td><code>${hit.path}</code></td>
+                            <td>${hit.referrer}</td>
+                            <td>${hit.userAgent ? hit.userAgent.split(')')[0] + ')' : 'Browser'}</td>
+                        </tr>
+                    `).join('') || '<tr><td colspan="4" style="text-align: center;">No activity recorded in Cloudflare KV.</td></tr>';
+
+                    setTimeout(syncStats, 10000); // 10s sync
+                } else {
+                    adminError.textContent = 'Auth Failure: Credentials rejected by bridge.';
+                }
+            } catch (e) {
+                adminError.textContent = 'Bridge Connection Timeout.';
+            }
         }
     </script>
 </body>

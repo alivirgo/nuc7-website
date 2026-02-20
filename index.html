@@ -29,118 +29,139 @@
     </nav>
 
     <header class="hero">
-        <div class="hero-content fade-in">
+        <div class="container fade-in">
             <h1 class="logo-large">NUC7</h1>
             <h2>The Ultimate Networking Odyssey</h2>
             <p class="hero-sub">Demystifying the 7 Layers of the OSI Model. Built for the next generation of Network
                 Engineers.</p>
-            <a href="#register" class="cta-btn">Begin Qualification Quiz</a>
+            <div style="display: flex; justify-content: center; width: 100%;">
+                <a href="#register" class="cta-btn">Begin Qualification Quiz</a>
+            </div>
         </div>
         <div class="hero-glow"></div>
     </header>
 
     <main class="content-wrapper">
         <section id="about" class="section">
-            <div class="section-header">
-                <span class="badge">NUC7 Philosophy</span>
-                <h3>Beyond the Bits and Bytes</h3>
-            </div>
-            <div class="text-block">
-                <p>Welcome to NUC7, where we transform complex networking theories into intuitive mastery. In an era
-                    dominated by cloud computing and decentralized networks, understanding the <strong>OSI
-                        Model</strong> (Open Systems Interconnection) is no longer a luxury—it's the fundamental
-                    language of the digital world.</p>
-                <p>Our curriculum isn't just about passing a test; it's about understanding how a simple click on your
-                    screen traverses through the layers of encapsulation to reach across the globe. We believe that true
-                    networking expertise begins with a deep appreciation for the 7 layers that bridge the gap between
-                    physical electricity and abstract application logic.</p>
+            <div class="container">
+                <div class="section-header">
+                    <span class="badge">NUC7 Philosophy</span>
+                    <h3>Beyond the Bits and Bytes</h3>
+                </div>
+                <div class="text-block">
+                    <p>Welcome to NUC7, where we transform complex networking theories into intuitive mastery. In an era
+                        dominated by cloud computing and decentralized networks, understanding the <strong>OSI
+                            Model</strong> (Open Systems Interconnection) is no longer a luxury—it's the fundamental
+                        language of the digital world.</p>
+                </div>
             </div>
         </section>
 
-        <section id="curriculum" class="section dark-section">
-            <div class="section-header">
-                <span class="badge">The Roadmap</span>
-                <h3>The 7-Layer Mastery</h3>
-            </div>
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <h4>Layer 1: Physical</h4>
-                    <p>The foundation of all communication. From copper cables to fiber optics and radio waves.</p>
+        <section id="curriculum" class="dark-section section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="badge">The Roadmap</span>
+                    <h3>The 7-Layer Mastery</h3>
                 </div>
-                <div class="feature-card">
-                    <h4>Layer 2: Data Link</h4>
-                    <p>Mac addresses, frames, and the logic of local network hops.</p>
-                </div>
-                <div class="feature-card">
-                    <h4>Layer 3: Network</h4>
-                    <p>The art of routing. Understanding IP addresses and the global web of interconnectivity.</p>
-                </div>
-                <div class="feature-card">
-                    <h4>Layer 4: Transport</h4>
-                    <p>TCP vs UDP. Ensuring your data arrives intact, in order, and reliably.</p>
-                </div>
-                <div class="feature-card">
-                    <h4>Layer 5-7: High-Level</h4>
-                    <p>From session management to data representation and the application interfaces we use every day.
-                    </p>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>Layer 1: Physical</h4>
+                        <p>The foundation of all communication. From copper cables to fiber optics and radio waves.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Layer 2: Data Link</h4>
+                        <p>MAC addresses, frames, and the logic of local network hops.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Layer 3: Network</h4>
+                        <p>The art of routing. Understanding IP addresses and global interconnectivity.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Layer 4: Transport</h4>
+                        <p>TCP vs UDP. Ensuring your data arrives intact, in order, and reliably.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Layer 5-7: High-Level</h4>
+                        <p>Session management, data representation, and application interfaces.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
         <section id="register" class="section">
-            <div class="auth-card mx-auto">
-                <h3>Are You Ready?</h3>
-                <p>NUC7 is an elite course. To ensure the quality of our community, all students must pass our
-                    10-question MCQ qualification quiz.</p>
-                <form id="registration-form">
-                    <input type="email" id="user-email" placeholder="Enter your email to receive quiz link..." required>
-                    <button type="submit" class="primary-btn">Email me Quiz Link</button>
-                </form>
-                <div id="status-msg" class="status-msg"></div>
+            <div class="container">
+                <div class="auth-card">
+                    <h3>Apply for Qualification</h3>
+                    <p>NUC7 is an elite platform. Registration is required to receive your personalized assessment link.
+                    </p>
+                    <form id="registration-form">
+                        <input type="email" id="user-email" placeholder="student@example.com" required>
+                        <button type="submit" class="primary-btn" id="reg-submit">Register for Assessment</button>
+                    </form>
+                    <div id="status-msg" class="status-msg"></div>
+                </div>
             </div>
         </section>
     </main>
 
     <footer class="footer">
-        <div class="footer-container">
+        <div class="container">
             <p>&copy; 2026 NUC7 - Networking Ultimate Course. All Rights Reserved.</p>
-            <p class="seo-text">Specializing in OSI Model Training, Network Fundamentals, and Digital Infrastructure
-                Education.</p>
+            <p class="seo-text">Specializing in OSI Model Training and Digital Infrastructure Education.</p>
         </div>
     </footer>
 
     <script>
-        // Real-time visitor tracking (Jetpack style)
+        // Production tracking
         async function trackVisitor() {
-            const data = {
-                path: window.location.pathname,
-                referrer: document.referrer || 'Direct',
-                timestamp: new Date().toISOString(),
-                userAgent: navigator.userAgent
-            };
-            // future fetch('/track', { method: 'POST', body: JSON.stringify(data) });
-            console.log('Tracking visitor:', data);
+            const data = { path: window.location.pathname, referrer: document.referrer, userAgent: navigator.userAgent };
+            fetch('https://nuc7-auth-bridge.alivirgo.workers.dev/track', {
+                method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+            }).catch(() => { });
         }
         trackVisitor();
 
         const regForm = document.getElementById('registration-form');
         const statusMsg = document.getElementById('status-msg');
+        const regSubmit = document.getElementById('reg-submit');
 
         regForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('user-email').value;
-            statusMsg.textContent = 'Generating personalized qualification link...';
+            regSubmit.disabled = true;
+            statusMsg.textContent = 'Contacting NUC7 Registry...';
+            statusMsg.style.color = 'white';
 
-            setTimeout(() => {
-                statusMsg.textContent = 'Quiz link dispatched! Check your inbox.';
-                statusMsg.style.color = '#44ff44';
+            try {
+                const res = await fetch('https://nuc7-auth-bridge.alivirgo.workers.dev/send-registration', {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
 
-                const demoLink = document.createElement('a');
-                demoLink.href = 'quiz.html?email=' + encodeURIComponent(email);
-                demoLink.textContent = 'Access Quiz (Demo Link)';
-                demoLink.className = 'demo-btn';
-                statusMsg.parentNode.appendChild(demoLink);
-            }, 1500);
+                if (res.ok) {
+                    statusMsg.textContent = 'Assessment link sent! Please check your inbox.';
+                    statusMsg.style.color = '#44ff44';
+                    regForm.style.display = 'none';
+
+                    // Production redirect simulated for user convenience
+                    const nextBtn = document.createElement('a');
+                    nextBtn.href = 'quiz.html?email=' + encodeURIComponent(email);
+                    nextBtn.className = 'cta-btn';
+                    nextBtn.style.marginTop = '2rem';
+                    nextBtn.textContent = 'Proceed to Test (Inbox Redirect)';
+                    statusMsg.parentNode.appendChild(nextBtn);
+                } else {
+                    statusMsg.textContent = 'System error. Please try again later.';
+                    statusMsg.style.color = '#ff4444';
+                    regSubmit.disabled = false;
+                }
+            } catch (e) {
+                statusMsg.textContent = 'Registry connection lost.';
+                statusMsg.style.color = '#ff4444';
+                regSubmit.disabled = false;
+            }
         });
     </script>
 </body>
