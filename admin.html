@@ -196,6 +196,13 @@
 
         async function syncStats() {
             try {
+                // First, check basic connectivity
+                const ping = await fetch('https://nuc7-auth-bridge.alivirgo.workers.dev/ping').catch(() => null);
+                if (!ping) {
+                    adminError.textContent = 'Bridge Unreachable: Check if Worker is deployed and URL is correct.';
+                    return;
+                }
+
                 const res = await fetch('https://nuc7-auth-bridge.alivirgo.workers.dev/stats', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -206,6 +213,7 @@
                     const data = await res.json();
                     adminLogin.style.display = 'none';
                     adminDash.style.display = 'flex';
+                    adminError.textContent = '';
 
                     document.getElementById('stat-active').textContent = data.activeUsers || 0;
                     document.getElementById('stat-views').textContent = data.pageViews || 0;
@@ -223,10 +231,12 @@
 
                     setTimeout(syncStats, 10000); // 10s sync
                 } else {
-                    adminError.textContent = 'Auth Failure: Credentials rejected by bridge.';
+                    const err = await res.json().catch(() => ({ error: 'Unauthorized' }));
+                    adminError.textContent = `Error: ${err.error || 'Auth Failure: Credentials rejected by bridge.'}`;
                 }
             } catch (e) {
-                adminError.textContent = 'Bridge Connection Timeout.';
+                adminError.textContent = 'Network Error: Check console for logs.';
+                console.error('NUC7 Bridge Error:', e);
             }
         }
     </script>

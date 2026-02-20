@@ -14,6 +14,13 @@ export default {
         const path = url.pathname;
 
         try {
+            // 0. HEALTH CHECK (No Dependencies)
+            if (path === '/ping') {
+                return new Response(JSON.stringify({ status: 'online', timestamp: new Date().toISOString() }), {
+                    headers: corsHeaders
+                });
+            }
+
             // 1. PRODUCTION VISITOR TRACKING (STRICT KV)
             if (path === '/track' && request.method === 'POST') {
                 const hitData = await request.json();
@@ -57,6 +64,12 @@ export default {
                         'User-Agent': 'nuc7-auth-bridge'
                     }
                 });
+
+                if (!vaultRes.ok) {
+                    const errText = await vaultRes.text();
+                    throw new Error(`Vault Access Failed: ${vaultRes.status} ${errText}`);
+                }
+
                 const vault = await vaultRes.json();
                 const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
                 const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
