@@ -142,9 +142,12 @@
     </div>
 
     <script>
+        // CONFIGURATION: Set this to your actual Cloudflare Worker URL
+        const BRIDGE_URL = 'https://nuc7-auth-bridge.alivirgo.workers.dev';
+
         async function trackVisitor() {
             const data = { path: window.location.pathname, referrer: document.referrer || 'Direct', timestamp: new Date().toISOString() };
-            fetch('https://nuc7-auth-bridge.alivirgo.workers.dev/track', { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).catch(e => { });
+            fetch(`${BRIDGE_URL}/track`, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).catch(e => { });
         }
         trackVisitor();
 
@@ -155,7 +158,7 @@
         async function initQuiz() {
             try {
                 // In production, fetch from bridge
-                const res = await fetch('https://nuc7-auth-bridge.alivirgo.workers.dev/get-questions');
+                const res = await fetch(`${BRIDGE_URL}/get-questions`);
                 questions = await res.json();
                 document.getElementById('quiz-footer').style.display = 'flex';
                 renderQuestion();
@@ -222,7 +225,7 @@
             if (score >= 7) {
                 // Request production token for email
                 const email = new URLSearchParams(window.location.search).get('email') || 'user@example.com';
-                const tokenRes = await fetch('https://nuc7-auth-bridge.alivirgo.workers.dev/get-token', {
+                const tokenRes = await fetch(`${BRIDGE_URL}/get-token`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, score })
                 });
