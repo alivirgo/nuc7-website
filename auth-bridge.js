@@ -1,70 +1,88 @@
 /**
- * nuc7 Authentication Bridge
+ * NUC7 Authentication Bridge v2
  * 
- * This worker securely fetches the password hash and API keys from a private 
- * GitHub repository and verifies the user's password.
+ * Manages:
+ * 1. Email-gated quiz requests.
+ * 2. Randomized question delivery from private vault.
+ * 3. Quiz validation and Course access token generation.
  */
 
 export default {
     async fetch(request, env) {
-        // CORS Headers
         const corsHeaders = {
             'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type',
         };
 
-        if (request.method === 'OPTIONS') {
-            return new Response(null, { headers: corsHeaders });
-        }
+        if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
-        if (request.method !== 'POST') {
-            return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
-        }
+        const url = new URL(request.url);
+        const path = url.pathname;
 
         try {
-            const { password } = await request.json();
+            // Endpoint: GET /get-questions
+            // Fetches 10 random questions from the private vault
+            if (path === '/get-questions') {
+                const vaultRes = await fetch(`https://api.github.com/repos/alivirgo/nuc7-vault/contents/questions.json`, {
+                    headers: {
+                        'Authorization': `token ${env.GITHUB_PAT}`,
+                        'Accept': 'application/vnd.github.v3.raw',
+                        'User-Agent': 'nuc7-auth-bridge'
+                    }
+                });
 
-            // 1. Fetch vault.json from Private Repo using GitHub API
-            // Requires GITHUB_PAT secret in Worker environment
-            const githubUrl = 'https://api.github.com/repos/alivirgo/nuc7-vault/contents/vault.json';
-            const response = await fetch(githubUrl, {
-                headers: {
-                    'Authorization': `token ${env.GITHUB_PAT}`,
-                    'Accept': 'application/vnd.github.v3.raw',
-                    'User-Agent': 'nuc7-auth-bridge'
+                const questions = await vaultRes.json();
+                // Randomize and pick 10
+                const shuffled = questions.sort(() => 0.5 - Math.random());
+                const selected = shuffled.slice(0, 10).map(q => ({
+                    id: q.id,
+                    question: q.question,
+                    options: q.options
+                }));
+
+                return new Response(JSON.stringify(selected), {
+                    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+                });
+            }
+
+            // Endpoint: POST /validate-quiz
+            // Checks answers against vault and returns access token
+            if (path === '/validate-quiz' && request.method === 'POST') {
+                const { email, answers } = await request.json(); // answers: { id: choiceIndex }
+
+                const vaultRes = await fetch(`https://api.github.com/repos/alivirgo/nuc7-vault/contents/questions.json`, {
+                    headers: {
+                        'Authorization': `token ${env.GITHUB_PAT}`,
+                        'Accept': 'application/vnd.github.v3.raw',
+                        'User-Agent': 'nuc7-auth-bridge'
+                    }
+                });
+                const questions = await vaultRes.json();
+
+                let score = 0;
+                answers.forEach(ua => {
+                    const q = questions.find(v => v.id === ua.id);
+                    if (q && q.answer === ua.choice) score++;
+                });
+
+                if (score >= 7) {
+                    // Generate a simple token (in production, use JWT signed with secret)
+                    const token = btoa(`${email}:${Date.now()}:passed`);
+                    return new Response(JSON.stringify({ success: true, score, token }), {
+                        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+                    });
+                } else {
+                    return new Response(JSON.stringify({ success: false, score, error: 'Failed' }), {
+                        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+                    });
                 }
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch vault data');
             }
 
-            const vault = await response.json();
-
-            // 2. Hash incoming password
-            const msgUint8 = new TextEncoder().encode(password);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-            // 3. Compare hashes
-            if (hashHex === vault.passwordHash) {
-                return new Response(JSON.stringify({
-                    success: true,
-                    apiKeys: vault.apiKeys // Only return keys if authed
-                }), {
-                    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-                });
-            } else {
-                return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
-                    status: 401,
-                    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-                });
-            }
+            return new Response('Not Found', { status: 404 });
 
         } catch (err) {
-            return new Response(JSON.stringify({ success: false, error: 'Internal Server Error' }), {
+            return new Response(JSON.stringify({ error: err.message }), {
                 status: 500,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' }
             });

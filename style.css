@@ -92,42 +92,57 @@ h1 {
     border: 1px solid hsla(0, 0%, 100%, 0.1);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     text-align: center;
-    max-width: 400px;
+    max-width: 450px;
     width: 90%;
+}
+
+.logo {
+    font-size: 4rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    background: linear-gradient(to bottom, #fff, #444);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .auth-card h2 {
     font-weight: 300;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
     letter-spacing: -0.01em;
+    font-size: 1.5rem;
 }
 
 .auth-card p {
-    color: hsla(0, 0%, 100%, 0.5);
-    font-size: 0.9rem;
+    color: hsla(0, 0%, 100%, 0.6);
+    font-size: 1rem;
     margin-bottom: 2rem;
+    line-height: 1.6;
 }
 
-input[type="password"] {
+input[type="email"],
+input[type="password"],
+input[type="text"] {
     width: 100%;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid hsla(0, 0%, 100%, 0.1);
-    padding: 1rem;
+    padding: 1rem 1.2rem;
     border-radius: 12px;
     color: white;
     font-family: inherit;
     font-size: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
     outline: none;
     transition: all 0.3s ease;
 }
 
-input[type="password"]:focus {
+input:focus {
     border-color: hsla(0, 0%, 100%, 0.3);
     background: rgba(255, 255, 255, 0.08);
 }
 
-button[type="submit"] {
+button[type="submit"],
+button.primary-btn {
     width: 100%;
     background: white;
     color: black;
@@ -135,18 +150,35 @@ button[type="submit"] {
     padding: 1rem;
     border-radius: 12px;
     font-weight: 600;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
-button[type="submit"]:hover {
+button:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
 }
 
-.error-msg {
-    margin-top: 1.5rem;
-    color: #ff4444;
-    font-size: 0.85rem;
+.status-msg {
+    margin-top: 2rem;
+    font-size: 0.9rem;
     min-height: 1.2rem;
+}
+
+.demo-btn {
+    display: inline-block;
+    margin-top: 1.5rem;
+    color: white;
+    text-decoration: none;
+    border: 1px solid hsla(0, 0%, 100%, 0.2);
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.demo-btn:hover {
+    background: hsla(0, 0%, 100%, 0.1);
+    border-color: white;
 }
