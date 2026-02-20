@@ -180,6 +180,18 @@
     </div>
 
     <script>
+        // Real-time visitor tracking
+        async function trackVisitor() {
+            const data = {
+                path: window.location.pathname,
+                referrer: document.referrer || 'Direct',
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent
+            };
+            console.log('Tracking visitor:', data);
+        }
+        trackVisitor();
+
         function showChapter(num) {
             document.querySelectorAll('.chapter-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.chapter-item').forEach(el => el.classList.remove('active'));

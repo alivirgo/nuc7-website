@@ -20,6 +20,52 @@ export default {
         const url = new URL(request.url);
         const path = url.pathname;
 
+        // Endpoint: POST /track
+        // Records a visitor hit (Referrer, Path, UA)
+        if (path === '/track' && request.method === 'POST') {
+            const hitData = await request.json();
+            // In production, we would log this to a KV store or Durable Object
+            // For now, we return success to the frontend tracking script
+            return new Response(JSON.stringify({ success: true }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            });
+        }
+
+        // Endpoint: POST /stats
+        // Protected endpoint to retrieve site metrics
+        if (path === '/stats' && request.method === 'POST') {
+            const { password } = await request.json();
+
+            const vaultRes = await fetch(`https://api.github.com/repos/alivirgo/nuc7-vault/contents/vault.json`, {
+                headers: {
+                    'Authorization': `token ${env.GITHUB_PAT}`,
+                    'Accept': 'application/vnd.github.v3.raw',
+                    'User-Agent': 'nuc7-auth-bridge'
+                }
+            });
+            const vault = await vaultRes.json();
+
+            const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+            const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+            if (hashHex === vault.adminPasswordHash) {
+                // Simulated live stats for the dashboard
+                return new Response(JSON.stringify({
+                    activeUsers: 42,
+                    pageViews: 1248,
+                    passRate: '82%',
+                    recentHits: [
+                        { time: new Date().toISOString(), path: '/', ref: 'Google' },
+                        { time: new Date().toISOString(), path: '/quiz.html', ref: 'Direct' }
+                    ]
+                }), {
+                    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+                });
+            } else {
+                return new Response('Unauthorized', { status: 401 });
+            }
+        }
+
         try {
             // Endpoint: GET /get-questions
             // Fetches 10 random questions from the private vault

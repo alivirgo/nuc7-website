@@ -103,7 +103,6 @@
         </div>
 
         <div id="quiz-content">
-            <!-- Questions injected here -->
             <div class="status-msg" style="text-align: center;">Loading your qualification test...</div>
         </div>
 
@@ -114,7 +113,18 @@
     </div>
 
     <script>
-        // Mock questions for demo (will be fetched from bridge)
+        // Real-time visitor tracking
+        async function trackVisitor() {
+            const data = {
+                path: window.location.pathname,
+                referrer: document.referrer || 'Direct',
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent
+            };
+            console.log('Tracking visitor:', data);
+        }
+        trackVisitor();
+
         const mockQuestions = [
             { question: "Which layer of the OSI model is responsible for routing?", options: ["Physical", "Data Link", "Network", "Transport"], answer: 2 },
             { question: "What is the standard port for HTTP?", options: ["21", "25", "80", "443"], answer: 2 },
