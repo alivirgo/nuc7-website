@@ -112,10 +112,13 @@
     </footer>
 
     <script>
+        // CONFIGURATION: Set this to your actual Cloudflare Worker URL
+        const BRIDGE_URL = 'https://nuc7-auth-bridge.alivirgo.workers.dev';
+
         // Production tracking
         async function trackVisitor() {
             const data = { path: window.location.pathname, referrer: document.referrer, userAgent: navigator.userAgent };
-            fetch('https://nuc7-auth-bridge.alivirgo.workers.dev/track', {
+            fetch(`${BRIDGE_URL}/track`, {
                 method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
             }).catch(() => { });
         }
@@ -133,7 +136,7 @@
             statusMsg.style.color = 'white';
 
             try {
-                const res = await fetch('https://nuc7-auth-bridge.alivirgo.workers.dev/send-registration', {
+                const res = await fetch(`${BRIDGE_URL}/send-registration`, {
                     method: 'POST',
                     mode: 'cors',
                     headers: { 'Content-Type': 'application/json' },
