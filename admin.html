@@ -181,6 +181,9 @@
     </div>
 
     <script>
+        // CONFIGURATION: Set this to your actual Cloudflare Worker URL
+        const BRIDGE_URL = 'https://nuc7-auth-bridge.alivirgo.workers.dev';
+
         const adminForm = document.getElementById('admin-form');
         const adminError = document.getElementById('admin-error');
         const adminLogin = document.getElementById('admin-login');
@@ -196,14 +199,15 @@
 
         async function syncStats() {
             try {
-                // First, check basic connectivity
-                const ping = await fetch('https://nuc7-auth-bridge.alivirgo.workers.dev/ping').catch(() => null);
+                // 1. Check basic connectivity (Health Check)
+                const ping = await fetch(`${BRIDGE_URL}/ping`).catch(() => null);
                 if (!ping) {
-                    adminError.textContent = 'Bridge Unreachable: Check if Worker is deployed and URL is correct.';
+                    adminError.textContent = `Bridge Unreachable: Please verify the URL: ${BRIDGE_URL}`;
                     return;
                 }
 
-                const res = await fetch('https://nuc7-auth-bridge.alivirgo.workers.dev/stats', {
+                // 2. Fetch actual stats
+                const res = await fetch(`${BRIDGE_URL}/stats`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: savedPass })
@@ -229,14 +233,14 @@
                         </tr>
                     `).join('') || '<tr><td colspan="4" style="text-align: center;">No activity recorded in Cloudflare KV.</td></tr>';
 
-                    setTimeout(syncStats, 10000); // 10s sync
+                    setTimeout(syncStats, 10000);
                 } else {
                     const err = await res.json().catch(() => ({ error: 'Unauthorized' }));
-                    adminError.textContent = `Error: ${err.error || 'Auth Failure: Credentials rejected by bridge.'}`;
+                    adminError.textContent = `Server Error: ${err.error || 'Access Denied'}`;
                 }
             } catch (e) {
-                adminError.textContent = 'Network Error: Check console for logs.';
-                console.error('NUC7 Bridge Error:', e);
+                adminError.textContent = 'Connection Error: Check browser console (F12).';
+                console.error('NUC7 Bridge Diagnostics:', e);
             }
         }
     </script>
