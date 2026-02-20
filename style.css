@@ -34,6 +34,7 @@ h1 {
     letter-spacing: -0.02em;
     background: linear-gradient(to bottom, #fff, #888);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     opacity: 0;
 }
@@ -60,6 +61,7 @@ h1 {
         transform: scale(0.95);
         filter: blur(10px);
     }
+
     100% {
         opacity: 1;
         transform: scale(1);
@@ -71,4 +73,80 @@ h1 {
     h1 {
         font-size: 3rem;
     }
+}
+
+/* Authentication Wall Styles */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--bg-color);
+}
+
+.auth-card {
+    background-color: var(--card-bg);
+    padding: 3rem;
+    border-radius: 24px;
+    border: 1px solid hsla(0, 0%, 100%, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+
+.auth-card h2 {
+    font-weight: 300;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
+}
+
+.auth-card p {
+    color: hsla(0, 0%, 100%, 0.5);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+}
+
+input[type="password"] {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid hsla(0, 0%, 100%, 0.1);
+    padding: 1rem;
+    border-radius: 12px;
+    color: white;
+    font-family: inherit;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+input[type="password"]:focus {
+    border-color: hsla(0, 0%, 100%, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+button[type="submit"] {
+    width: 100%;
+    background: white;
+    color: black;
+    border: none;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
+}
+
+.error-msg {
+    margin-top: 1.5rem;
+    color: #ff4444;
+    font-size: 0.85rem;
+    min-height: 1.2rem;
 }
