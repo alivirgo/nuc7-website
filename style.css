@@ -227,3 +227,18 @@ input:focus {
         display: none;
     }
 }
+
+/* Course Layout Additions */
+.course-nav {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding-bottom: 2rem;
+}
+
+/* Hide scrollbar for cleaner look */
+.course-nav::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
