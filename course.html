@@ -53,12 +53,25 @@
     </nav>
 
     <div id="lock-screen" class="container" style="display: none; padding-top: 100px; text-align: center;">
-        <div class="glass-card fade-in" style="max-width: 400px; margin: 0 auto;">
-            <span class="badge" style="color: #ff4444; border-color: #ff4444;">UNAUTHORIZED</span>
-            <h2 style="margin-top: 2rem;">Vault Locked</h2>
-            <p style="color: var(--text-secondary); margin-top: 1rem;">Valid qualification token required to access NUC7
-                curriculum.</p>
-            <a href="index.html" class="cta-btn" style="display: block; margin-top: 2rem;">Acquire License</a>
+        <div class="glass-card fade-in" style="max-width: 450px; margin: 0 auto; border-color: rgba(255,68,68,0.2);">
+            <span class="badge" style="color: #ff4444; border-color: #ff4444; margin-bottom: 2rem;">VAULT STATUS:
+                LOCKED</span>
+            <h2 style="font-weight: 200; font-size: 2.5rem; margin-bottom: 1rem;">Access <span
+                    style="font-weight: 600;">Denied</span></h2>
+            <p style="color: var(--text-secondary); margin-bottom: 3rem; font-size: 0.9rem; line-height: 1.6;">A valid
+                qualification token is required to decrypt and access the NUC7 curriculum database.</p>
+
+            <div id="recovery-form" style="margin-bottom: 2rem;">
+                <input type="email" id="recover-email" placeholder="Enter enrolled email"
+                    style="margin-bottom: 1rem; text-align: center;">
+                <button onclick="requestToken()" id="recover-btn" class="outline-btn"
+                    style="width: 100%; padding: 0.8rem;">Resend Access Link</button>
+            </div>
+
+            <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem;">
+                <a href="index.html" style="font-size: 0.8rem; color: #fff; text-decoration: none; opacity: 0.5;">New
+                    Candidate? Register Here</a>
+            </div>
         </div>
     </div>
 
@@ -86,16 +99,60 @@
             { id: 6, name: "Presentation Layer", text: "Data translation. Encryption and syntax formatting." },
             { id: 7, name: "Application Layer", text: "User interaction. HTTP, DNS, and service protocols." }
         ];
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        const email = params.get('email');
+        const BRIDGE_URL = 'https://nuc7-auth-bridge.alivirgo123.workers.dev';
 
-        window.onload = () => {
-            const token = new URLSearchParams(window.location.search).get('token');
-            if (!token) {
+        window.onload = async () => {
+            if (!token || !email) {
                 document.getElementById('lock-screen').style.display = 'block';
-            } else {
+                return;
+            }
+
+            // Verify Token with Bridge
+            try {
+                const res = await fetch(`${BRIDGE_URL}/validate-token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, token })
+                });
+
+                if (res.ok) {
+                    document.getElementById('course-portal').style.display = 'flex';
+                    init();
+                } else {
+                    document.getElementById('lock-screen').style.display = 'block';
+                }
+            } catch (e) {
+                // Fallback to simple check if bridge is down but token exists
                 document.getElementById('course-portal').style.display = 'flex';
                 init();
             }
         };
+
+        async function requestToken() {
+            const emailInput = document.getElementById('recover-email').value;
+            const btn = document.getElementById('recover-btn');
+            if (!emailInput) return;
+
+            btn.disabled = true;
+            btn.textContent = 'Contacting Registry...';
+
+            try {
+                await fetch(`${BRIDGE_URL}/send-registration`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailInput, name: 'Returning Student' })
+                });
+                alert('Access link dispatched to your inbox.');
+            } catch (e) {
+                alert('Connection error.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Resend Access Link';
+            }
+        }
 
         function init() {
             const list = document.getElementById('chapters');
@@ -108,10 +165,23 @@
             show(1);
         }
 
+        async function trackProgress(chapterId) {
+            if (!email || !token) return;
+            fetch(`${BRIDGE_URL}/update-progress`, {
+                method: 'POST',
+                mode: 'cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, chapterId: `Layer ${chapterId}`, token })
+            }).catch(() => { });
+        }
+
         function show(id) {
             const l = layers.find(x => x.id === id);
             document.querySelectorAll('.ch-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`nav-${id}`).classList.add('active');
+            const sideItem = document.getElementById(`nav-${id}`);
+            if (sideItem) sideItem.classList.add('active');
+
+            trackProgress(id);
 
             const area = document.getElementById('ch-content');
             area.style.opacity = '0';

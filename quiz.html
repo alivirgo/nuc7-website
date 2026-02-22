@@ -151,7 +151,7 @@
                     body: JSON.stringify({ email, score })
                 });
                 const { token } = await res.json();
-                location.href = `course.html?token=${token}`;
+                location.href = `course.html?token=${token}&email=${encodeURIComponent(email)}`;
             } catch (err) {
                 alert('Token Generation Failed.');
                 btn.disabled = false;

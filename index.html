@@ -59,6 +59,7 @@
                     <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.9rem;">Submit your email
                         to receive your unique assessment link. Qualification is required for course access.</p>
                     <form id="reg-form">
+                        <input type="text" id="user-name" placeholder="Full Name" required>
                         <input type="email" id="user-email" placeholder="email@address.com" required>
                         <button type="submit" class="cta-btn" style="width: 100%;" id="reg-btn">Request
                             Assessment</button>
@@ -106,6 +107,7 @@
         regForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('user-email').value;
+            const name = document.getElementById('user-name').value;
 
             btn.disabled = true;
             btn.textContent = 'Contacting Vault...';
@@ -116,7 +118,7 @@
                     method: 'POST',
                     mode: 'cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
+                    body: JSON.stringify({ email, name })
                 });
 
                 if (res.ok) {

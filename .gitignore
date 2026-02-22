@@ -1,0 +1,4 @@
+vault-tmp/
+node_modules/
+.env
+*.log

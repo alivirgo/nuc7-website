@@ -36,11 +36,13 @@ export default {
 
                 const timestamp = new Date().toISOString();
                 const cf = request.cf || {};
+                const ip = request.headers.get('cf-connecting-ip') || 'Unknown';
 
                 const hit = {
                     path: hitData.path,
                     referrer: hitData.referrer || 'Direct',
                     userAgent: hitData.userAgent || 'Unknown',
+                    ip: ip,
                     city: cf.city || 'Unknown',
                     country: cf.country || 'Unknown',
                     isp: cf.asOrganization || 'Unknown',
@@ -96,17 +98,56 @@ export default {
                 const totalViews = await STATS_KV.get('totalViews') || '0';
                 const registrations = await STATS_KV.get('totalReg') || '0';
 
+                // Fetch Student List
+                const list = await STATS_KV.list({ prefix: 'user:' });
+                const students = [];
+                for (const key of list.keys) {
+                    const u = await STATS_KV.get(key.name, 'json');
+                    if (u) students.push(u);
+                }
+
                 return new Response(JSON.stringify({
                     activeUsers: Math.max(1, Math.floor(hits.length / 4)), // Estimated live
                     pageViews: totalViews,
                     totalRegistrations: registrations,
-                    hits: hits
+                    hits: hits,
+                    students: students
                 }), { headers: corsHeaders });
+            }
+
+            // 2.1 CLEAR STATS (Admin Only)
+            if (path === '/clear-stats' && request.method === 'POST') {
+                const { password } = await request.json();
+
+                // Auth Check (Same as stats)
+                const vaultRes = await fetch(`https://api.github.com/repos/alivirgo/nuc7-vault/contents/vault.json`, {
+                    headers: {
+                        'Authorization': `token ${env.GITHUB_PAT}`,
+                        'Accept': 'application/vnd.github.v3.raw',
+                        'User-Agent': 'nuc7-auth-bridge'
+                    }
+                });
+                const vault = await vaultRes.json();
+                const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+                const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+                if (hashHex !== vault.adminPasswordHash) {
+                    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
+                }
+
+                if (STATS_KV) {
+                    await STATS_KV.delete('hits');
+                    await STATS_KV.put('totalViews', '0');
+                }
+
+                return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
             }
 
             // 3. SECURE EMAIL REGISTRATION
             if (path === '/send-registration' && request.method === 'POST') {
-                const { email } = await request.json();
+                const { name, email } = await request.json();
+                const ip = request.headers.get('cf-connecting-ip') || 'Unknown';
+                const cf = request.cf || {};
 
                 // 1. Generate Signed Token
                 const salt = env.AUTH_SECRET || 'nuc7_prod_secret';
@@ -114,8 +155,19 @@ export default {
                 const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(tokenSource));
                 const token = btoa(Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''));
 
-                // 2. Log Registration Stats
+                // 2. Log Registration Stats & Create Profile
                 if (STATS_KV) {
+                    const userData = {
+                        name: name || 'Anonymous',
+                        email,
+                        ip,
+                        location: `${cf.city || '?'}, ${cf.country || '?'}`,
+                        isp: cf.asOrganization || 'Unknown',
+                        registeredAt: new Date().toISOString(),
+                        progress: { score: 0, chapters: [] }
+                    };
+                    await STATS_KV.put(`user:${email}`, JSON.stringify(userData));
+
                     const totalReg = (parseInt(await STATS_KV.get('totalReg')) || 0) + 1;
                     await STATS_KV.put('totalReg', totalReg.toString());
                 }
@@ -156,7 +208,42 @@ export default {
                 const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(tokenSource));
                 const token = btoa(Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''));
 
+                // Record Score in Student Profile
+                if (STATS_KV) {
+                    let user = await STATS_KV.get(`user:${email}`, 'json');
+                    if (user) {
+                        user.progress.score = score;
+                        await STATS_KV.put(`user:${email}`, JSON.stringify(user));
+                    }
+                }
+
                 return new Response(JSON.stringify({ token }), { headers: corsHeaders });
+            }
+
+            // 3.6 UPDATE COURSE PROGRESS
+            if (path === '/update-progress' && request.method === 'POST') {
+                const { email, chapterId, token } = await request.json();
+
+                // Token Validation
+                const salt = env.AUTH_SECRET || 'nuc7_prod_secret';
+                const tokenSource = `${email}:course_access:${salt}`;
+                const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(tokenSource));
+                const expectedToken = btoa(Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''));
+
+                if (token !== expectedToken) {
+                    return new Response(JSON.stringify({ error: 'Invalid Token' }), { status: 403, headers: corsHeaders });
+                }
+
+                if (STATS_KV) {
+                    let user = await STATS_KV.get(`user:${email}`, 'json');
+                    if (user) {
+                        if (!user.progress.chapters.includes(chapterId)) {
+                            user.progress.chapters.push(chapterId);
+                            await STATS_KV.put(`user:${email}`, JSON.stringify(user));
+                        }
+                    }
+                }
+                return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
             }
 
             // 4. SECURE QUESTION FETCH
@@ -182,6 +269,20 @@ export default {
                 const allQuestions = await res.json();
                 const shuffled = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 10);
                 return new Response(JSON.stringify(shuffled), { headers: corsHeaders });
+            }
+
+            // 5. VALIDATE TOKEN (Self-Service & Verification)
+            if (path === '/validate-token' && request.method === 'POST') {
+                const { email, token } = await request.json();
+                const salt = env.AUTH_SECRET || 'nuc7_prod_secret';
+                const tokenSource = `${email}:course_access:${salt}`;
+                const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(tokenSource));
+                const expectedToken = btoa(Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''));
+
+                if (token === expectedToken) {
+                    return new Response(JSON.stringify({ valid: true }), { headers: corsHeaders });
+                }
+                return new Response(JSON.stringify({ valid: false }), { status: 403, headers: corsHeaders });
             }
 
             return new Response('NUC7 Bridge: Path Not Found', { status: 404, headers: corsHeaders });

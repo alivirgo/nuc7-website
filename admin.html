@@ -38,7 +38,10 @@
         <div class="fade-in">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4rem;">
                 <h2 style="font-weight: 200;">Production <span style="font-weight: 600;">Intelligence</span></h2>
-                <button onclick="location.reload()" class="outline-btn" style="padding: 0.6rem 1.5rem;">Logout</button>
+                <div style="display: flex; gap: 1rem;">
+                    <button onclick="location.reload()" class="outline-btn"
+                        style="padding: 0.6rem 1.5rem;">Logout</button>
+                </div>
             </div>
 
             <div
@@ -57,31 +60,79 @@
                 </div>
             </div>
 
-            <div class="glass-card" style="padding: 0; overflow: hidden;">
+            <div
+                style="display: flex; gap: 1rem; margin-bottom: 3rem; background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 12px; width: fit-content;">
+                <button id="tab-v" class="outline-btn"
+                    style="border: none; background: rgba(255,255,255,0.1); color: #fff; padding: 0.8rem 2rem;">Visitor
+                    Activity</button>
+                <button id="tab-s" class="outline-btn" style="border: none; padding: 0.8rem 2rem;">Student
+                    Portal</button>
+            </div>
+
+            <!-- Visitor Log -->
+            <div id="v-section" class="glass-card" style="padding: 0; overflow: hidden;">
                 <div
-                    style="padding: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02);">
+                    style="padding: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02); display: flex; justify-content: space-between; align-items: center;">
                     <h3 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">Real-Time Visitor Log
                     </h3>
+                    <button id="clear-btn"
+                        style="background: none; border: 1px solid rgba(255,68,68,0.3); color: #ff6666; font-size: 0.7rem; padding: 0.4rem 1rem; border-radius: 4px; cursor: pointer;">Clear
+                        Hits</button>
                 </div>
-                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
-                    <thead>
-                        <tr style="background: rgba(255,255,255,0.05);">
-                            <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">TIME (UTC)</th>
-                            <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">PATH</th>
-                            <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">LOCATION</th>
-                            <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">ISP / NETWORK
-                            </th>
-                            <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">COLO</th>
-                            <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">AGENT</th>
-                        </tr>
-                    </thead>
-                    <tbody id="v-log">
-                        <tr>
-                            <td colspan="4" style="padding: 4rem; text-align: center; opacity: 0.3;">Establishing Vault
-                                Connection...</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem;">
+                        <thead>
+                            <tr style="background: rgba(255,255,255,0.05);">
+                                <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">TIME</th>
+                                <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">IP ADDRESS
+                                </th>
+                                <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">LOCATION
+                                </th>
+                                <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">ISP</th>
+                                <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">PATH</th>
+                            </tr>
+                        </thead>
+                        <tbody id="v-log">
+                            <tr>
+                                <td colspan="5" style="padding: 4rem; text-align: center; opacity: 0.3;">Fetching Hive
+                                    Data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Student Portal -->
+            <div id="s-section" class="glass-card" style="padding: 0; overflow: hidden; display: none;">
+                <div
+                    style="padding: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02);">
+                    <h3 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">Registered Students
+                    </h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem;">
+                        <thead>
+                            <tr style="background: rgba(255,255,255,0.05);">
+                                <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">NAME /
+                                    EMAIL</th>
+                                <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">IP /
+                                    LOCATION</th>
+                                <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">QUIZ SCORE
+                                </th>
+                                <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">CHAPTERS
+                                </th>
+                                <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">REG DATE
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="s-log">
+                            <tr>
+                                <td colspan="5" style="padding: 4rem; text-align: center; opacity: 0.3;">Loading
+                                    Students...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -92,6 +143,12 @@
         const loginErr = document.getElementById('login-err');
         const dash = document.getElementById('dashboard');
         const loginScreen = document.getElementById('login-screen');
+        const vLog = document.getElementById('v-log');
+        const sLog = document.getElementById('s-log');
+        const tabV = document.getElementById('tab-v');
+        const tabS = document.getElementById('tab-s');
+        const vSec = document.getElementById('v-section');
+        const sSec = document.getElementById('s-section');
 
         let savedPass = '';
 
@@ -118,17 +175,47 @@
                     document.getElementById('stat-views').textContent = data.pageViews || 0;
                     document.getElementById('stat-reg').textContent = data.totalRegistrations || 0;
 
-                    const tbody = document.getElementById('v-log');
-                    tbody.innerHTML = data.hits.map(h => `
+                    const totalModules = (data.students || []).reduce((acc, s) => acc + (s.progress?.chapters?.length || 0), 0);
+                    // document.getElementById('stat-views').parentElement.querySelector('.badge').textContent = 'Modules Completed'; // Optional rename
+
+                    // Render Visitor Logs
+                    vLog.innerHTML = data.hits.map(h => `
                         <tr>
                             <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05);">${new Date(h.timestamp).toLocaleTimeString()}</td>
-                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: #fff;"><code>${h.path}</code></td>
+                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: #fff;"><code>${h.ip || 'Unknown'}</code></td>
                             <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary);">${h.city || '?'}, ${h.country || '?'}</td>
                             <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary); font-size: 0.75rem;">${h.isp || 'Unknown'}</td>
-                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary);">${h.datacenter || '?'}</td>
-                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary);">${h.userAgent ? h.userAgent.split(')')[0] + ')' : 'Auto'}</td>
+                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: #fff;"><code>${h.path}</code></td>
                         </tr>
-                    `).join('') || '<tr><td colspan="6" style="padding: 4rem; text-align: center;">No activity recorded.</td></tr>';
+                    `).join('') || '<tr><td colspan="5" style="padding: 4rem; text-align: center;">No activity recorded.</td></tr>';
+
+                    // Render Student Profiles
+                    sLog.innerHTML = (data.students || []).map(u => {
+                        const prog = u.progress || { score: 0, chapters: [] };
+                        return `
+                        <tr>
+                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-weight: 600; color: #fff;">${u.name || 'Anonymous'}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-secondary);">${u.email}</div>
+                            </td>
+                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <div style="color: #fff;"><code>${u.ip || 'Unknown'}</code></div>
+                                <div style="font-size: 0.75rem; color: var(--text-secondary);">${u.location || 'Unknown'}</div>
+                            </td>
+                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <span class="badge" style="background: ${prog.score >= 7 ? 'rgba(68,255,68,0.1)' : 'rgba(255,68,68,0.1)'}; color: ${prog.score >= 7 ? '#44ff44' : '#ff4444'};">
+                                    ${prog.score}/10
+                                </span>
+                            </td>
+                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 0.75rem; color: #fff;">${prog.chapters.length} / 7 Modules</div>
+                                <div style="font-size: 0.65rem; color: var(--text-secondary);">${prog.chapters.join(', ') || 'Not started'}</div>
+                            </td>
+                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary);">
+                                ${new Date(u.registeredAt || Date.now()).toLocaleDateString()}
+                            </td>
+                        </tr>
+                    `}).join('') || '<tr><td colspan="5" style="padding: 4rem; text-align: center;">No students registered.</td></tr>';
 
                     setTimeout(sync, 15000);
                 } else {
@@ -139,6 +226,44 @@
                 loginErr.textContent = 'Connection Refused by Bridge';
             }
         }
+
+        document.getElementById('clear-btn').addEventListener('click', async () => {
+            if (!confirm('Permanently wipe all visitor statistics?')) return;
+
+            try {
+                const res = await fetch(`${BRIDGE_URL}/clear-stats`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: savedPass })
+                });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    alert('Clear failed: Authorization expired.');
+                }
+            } catch (err) {
+                alert('Connection error during clear request.');
+            }
+        });
+
+        // Tab Switching
+        tabV.addEventListener('click', () => {
+            vSec.style.display = 'block';
+            sSec.style.display = 'none';
+            tabV.style.background = 'rgba(255,255,255,0.05)';
+            tabV.style.color = '#fff';
+            tabS.style.background = 'none';
+            tabS.style.color = 'var(--text-secondary)';
+        });
+
+        tabS.addEventListener('click', () => {
+            vSec.style.display = 'none';
+            sSec.style.display = 'block';
+            tabS.style.background = 'rgba(255,255,255,0.05)';
+            tabS.style.color = '#fff';
+            tabV.style.background = 'none';
+            tabV.style.color = 'var(--text-secondary)';
+        });
     </script>
 </body>
 
