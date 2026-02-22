@@ -26,6 +26,11 @@
             <p style="color: var(--text-secondary); margin-bottom: 3rem;">You must score at least 7/10 to unlock the
                 NUC7 Networking course. The questions are pulled from our secure vault.</p>
             <button onclick="startQuiz()" class="cta-btn" id="start-btn">Initialize Connection</button>
+            <div style="margin-top: 1.5rem;">
+                <button onclick="skipQuiz()" id="skip-btn" class="outline-btn"
+                    style="padding: 0.6rem 2rem; font-size: 0.9rem; color: #888; border-color: rgba(255,255,255,0.1);">Skip
+                    Assessment & Start Course Directly</button>
+            </div>
         </div>
 
         <div id="quiz-run" style="display: none;">
@@ -157,6 +162,28 @@
             } catch (err) {
                 alert('Token Generation Failed.');
                 btn.disabled = false;
+            }
+        }
+
+        async function skipQuiz() {
+            const btn = document.getElementById('skip-btn');
+            const email = new URLSearchParams(window.location.search).get('email') || 'candidate@nuc7.dev';
+            btn.disabled = true;
+            btn.textContent = 'Generating Access Token...';
+
+            try {
+                const courseId = new URLSearchParams(window.location.search).get('course') || 'osi-model';
+                const res = await fetch(`${BRIDGE_URL}/get-token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, score: 0, courseId, skip: true })
+                });
+                const { token } = await res.json();
+                location.href = `course.html?id=${courseId}&token=${token}&email=${encodeURIComponent(email)}`;
+            } catch (err) {
+                alert('Token Generation Failed.');
+                btn.disabled = false;
+                btn.textContent = 'Skip Assessment & Start Course Directly';
             }
         }
     </script>

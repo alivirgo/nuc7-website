@@ -246,11 +246,11 @@ export default {
                 return new Response(JSON.stringify({ success: true, message: 'Registry complete. Check email.' }), { headers: corsHeaders });
             }
 
-            // 3.5 GET PRODUCTION TOKEN (After Quiz Success)
+            // 3.5 GET PRODUCTION TOKEN (After Quiz Success or Skip)
             if (path === '/get-token' && request.method === 'POST') {
-                const { email, score, courseId } = await request.json();
+                const { email, score = 0, courseId, skip } = await request.json();
 
-                if (score < 7) {
+                if (!skip && score < 7) {
                     return new Response(JSON.stringify({ error: 'Score too low.' }), { status: 403, headers: corsHeaders });
                 }
 

@@ -9,8 +9,6 @@
     }
   ],
   "vars": {
-    "SENDGRID_API_KEY": "INSERT_KEY_HERE_OR_USE_DASHBOARD",
-    "AUTH_SECRET": "INSERT_SECRET_HERE_OR_USE_DASHBOARD",
     "FRONTEND_URL": "https://nuc7.com"
   },
   "observability": {
