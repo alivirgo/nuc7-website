@@ -4,209 +4,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NUC7 | Admin Dashboard</title>
+    <title>NUC7 | Analytics Vault</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&display=swap" rel="stylesheet">
-    <style>
-        .admin-page {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            min-height: 100vh;
-            padding-top: 100px;
-        }
-
-        .admin-container {
-            width: 100%;
-            max-width: 1200px;
-            padding: 0 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-            width: 100%;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            padding: 2.5rem;
-            border-radius: 20px;
-            border: 1px solid hsla(0, 0%, 100%, 0.1);
-            text-align: center;
-        }
-
-        .stat-card .value {
-            font-size: 3rem;
-            font-weight: 600;
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-card .label {
-            font-size: 0.8rem;
-            color: hsla(0, 0%, 100%, 0.5);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .visitor-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--card-bg);
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid hsla(0, 0%, 100%, 0.1);
-            margin-top: 2rem;
-        }
-
-        .visitor-table th,
-        .visitor-table td {
-            padding: 1.2rem;
-            text-align: left;
-            border-bottom: 1px solid hsla(0, 0%, 100%, 0.05);
-        }
-
-        .visitor-table th {
-            background: rgba(255, 255, 255, 0.05);
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: hsla(0, 0%, 100%, 0.5);
-        }
-
-        .visitor-table td {
-            font-size: 0.9rem;
-        }
-
-        .live-pulse {
-            width: 8px;
-            height: 8px;
-            background: #44ff44;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-            box-shadow: 0 0 10px #44ff44;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.3;
-            }
-
-            100% {
-                opacity: 1;
-            }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body style="padding-top: 100px;">
     <nav class="navbar">
-        <div class="nav-container">
+        <div class="container nav-container">
             <span class="nav-logo">NUC7</span>
-            <div class="nav-links"><a href="index.html">Exit Admin</a></div>
+            <div class="nav-links">
+                <a href="index.html">Exit Dashboard</a>
+            </div>
         </div>
     </nav>
 
-    <div id="admin-login" class="admin-page" style="justify-content: center; padding-top: 0;">
-        <div class="auth-card fade-in">
-            <button onclick="location.href='index.html'" class="close-btn" title="Cancel">&times;</button>
-            <h2>Admin Login</h2>
-            <p>Accessing real-time production analytics</p>
-            <form id="admin-form">
-                <input type="password" id="admin-pass" placeholder="System Password" required>
-                <button type="submit" class="primary-btn">Unlock Records</button>
+    <div id="login-screen" class="container">
+        <div class="glass-card fade-in" style="max-width: 400px; margin: 0 auto; text-align: center;">
+            <span class="badge">SECURE ACCESS</span>
+            <h2 style="margin-bottom: 2rem;">Unlock Analytics</h2>
+            <form id="login-form">
+                <input type="password" id="admin-pass" placeholder="Vault Password" required>
+                <button type="submit" class="cta-btn" style="width: 100%;">Authorize Access</button>
             </form>
-            <div id="admin-error" class="status-msg" style="color: #ff4444;"></div>
+            <div id="login-err"
+                style="margin-top: 1.5rem; color: #ff4444; font-size: 0.8rem; text-transform: uppercase;"></div>
         </div>
     </div>
 
-    <div id="admin-dashboard" class="admin-page" style="display: none;">
-        <div class="admin-container">
+    <div id="dashboard" class="container" style="display: none;">
+        <div class="fade-in">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4rem;">
+                <h2 style="font-weight: 200;">Production <span style="font-weight: 600;">Intelligence</span></h2>
+                <button onclick="location.reload()" class="outline-btn" style="padding: 0.6rem 1.5rem;">Logout</button>
+            </div>
+
             <div
-                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4rem; width: 100%;">
-                <h1 style="font-weight: 300;"><span class="live-pulse"></span>NUC7 Live Analytics</h1>
-                <button onclick="location.reload()" class="primary-btn" style="min-width: 120px;">Logout</button>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <span class="value" id="stat-active">--</span>
-                    <span class="label">Live Sessions</span>
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 5rem;">
+                <div class="glass-card" style="padding: 2rem; text-align: center;">
+                    <span id="stat-active" style="font-size: 3rem; font-weight: 200; display: block;">--</span>
+                    <span class="badge" style="margin-bottom: 0;">Live Users</span>
                 </div>
-                <div class="stat-card">
-                    <span class="value" id="stat-views">--</span>
-                    <span class="label">Total Page Views</span>
+                <div class="glass-card" style="padding: 2rem; text-align: center;">
+                    <span id="stat-views" style="font-size: 3rem; font-weight: 200; display: block;">--</span>
+                    <span class="badge" style="margin-bottom: 0;">Total Hits</span>
                 </div>
-                <div class="stat-card">
-                    <span class="value" id="stat-reg">--</span>
-                    <span class="label">Total Registrations</span>
+                <div class="glass-card" style="padding: 2rem; text-align: center;">
+                    <span id="stat-reg" style="font-size: 3rem; font-weight: 200; display: block;">--</span>
+                    <span class="badge" style="margin-bottom: 0;">Registrations</span>
                 </div>
             </div>
 
-            <h3
-                style="margin-top: 4rem; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; color: hsla(0,0%,100%,0.5); width: 100%; text-align: left;">
-                Real-Time Visitor Log</h3>
-            <table class="visitor-table">
-                <thead>
-                    <tr>
-                        <th>Time (UTC)</th>
-                        <th>Path</th>
-                        <th>Source</th>
-                        <th>System</th>
-                    </tr>
-                </thead>
-                <tbody id="visitor-log">
-                    <tr>
-                        <td colspan="4" style="text-align: center; padding: 4rem; opacity: 0.5;">Establishing data
-                            link...</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="glass-card" style="padding: 0; overflow: hidden;">
+                <div
+                    style="padding: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02);">
+                    <h3 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">Real-Time Visitor Log
+                    </h3>
+                </div>
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+                    <thead>
+                        <tr style="background: rgba(255,255,255,0.05);">
+                            <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">TIME (UTC)</th>
+                            <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">PATH</th>
+                            <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">REFERRER</th>
+                            <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">AGENT</th>
+                        </tr>
+                    </thead>
+                    <tbody id="v-log">
+                        <tr>
+                            <td colspan="4" style="padding: 4rem; text-align: center; opacity: 0.3;">Establishing Vault
+                                Connection...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <script>
-        // CONFIGURATION: Set this to your actual Cloudflare Worker URL
-        const BRIDGE_URL = 'https://nuc7-auth-bridge.alivirgo.workers.dev';
-
-        const adminForm = document.getElementById('admin-form');
-        const adminError = document.getElementById('admin-error');
-        const adminLogin = document.getElementById('admin-login');
-        const adminDash = document.getElementById('admin-dashboard');
+        const BRIDGE_URL = 'https://nuc7-auth-bridge.alivirgo123.workers.dev';
+        const loginForm = document.getElementById('login-form');
+        const loginErr = document.getElementById('login-err');
+        const dash = document.getElementById('dashboard');
+        const loginScreen = document.getElementById('login-screen');
 
         let savedPass = '';
 
-        adminForm.addEventListener('submit', async (e) => {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             savedPass = document.getElementById('admin-pass').value;
-            await syncStats();
+            await sync();
         });
 
-        async function syncStats() {
+        async function sync() {
             try {
-                // 1. Check basic connectivity (Health Check)
-                const ping = await fetch(`${BRIDGE_URL}/ping`).catch(() => null);
-                if (!ping) {
-                    adminError.textContent = `Bridge Unreachable: Please verify the URL: ${BRIDGE_URL}`;
-                    return;
-                }
-
-                // 2. Fetch actual stats
                 const res = await fetch(`${BRIDGE_URL}/stats`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -215,32 +108,29 @@
 
                 if (res.ok) {
                     const data = await res.json();
-                    adminLogin.style.display = 'none';
-                    adminDash.style.display = 'flex';
-                    adminError.textContent = '';
+                    loginScreen.style.display = 'none';
+                    dash.style.display = 'block';
 
                     document.getElementById('stat-active').textContent = data.activeUsers || 0;
                     document.getElementById('stat-views').textContent = data.pageViews || 0;
                     document.getElementById('stat-reg').textContent = data.totalRegistrations || 0;
 
-                    const tbody = document.getElementById('visitor-log');
-                    tbody.innerHTML = data.hits.map(hit => `
+                    const tbody = document.getElementById('v-log');
+                    tbody.innerHTML = data.hits.map(h => `
                         <tr>
-                            <td>${new Date(hit.timestamp).toLocaleTimeString()}</td>
-                            <td><code>${hit.path}</code></td>
-                            <td>${hit.referrer}</td>
-                            <td>${hit.userAgent ? hit.userAgent.split(')')[0] + ')' : 'Browser'}</td>
+                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05);">${new Date(h.timestamp).toLocaleTimeString()}</td>
+                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: #fff;"><code>${h.path}</code></td>
+                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary);">${h.referrer}</td>
+                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary);">${h.userAgent ? h.userAgent.split(')')[0] + ')' : 'Auto'}</td>
                         </tr>
-                    `).join('') || '<tr><td colspan="4" style="text-align: center;">No activity recorded in Cloudflare KV.</td></tr>';
+                    `).join('') || '<tr><td colspan="4" style="padding: 4rem; text-align: center;">No activity recorded.</td></tr>';
 
-                    setTimeout(syncStats, 10000);
+                    setTimeout(sync, 15000);
                 } else {
-                    const err = await res.json().catch(() => ({ error: 'Unauthorized' }));
-                    adminError.textContent = `Server Error: ${err.error || 'Access Denied'}`;
+                    loginErr.textContent = 'Unauthorized: Access Denied';
                 }
-            } catch (e) {
-                adminError.textContent = 'Connection Error: Check browser console (F12).';
-                console.error('NUC7 Bridge Diagnostics:', e);
+            } catch (err) {
+                loginErr.textContent = 'Connection Refused by Bridge';
             }
         }
     </script>

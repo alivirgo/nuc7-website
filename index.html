@@ -4,136 +4,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NUC7 | Networking Ultimate Course - Master the OSI Model</title>
-    <meta name="description"
-        content="Unlock the secrets of computer networking with NUC7. A comprehensive 7-chapter course focusing on the 7 layers of the OSI model. Pass the quiz to qualify.">
-    <meta name="keywords"
-        content="Networking Course, OSI Model, Computer Networking, Network Engineering, 7 Layers of OSI, NUC7, TCP/IP, Network Security">
+    <title>NUC7 | The Ultimate Networking Odyssey</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <nav class="navbar">
-        <div class="nav-container">
+        <div class="container nav-container">
             <span class="nav-logo">NUC7</span>
             <div class="nav-links">
-                <a href="#about">About</a>
-                <a href="#curriculum">Curriculum</a>
-                <a href="#register">Start Course</a>
-                <a href="admin.html" class="admin-entry">Admin</a>
+                <a href="#about">Philosophy</a>
+                <a href="#register">Access</a>
+                <a href="admin.html" style="opacity: 0.1;">.</a>
             </div>
         </div>
     </nav>
 
     <header class="hero">
+        <div class="hero-glow"></div>
         <div class="container fade-in">
+            <span class="badge">Version 2.0 | Secure Odyssey</span>
             <h1 class="logo-large">NUC7</h1>
-            <h2>The Ultimate Networking Odyssey</h2>
-            <p class="hero-sub">Demystifying the 7 Layers of the OSI Model. Built for the next generation of Network
-                Engineers.</p>
-            <div style="display: flex; justify-content: center; width: 100%;">
-                <a href="#register" class="cta-btn">Begin Qualification Quiz</a>
+            <h2 style="font-weight: 200; font-size: 1.5rem; color: var(--text-secondary);">Master the 7 Layers of the
+                OSI Model</h2>
+            <div style="margin-top: 3rem; display: flex; gap: 1.5rem; justify-content: center;">
+                <a href="#register" class="cta-btn">Begin Qualification</a>
+                <a href="#about" class="outline-btn">Learn More</a>
             </div>
         </div>
-        <div class="hero-glow"></div>
     </header>
 
-    <main class="content-wrapper">
+    <main>
         <section id="about" class="section">
             <div class="container">
-                <div class="section-header">
-                    <span class="badge">NUC7 Philosophy</span>
-                    <h3>Beyond the Bits and Bytes</h3>
-                </div>
-                <div class="text-block">
-                    <p>Welcome to NUC7, where we transform complex networking theories into intuitive mastery. In an era
-                        dominated by cloud computing and decentralized networks, understanding the <strong>OSI
-                            Model</strong> (Open Systems Interconnection) is no longer a luxury—it's the fundamental
-                        language of the digital world.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="curriculum" class="dark-section section">
-            <div class="container">
-                <div class="section-header">
-                    <span class="badge">The Roadmap</span>
-                    <h3>The 7-Layer Mastery</h3>
-                </div>
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <h4>Layer 1: Physical</h4>
-                        <p>The foundation of all communication. From copper cables to fiber optics and radio waves.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>Layer 2: Data Link</h4>
-                        <p>MAC addresses, frames, and the logic of local network hops.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>Layer 3: Network</h4>
-                        <p>The art of routing. Understanding IP addresses and global interconnectivity.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>Layer 4: Transport</h4>
-                        <p>TCP vs UDP. Ensuring your data arrives intact, in order, and reliably.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h4>Layer 5-7: High-Level</h4>
-                        <p>Session management, data representation, and application interfaces.</p>
-                    </div>
+                <div class="glass-card fade-in" style="max-width: 800px; margin: 0 auto; text-align: left;">
+                    <h3 style="font-size: 2rem; margin-bottom: 2rem;">Beyond the Surface</h3>
+                    <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">NUC7 is not just a course; it is a
+                        fundamental shift in how you perceive digital communication. We strip away the complexity to
+                        reveal the architectural elegance of the OSI model.</p>
+                    <p style="color: var(--text-secondary);">From the physical pulse of a bit to the abstract logic of
+                        an application, NUC7 guides you through the labyrinth of networking with precision and clarity.
+                    </p>
                 </div>
             </div>
         </section>
 
         <section id="register" class="section">
             <div class="container">
-                <div class="auth-card">
-                    <h3>Apply for Qualification</h3>
-                    <p>NUC7 is an elite platform. Registration is required to receive your personalized assessment link.
-                    </p>
-                    <form id="registration-form">
-                        <input type="email" id="user-email" placeholder="student@example.com" required>
-                        <button type="submit" class="primary-btn" id="reg-submit">Register for Assessment</button>
+                <div class="glass-card fade-in" style="max-width: 500px; margin: 0 auto;">
+                    <h3 style="margin-bottom: 1rem;">Entry Qualification</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.9rem;">Submit your email
+                        to receive your unique assessment link. Qualification is required for course access.</p>
+                    <form id="reg-form">
+                        <input type="email" id="user-email" placeholder="email@address.com" required>
+                        <button type="submit" class="cta-btn" style="width: 100%;" id="reg-btn">Request
+                            Assessment</button>
                     </form>
-                    <div id="status-msg" class="status-msg"></div>
+                    <div id="status-msg"
+                        style="margin-top: 1.5rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="footer">
+    <footer class="section" style="padding: 5rem 0; border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
         <div class="container">
-            <p>&copy; 2026 NUC7 - Networking Ultimate Course. All Rights Reserved.</p>
-            <p class="seo-text">Specializing in OSI Model Training and Digital Infrastructure Education.</p>
+            <p style="color: var(--text-secondary); font-size: 0.8rem; letter-spacing: 1px;">&copy; 2026 NUC7
+                ARCHITECTURE. ALL RIGHTS RESERVED.</p>
         </div>
     </footer>
 
     <script>
-        // CONFIGURATION: Set this to your actual Cloudflare Worker URL
-        const BRIDGE_URL = 'https://nuc7-auth-bridge.alivirgo.workers.dev';
+        // CONFIGURATION: Replace with your Cloudflare Worker URL
+        const BRIDGE_URL = 'https://nuc7-auth-bridge.alivirgo123.workers.dev';
 
-        // Production tracking
+        // Secure Tracking
         async function trackVisitor() {
-            const data = { path: window.location.pathname, referrer: document.referrer, userAgent: navigator.userAgent };
+            const data = {
+                path: window.location.pathname,
+                referrer: document.referrer || 'Direct',
+                userAgent: navigator.userAgent
+            };
             fetch(`${BRIDGE_URL}/track`, {
-                method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+                method: 'POST',
+                mode: 'cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
             }).catch(() => { });
         }
         trackVisitor();
 
-        const regForm = document.getElementById('registration-form');
-        const statusMsg = document.getElementById('status-msg');
-        const regSubmit = document.getElementById('reg-submit');
+        // Registration Flow
+        const regForm = document.getElementById('reg-form');
+        const status = document.getElementById('status-msg');
+        const btn = document.getElementById('reg-btn');
 
         regForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('user-email').value;
-            regSubmit.disabled = true;
-            statusMsg.textContent = 'Contacting NUC7 Registry...';
-            statusMsg.style.color = 'white';
+
+            btn.disabled = true;
+            btn.textContent = 'Contacting Vault...';
+            status.textContent = '';
 
             try {
                 const res = await fetch(`${BRIDGE_URL}/send-registration`, {
@@ -144,26 +120,26 @@
                 });
 
                 if (res.ok) {
-                    statusMsg.textContent = 'Assessment link sent! Please check your inbox.';
-                    statusMsg.style.color = '#44ff44';
+                    status.style.color = '#44ff44';
+                    status.textContent = 'Assessment link dispatched to your inbox.';
                     regForm.style.display = 'none';
 
-                    // Production redirect simulated for user convenience
-                    const nextBtn = document.createElement('a');
-                    nextBtn.href = 'quiz.html?email=' + encodeURIComponent(email);
-                    nextBtn.className = 'cta-btn';
-                    nextBtn.style.marginTop = '2rem';
-                    nextBtn.textContent = 'Proceed to Test (Inbox Redirect)';
-                    statusMsg.parentNode.appendChild(nextBtn);
+                    // Demo skip for user convenience
+                    const skip = document.createElement('a');
+                    skip.href = `quiz.html?email=${encodeURIComponent(email)}`;
+                    skip.className = 'outline-btn';
+                    skip.style.display = 'block';
+                    skip.style.marginTop = '2rem';
+                    skip.textContent = 'Manual Redirect (Dev Mode)';
+                    regForm.parentNode.appendChild(skip);
                 } else {
-                    statusMsg.textContent = 'System error. Please try again later.';
-                    statusMsg.style.color = '#ff4444';
-                    regSubmit.disabled = false;
+                    throw new Error();
                 }
-            } catch (e) {
-                statusMsg.textContent = 'Registry connection lost.';
-                statusMsg.style.color = '#ff4444';
-                regSubmit.disabled = false;
+            } catch (err) {
+                status.style.color = '#ff4444';
+                status.textContent = 'Vault connection failed. Try again later.';
+                btn.disabled = false;
+                btn.textContent = 'Request Assessment';
             }
         });
     </script>

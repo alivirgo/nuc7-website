@@ -4,252 +4,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NUC7 | Qualification Quiz</title>
+    <title>NUC7 | Qualification Assessment</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&display=swap" rel="stylesheet">
-    <style>
-        .quiz-container {
-            width: 100%;
-            max-width: 600px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 80vh;
-        }
-
-        .question-card {
-            background: var(--card-bg);
-            padding: 3rem 2rem;
-            border-radius: 20px;
-            border: 1px solid hsla(0, 0%, 100%, 0.1);
-            width: 100%;
-            display: none;
-            text-align: center;
-            position: relative;
-        }
-
-        .question-card.active {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-top: 2rem;
-            width: 100%;
-        }
-
-        .option-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid hsla(0, 0%, 100%, 0.1);
-            padding: 1.2rem;
-            border-radius: 12px;
-            color: white;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-            font-size: 1rem;
-            width: 100%;
-        }
-
-        .option-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: hsla(0, 0%, 100%, 0.3);
-        }
-
-        .option-btn.selected {
-            background: white;
-            color: black;
-            font-weight: 600;
-        }
-
-        .progress-bar {
-            width: 100%;
-            max-width: 600px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            margin-bottom: 3rem;
-            overflow: hidden;
-            position: sticky;
-            top: 80px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: white;
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .quiz-footer {
-            width: 100%;
-            max-width: 600px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 2rem;
-            padding: 0 1rem;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body style="padding-top: 100px;">
     <nav class="navbar">
-        <div class="nav-container">
+        <div class="container nav-container">
             <span class="nav-logo">NUC7</span>
-            <div class="nav-links">
-                <a href="index.html">Home</a>
-                <button onclick="location.href='index.html'" class="close-btn" title="Exit Quiz">&times;</button>
-            </div>
+            <div class="nav-links"><a href="index.html">Exit Quiz</a></div>
         </div>
     </nav>
 
-    <div class="quiz-container">
-        <div class="progress-bar">
-            <div id="progress" class="progress-fill"></div>
+    <div class="container" style="max-width: 700px;">
+        <div id="quiz-pre" class="glass-card fade-in" style="text-align: center;">
+            <span class="badge">SECURE CHALLENGE</span>
+            <h2 style="margin-bottom: 2rem;">Qualification Assessment</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 3rem;">You must score at least 7/10 to unlock the
+                NUC7 Networking course. The questions are pulled from our secure vault.</p>
+            <button onclick="startQuiz()" class="cta-btn" id="start-btn">Initialize Connection</button>
         </div>
 
-        <div id="quiz-content" style="width: 100%;">
-            <div class="status-msg">Fetching your networking challenge...</div>
+        <div id="quiz-run" style="display: none;">
+            <div
+                style="height: 4px; background: rgba(255,255,255,0.05); margin-bottom: 3rem; border-radius: 2px; overflow: hidden;">
+                <div id="progress" style="height: 100%; background: #fff; width: 0%; transition: width 0.3s ease;">
+                </div>
+            </div>
+            <div id="q-card" class="glass-card fade-in">
+                <!-- Q content here -->
+            </div>
+            <div
+                style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center; padding: 0 1rem;">
+                <span id="q-count"
+                    style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary);">Question
+                    1 of 10</span>
+                <button id="next-btn" class="cta-btn" style="padding: 0.6rem 2rem;" disabled>Next</button>
+            </div>
         </div>
 
-        <div class="quiz-footer" id="quiz-footer" style="display: none;">
-            <span id="question-count">Question 1 of 10</span>
-            <button id="next-btn" class="primary-btn" style="min-width: 120px; padding: 0.8rem 1.5rem;"
-                disabled>Next</button>
+        <div id="quiz-end" class="glass-card fade-in" style="display: none; text-align: center;">
+            <!-- Result here -->
         </div>
     </div>
 
     <script>
-        // CONFIGURATION: Set this to your actual Cloudflare Worker URL
-        const BRIDGE_URL = 'https://nuc7-auth-bridge.alivirgo.workers.dev';
-
-        async function trackVisitor() {
-            const data = { path: window.location.pathname, referrer: document.referrer || 'Direct', timestamp: new Date().toISOString() };
-            fetch(`${BRIDGE_URL}/track`, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).catch(e => { });
-        }
-        trackVisitor();
-
+        const BRIDGE_URL = 'https://nuc7-auth-bridge.alivirgo123.workers.dev';
         let questions = [];
-        let currentStep = 0;
-        let selectedAnswers = [];
+        let cur = 0;
+        let selected = null;
+        let score = 0;
 
-        async function initQuiz() {
+        async function startQuiz() {
+            const btn = document.getElementById('start-btn');
+            btn.disabled = true;
+            btn.textContent = 'Syncing Vault...';
+
             try {
-                // In production, fetch from bridge
                 const res = await fetch(`${BRIDGE_URL}/get-questions`);
                 questions = await res.json();
-                document.getElementById('quiz-footer').style.display = 'flex';
-                renderQuestion();
-            } catch (e) {
-                // Fallback for demo/dev if bridge is down
-                questions = [
-                    { question: "What is the unit of data at the Physical layer?", options: ["Bits", "Frames", "Packets", "Segments"], answer: 0 },
-                    { question: "Which layer handles MAC addresses?", options: ["Physical", "Data Link", "Network", "Transport"], answer: 1 },
-                    { question: "At which layer does IP operate?", options: ["Layer 1", "Layer 2", "Layer 3", "Layer 4"], answer: 2 },
-                    { question: "Which protocol is connection-oriented?", options: ["UDP", "ICMP", "TCP", "DNS"], answer: 2 },
-                    { question: "Port 80 is used by which service?", options: ["FTP", "SSH", "HTTP", "HTTPS"], answer: 2 },
-                    { question: "What does the 'A' in ARP stand for?", options: ["Address", "Access", "Application", "Analysis"], answer: 0 },
-                    { question: "Which layer is responsible for encryption?", options: ["Application", "Presentation", "Session", "Transport"], answer: 1 },
-                    { question: "A Hub operates at which layer?", options: ["Physical", "Data Link", "Network", "Transport"], answer: 0 },
-                    { question: "What is the max value of an IPv4 octet?", options: ["128", "255", "256", "512"], answer: 1 },
-                    { question: "Which layer manages dialog control?", options: ["Session", "Presentation", "Transport", "Network"], answer: 0 }
-                ];
-                document.getElementById('quiz-footer').style.display = 'flex';
-                renderQuestion();
+                document.getElementById('quiz-pre').style.display = 'none';
+                document.getElementById('quiz-run').style.display = 'block';
+                render();
+            } catch (err) {
+                alert('Vault Synchronization Failed. Check Bridge Status.');
+                btn.disabled = false;
+                btn.textContent = 'Retry Connection';
             }
         }
 
-        function renderQuestion() {
-            const q = questions[currentStep];
-            const content = document.getElementById('quiz-content');
-            content.innerHTML = `
-                <div class="question-card active">
-                    <h3>${q.question}</h3>
-                    <div class="options">
-                        ${q.options.map((opt, i) => `
-                            <button class="option-btn ${selectedAnswers[currentStep] === i ? 'selected' : ''}" onclick="selectOption(${i})">${opt}</button>
-                        `).join('')}
-                    </div>
+        function render() {
+            const q = questions[cur];
+            const card = document.getElementById('q-card');
+            card.innerHTML = `
+                <h3 style="font-weight: 200; margin-bottom: 3rem; font-size: 1.5rem;">${q.question}</h3>
+                <div style="display: grid; gap: 1rem;">
+                    ${q.options.map((o, i) => `
+                        <button class="outline-btn" style="text-align: left; padding: 1.2rem; font-weight: 400; font-size: 0.95rem; display: block; width: 100%;" onclick="select(${i}, this)">${o}</button>
+                    `).join('')}
                 </div>
             `;
-            document.getElementById('question-count').textContent = `Question ${currentStep + 1} of 10`;
-            document.getElementById('progress').style.width = `${(currentStep + 1) * 10}%`;
-            document.getElementById('next-btn').disabled = selectedAnswers[currentStep] === undefined;
+            document.getElementById('q-count').textContent = `Question ${cur + 1} of ${questions.length}`;
+            document.getElementById('progress').style.width = `${((cur + 1) / questions.length) * 100}%`;
+            document.getElementById('next-btn').disabled = true;
+            selected = null;
         }
 
-        window.selectOption = (index) => {
-            selectedAnswers[currentStep] = index;
-            renderQuestion();
+        window.select = (idx, el) => {
+            selected = idx;
+            document.querySelectorAll('#q-card button').forEach(b => {
+                b.style.background = 'transparent';
+                b.style.color = '#fff';
+            });
+            el.style.background = '#fff';
+            el.style.color = '#000';
             document.getElementById('next-btn').disabled = false;
         };
 
         document.getElementById('next-btn').addEventListener('click', () => {
-            if (currentStep < 9) {
-                currentStep++;
-                renderQuestion();
+            if (selected === questions[cur].answer) score++;
+
+            if (cur < questions.length - 1) {
+                cur++;
+                render();
             } else {
-                finishQuiz();
+                finish();
             }
         });
 
-        async function finishQuiz() {
-            let score = 0;
-            selectedAnswers.forEach((ans, i) => { if (ans === questions[i].answer) score++; });
-
-            const content = document.getElementById('quiz-content');
-            document.getElementById('quiz-footer').style.display = 'none';
-            document.getElementById('progress').parentElement.style.display = 'none';
+        async function finish() {
+            document.getElementById('quiz-run').style.display = 'none';
+            const end = document.getElementById('quiz-end');
+            end.style.display = 'block';
 
             if (score >= 7) {
-                // Request production token for email
-                const email = new URLSearchParams(window.location.search).get('email') || 'user@example.com';
-                const tokenRes = await fetch(`${BRIDGE_URL}/get-token`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, score })
-                });
-                const { token } = await tokenRes.json();
-
-                content.innerHTML = `
-                    <div class="auth-card fade-in">
-                        <h2 style="color: #44ff44; margin-bottom: 1rem;">Course Qualified</h2>
-                        <p>Excellent work. You scored ${score}/10. Your personalized access token has been generated.</p>
-                        <a href="course.html?token=${token}" class="primary-btn" style="text-decoration: none;">Unlock Full Course</a>
-                    </div>
+                const email = new URLSearchParams(window.location.search).get('email') || 'candidate@nuc7.dev';
+                end.innerHTML = `
+                    <span class="badge" style="background: rgba(68, 255, 68, 0.1); border-color: rgba(68, 255, 68, 0.2); color: #44ff44;">Qualified</span>
+                    <h2 style="margin-bottom: 2rem;">Assessment Success</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 3rem;">Congratulations. You scored ${score}/${questions.length}. Proceed to the secure course portal.</p>
+                    <button id="unlock-btn" class="cta-btn" onclick="unlock()">Unlock Course Portal</button>
                 `;
             } else {
-                content.innerHTML = `
-                    <div class="auth-card fade-in">
-                        <h2 style="color: #ff4444; margin-bottom: 1rem;">Access Denied</h2>
-                        <p>Score: ${score}/10. A minimum of 7/10 is required for NUC7 qualification. Please review the fundamentals and try again.</p>
-                        <button onclick="location.reload()" class="primary-btn">Retry Assessment</button>
-                    </div>
+                end.innerHTML = `
+                    <span class="badge" style="background: rgba(255, 68, 68, 0.1); border-color: rgba(255, 68, 68, 0.2); color: #ff4444;">Denied</span>
+                    <h2 style="margin-bottom: 2rem;">Assessment Failure</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 3rem;">Score: ${score}/${questions.length}. A minimum of 7/10 is required for NUC7 selection. Review the layers and try again.</p>
+                    <button onclick="location.reload()" class="cta-btn">Retry Assessment</button>
                 `;
             }
         }
 
-        initQuiz();
+        async function unlock() {
+            const btn = document.getElementById('unlock-btn');
+            const email = new URLSearchParams(window.location.search).get('email') || 'candidate@nuc7.dev';
+            btn.disabled = true;
+            btn.textContent = 'Generating Access Token...';
+
+            try {
+                const res = await fetch(`${BRIDGE_URL}/get-token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, score })
+                });
+                const { token } = await res.json();
+                location.href = `course.html?token=${token}`;
+            } catch (err) {
+                alert('Token Generation Failed.');
+                btn.disabled = false;
+            }
+        }
     </script>
 </body>
 

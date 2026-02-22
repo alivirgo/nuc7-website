@@ -4,230 +4,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NUC7 | Networking Ultimate Course</title>
+    <title>NUC7 | Networking Mastery</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&display=swap" rel="stylesheet">
     <style>
-        .course-layout {
-            display: flex;
-            width: 100%;
-            max-width: 1400px;
-            min-height: 90vh;
-            margin-top: 60px;
-        }
-
-        .sidebar {
+        .course-nav {
             width: 300px;
-            background: rgba(5, 5, 5, 0.5);
-            backdrop-filter: blur(10px);
-            border-right: 1px solid hsla(0, 0%, 100%, 0.1);
-            padding: 2rem;
+            height: calc(100vh - 80px);
             position: sticky;
-            top: 60px;
-            height: calc(100vh - 60px);
-            overflow-y: auto;
+            top: 80px;
+            padding: 2rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(5, 5, 5, 0.3);
+            backdrop-filter: blur(20px);
         }
 
-        .course-main {
-            flex: 1;
-            padding: 4rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .chapter-list {
-            list-style: none;
-            margin-top: 2rem;
-            width: 100%;
-        }
-
-        .chapter-item {
+        .ch-item {
             padding: 1rem;
             cursor: pointer;
             border-radius: 12px;
-            transition: all 0.2s;
-            color: hsla(0, 0%, 100%, 0.5);
-            font-size: 0.95rem;
+            color: var(--text-secondary);
             margin-bottom: 0.5rem;
-            text-align: left;
+            transition: var(--transition);
         }
 
-        .chapter-item:hover,
-        .chapter-item.active {
+        .ch-item:hover,
+        .ch-item.active {
             background: rgba(255, 255, 255, 0.05);
-            color: white;
+            color: #fff;
         }
 
-        .chapter-content {
-            display: none;
-            width: 100%;
-            max-width: 800px;
-            text-align: left;
-        }
-
-        .chapter-content.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .chapter-content h1 {
-            font-size: 3rem;
-            font-weight: 300;
-            margin-bottom: 2rem;
-        }
-
-        .chapter-content h2 {
-            font-size: 1.5rem;
-            margin: 2rem 0 1rem;
-            color: hsla(0, 0%, 100%, 0.8);
-        }
-
-        .chapter-content p {
-            font-size: 1.1rem;
-            color: hsla(0, 0%, 100%, 0.6);
-            margin-bottom: 1.5rem;
-            line-height: 1.8;
-        }
-
-        @media (max-width: 1024px) {
-            .course-layout {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                top: 0;
-            }
-
-            .course-main {
-                padding: 2rem;
-            }
+        .content-area {
+            flex: 1;
+            padding: 5rem;
+            max-width: 900px;
         }
     </style>
 </head>
 
-<body>
+<body style="padding-top: 80px;">
     <nav class="navbar">
-        <div class="nav-container">
+        <div class="container nav-container">
             <span class="nav-logo">NUC7</span>
-            <div class="nav-links">
-                <a href="index.html">Exit Course</a>
-            </div>
+            <div class="nav-links"><a href="index.html">Log Out</a></div>
         </div>
     </nav>
 
-    <div class="course-layout">
-        <aside class="sidebar">
-            <div class="badge">Course Progress: 0%</div>
-            <ul class="chapter-list">
-                <li class="chapter-item active" onclick="showChapter(1)">01. The Physical Layer</li>
-                <li class="chapter-item" onclick="showChapter(2)">02. The Data Link Layer</li>
-                <li class="chapter-item" onclick="showChapter(3)">03. The Network Layer</li>
-                <li class="chapter-item" onclick="showChapter(4)">04. The Transport Layer</li>
-                <li class="chapter-item" onclick="showChapter(5)">05. The Session Layer</li>
-                <li class="chapter-item" onclick="showChapter(6)">06. The Presentation Layer</li>
-                <li class="chapter-item" onclick="showChapter(7)">07. The Application Layer</li>
-            </ul>
+    <div id="lock-screen" class="container" style="display: none; padding-top: 100px; text-align: center;">
+        <div class="glass-card fade-in" style="max-width: 400px; margin: 0 auto;">
+            <span class="badge" style="color: #ff4444; border-color: #ff4444;">UNAUTHORIZED</span>
+            <h2 style="margin-top: 2rem;">Vault Locked</h2>
+            <p style="color: var(--text-secondary); margin-top: 1rem;">Valid qualification token required to access NUC7
+                curriculum.</p>
+            <a href="index.html" class="cta-btn" style="display: block; margin-top: 2rem;">Acquire License</a>
+        </div>
+    </div>
+
+    <div id="course-portal" class="container" style="display: none; flex-direction: row; align-items: flex-start;">
+        <aside class="course-nav">
+            <span class="badge" style="width: 100%; text-align: center;">CURRICULUM</span>
+            <div id="chapters">
+                <!-- Chapters -->
+            </div>
         </aside>
-
-        <main class="course-main">
-            <!-- Chapter 1 -->
-            <div id="ch-1" class="chapter-content active">
-                <span class="badge">Module 01</span>
-                <h1>Physical Layer</h1>
-                <p>Welcome to the foundation of the OSI model. The Physical Layer is responsible for the actual
-                    electrical, optical, or radio-frequency transmission of raw bits across a physical medium.</p>
-                <h2>Core Concepts</h2>
-                <p>Think of this layer as the "pipes" of the internet. It deals with bit-by-bit delivery and defines the
-                    hardware specifications like cables, cards, and connectors.</p>
-                <div style="display: flex; justify-content: center; margin-top: 4rem;">
-                    <button class="primary-btn" onclick="showChapter(2)">Next Chapter</button>
-                </div>
-            </div>
-
-            <!-- Chapter 2 -->
-            <div id="ch-2" class="chapter-content">
-                <span class="badge">Module 02</span>
-                <h1>Data Link Layer</h1>
-                <p>This layer ensures reliable delivery of data across a single link between two devices. It introduces
-                    the concept of **Frames** and **MAC Addresses**.</p>
-                <h2>Switching and Frames</h2>
-                <p>While the physical layer sees bits, the data link layer sees structured frames with error-checking
-                    mechanisms.</p>
-                <div style="display: flex; justify-content: center; margin-top: 4rem;">
-                    <button class="primary-btn" onclick="showChapter(3)">Next Chapter</button>
-                </div>
-            </div>
-
-            <!-- Chapters 3-7 simplified for brevity, following the same pattern -->
-            <div id="ch-3" class="chapter-content">
-                <span class="badge">Module 03</span>
-                <h1>Network Layer</h1>
-                <p>The Network Layer handles logical addressing (**IP Addresses**) and global routing of packets.</p>
-                <div style="display: flex; justify-content: center; margin-top: 4rem;">
-                    <button class="primary-btn" onclick="showChapter(4)">Next Chapter</button>
-                </div>
-            </div>
-
-            <div id="ch-4" class="chapter-content">
-                <span class="badge">Module 04</span>
-                <h1>Transport Layer</h1>
-                <p>Ensuring end-to-end communication reliability via TCP and high-speed data delivery via UDP.</p>
-                <div style="display: flex; justify-content: center; margin-top: 4rem;">
-                    <button class="primary-btn" onclick="showChapter(5)">Next Chapter</button>
-                </div>
-            </div>
-
-            <div id="ch-5" class="chapter-content">
-                <span class="badge">Module 05</span>
-                <h1>Session Layer</h1>
-                <p>Managing the "conversation" or session between two endpoints.</p>
-                <div style="display: flex; justify-content: center; margin-top: 4rem;">
-                    <button class="primary-btn" onclick="showChapter(6)">Next Chapter</button>
-                </div>
-            </div>
-
-            <div id="ch-6" class="chapter-content">
-                <span class="badge">Module 06</span>
-                <h1>Presentation Layer</h1>
-                <p>Data formatting, encryption, and translation between different systems.</p>
-                <div style="display: flex; justify-content: center; margin-top: 4rem;">
-                    <button class="primary-btn" onclick="showChapter(7)">Next Chapter</button>
-                </div>
-            </div>
-
-            <div id="ch-7" class="chapter-content">
-                <span class="badge">Module 07</span>
-                <h1>Application Layer</h1>
-                <p>The interface where human-computer interaction occurs—HTTP, SMTP, FTP, and more.</p>
-                <div style="display: flex; justify-content: center; margin-top: 4rem;">
-                    <button class="primary-btn" onclick="location.href='index.html'">Complete Course</button>
-                </div>
+        <main class="content-area">
+            <div id="ch-content" class="fade-in">
+                <!-- Content -->
             </div>
         </main>
     </div>
 
     <script>
-        async function trackVisitor() {
-            const data = { path: window.location.pathname, referrer: document.referrer || 'Direct', timestamp: new Date().toISOString() };
-            fetch('https://nuc7-auth-bridge.alivirgo.workers.dev/track', { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).catch(e => { });
+        const layers = [
+            { id: 1, name: "Physical Layer", text: "The foundation. Raw bits over electrical, optical, or radio signals." },
+            { id: 2, name: "Data Link Layer", text: "MAC addresses and frames. The logic of the single hop." },
+            { id: 3, name: "Network Layer", text: "IP Routing. The global interconnectivity of packets." },
+            { id: 4, name: "Transport Layer", text: "TCP/UDP. End-to-end reliability and flow control." },
+            { id: 5, name: "Session Layer", text: "Dialog control. Managing the conversation state." },
+            { id: 6, name: "Presentation Layer", text: "Data translation. Encryption and syntax formatting." },
+            { id: 7, name: "Application Layer", text: "User interaction. HTTP, DNS, and service protocols." }
+        ];
+
+        window.onload = () => {
+            const token = new URLSearchParams(window.location.search).get('token');
+            if (!token) {
+                document.getElementById('lock-screen').style.display = 'block';
+            } else {
+                document.getElementById('course-portal').style.display = 'flex';
+                init();
+            }
+        };
+
+        function init() {
+            const list = document.getElementById('chapters');
+            list.innerHTML = layers.map(l => `
+                <div class="ch-item" id="nav-${l.id}" onclick="show(${l.id})">
+                    <span style="font-weight: 200; font-size: 0.8rem; display: block; opacity: 0.5;">LAYER 0${l.id}</span>
+                    ${l.name}
+                </div>
+            `).join('');
+            show(1);
         }
-        trackVisitor();
 
-        function showChapter(num) {
-            document.querySelectorAll('.chapter-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.chapter-item').forEach(el => el.classList.remove('active'));
+        function show(id) {
+            const l = layers.find(x => x.id === id);
+            document.querySelectorAll('.ch-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`nav-${id}`).classList.add('active');
 
-            document.getElementById('ch-' + num).classList.add('active');
-            document.querySelectorAll('.chapter-item')[num - 1].classList.add('active');
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            document.querySelector('.badge').textContent = `Course Progress: ${Math.round((num / 7) * 100)}%`;
+            const area = document.getElementById('ch-content');
+            area.style.opacity = '0';
+            setTimeout(() => {
+                area.innerHTML = `
+                    <span class="badge">Module 0${l.id}</span>
+                    <h1 style="font-size: 4rem; font-weight: 200; margin-bottom: 2rem;">${l.name}</h1>
+                    <p style="font-size: 1.2rem; color: var(--text-secondary); line-height: 2;">${l.text}</p>
+                    <div style="margin-top: 5rem; padding: 3rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px;">
+                        <h4 style="margin-bottom: 1rem;">Core Deep-Dive</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.95rem;">[Comprehensive curriculum content for ${l.name} will be expanded here based on vault data.]</p>
+                    </div>
+                    <div style="margin-top: 4rem;">
+                        ${id < 7 ? `<button class="cta-btn" onclick="show(${id + 1})">Next Module</button>` : `<button class="outline-btn" onclick="location.href='index.html'">Complete Mastery</button>`}
+                    </div>
+                `;
+                area.style.opacity = '1';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 200);
         }
     </script>
 </body>
