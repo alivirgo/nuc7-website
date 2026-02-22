@@ -443,6 +443,19 @@ export default {
                 return new Response(JSON.stringify({ valid: false, error: 'Certificate Not Found' }), { status: 404, headers: corsHeaders });
             }
 
+            // 7. DIAGNOSTIC: Check environment variables (no secrets exposed)
+            if (path === '/debug-env' && request.method === 'GET') {
+                return new Response(JSON.stringify({
+                    SENDGRID_API_KEY: env.SENDGRID_API_KEY ? `SET (${env.SENDGRID_API_KEY.length} chars, starts with ${env.SENDGRID_API_KEY.substring(0, 5)}...)` : 'NOT SET',
+                    AUTH_SECRET: env.AUTH_SECRET ? 'SET' : 'NOT SET',
+                    GITHUB_PAT: env.GITHUB_PAT ? 'SET' : 'NOT SET',
+                    FRONTEND_URL: env.FRONTEND_URL || 'NOT SET (will use fallback)',
+                    SENDGRID_FROM_EMAIL: env.SENDGRID_FROM_EMAIL || 'NOT SET (will use noreply@nuc7.com)',
+                    KV_BOUND: STATS_KV ? true : false,
+                    workerVersion: 'v3-sendgrid-debug'
+                }, null, 2), { headers: corsHeaders });
+            }
+
             return new Response('NUC7 Bridge: Path Not Found', { status: 404, headers: corsHeaders });
 
         } catch (e) {
