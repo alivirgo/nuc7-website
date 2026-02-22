@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NUC7 | Master The OSI-Model in a simple way</title>
+    <title>NUC7 | Networking Mastery: OSI Module & IP Subnetting</title>
     <meta name="description"
-        content="The 7 Layers of the OSI Model. Learn about the OSI-Model through a simple, interactive course! All the related protocols, services and general OSI Model info in one place.">
+        content="Master the OSI Model and IP Addressing. Learn IPv4, Subnetting, CIDR, and the 7 Layers of Networking through simple, interactive courses with certification.">
     <meta name="keywords"
-        content="OSI Model, osi reference model, 7 osi layer, osi model layers, osi model explained, iso/osi reference model">
+        content="OSI Model, IP Addressing, Subnetting, IPv4 vs IPv6, CIDR Calculator, Networking Basics, CCNA Study Guide, NUC7 Course">
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,6 +20,7 @@
         <div class="container nav-container">
             <span class="nav-logo">NUC7</span>
             <div class="nav-links">
+                <a href="#catalog">Courses</a>
                 <a href="#about">Philosophy</a>
                 <a href="#register">Access</a>
                 <a href="admin.html" style="opacity: 0.1;">.</a>
@@ -30,13 +31,13 @@
     <header class="hero">
         <div class="hero-glow"></div>
         <div class="container fade-in">
-            <span class="badge">Version 2.0 | Secure Odyssey</span>
+            <span class="badge">Version 2.1 | Multi-Course Platform</span>
             <h1 class="logo-large">NUC7</h1>
-            <h2 style="font-weight: 200; font-size: 1.5rem; color: var(--text-secondary);">Master the 7 Layers of the
-                OSI Model</h2>
+            <h2 style="font-weight: 200; font-size: 1.5rem; color: var(--text-secondary);">Architectural Networking
+                Mastery</h2>
             <div style="margin-top: 3rem; display: flex; gap: 1.5rem; justify-content: center;">
-                <a href="#register" class="cta-btn">Begin Qualification</a>
-                <a href="#about" class="outline-btn">Learn More</a>
+                <a href="#catalog" class="cta-btn">View Catalog</a>
+                <a href="#register" class="outline-btn">Enroll Now</a>
             </div>
         </div>
     </header>
@@ -46,80 +47,60 @@
             <div class="container">
                 <div class="glass-card fade-in" style="max-width: 800px; margin: 0 auto; text-align: left;">
                     <h3 style="font-size: 2rem; margin-bottom: 2rem;">Beyond the Surface</h3>
-                    <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">NUC7 is not just a course; it is a
+                    <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">NUC7 is not just a platform; it is a
                         fundamental shift in how you perceive digital communication. We strip away the complexity to
-                        reveal the architectural elegance of the OSI model.</p>
-                    <p style="color: var(--text-secondary);">From the physical pulse of a bit to the abstract logic of
-                        an application, NUC7 guides you through the labyrinth of networking with precision and clarity.
-                    </p>
+                        reveal the architectural elegance of the modern internet.</p>
+                    <p style="color: var(--text-secondary);">Whether mastering the physical pulse of an OSI bit or
+                        dividing global networks with precision subnetting, NUC7 guides you through the labyrinth with
+                        unmatched clarity.</p>
                 </div>
             </div>
         </section>
 
-        <section id="osi-layers" class="section">
+        <section id="catalog" class="section">
             <div class="container">
-                <div class="glass-card fade-in" style="max-width: 800px; margin: 0 auto; text-align: left;">
-                    <h3 style="font-size: 2rem; margin-bottom: 1.5rem;">The 7 Layers of the OSI Model</h3>
-                    <p style="color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6;">Each OSI layer
-                        serves a unique task for network communication. We break down exactly how your data travels from
-                        a physical wire directly to your web browser.</p>
-
-                    <div style="display: grid; gap: 1rem; margin-bottom: 3rem;">
-                        <div
-                            style="padding: 1rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;">
-                            <strong style="color: #f472b6;">Layer 7 - Application Layer:</strong> Top Level APIs,
-                            network services, and process-to-process data (e.g. HTTP, DNS).
+                <h3 style="text-align: center; margin-bottom: 3rem; font-size: 2.5rem; font-weight: 200;">Curriculum
+                    <span style="font-weight: 600;">Catalog</span>
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem;">
+                    <!-- OSI Model Course -->
+                    <div class="glass-card fade-in"
+                        style="display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <span class="badge" style="color: #4a90e2; border-color: #4a90e2;">FUNDAMENTALS</span>
+                            <h4 style="font-size: 1.8rem; margin: 1.5rem 0 1rem;">OSI Model Mastery</h4>
+                            <p style="color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6;">A deep-dive
+                                into the 7-layer architectural framework of communication. From cables to applications.
+                            </p>
+                            <ul
+                                style="color: var(--text-secondary); line-height: 2; margin-bottom: 2rem; padding-left: 1rem;">
+                                <li>The 7-Layer ISO/OSI standard</li>
+                                <li>Encapsulation & Peer Processes</li>
+                                <li>Acronym Mastery & Protocols</li>
+                            </ul>
                         </div>
-                        <div
-                            style="padding: 1rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;">
-                            <strong style="color: #2dd4bf;">Layer 6 - Presentation Layer:</strong> Data conversion,
-                            abstraction, formatting, encryption and decryption.
-                        </div>
-                        <div
-                            style="padding: 1rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;">
-                            <strong style="color: #fbbf24;">Layer 5 - Session Layer:</strong> Opening, closing, and
-                            managing synchronized sessions between apps.
-                        </div>
-                        <div
-                            style="padding: 1rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;">
-                            <strong style="color: #a78bfa;">Layer 4 - Transport Layer:</strong> Reliability, flow
-                            control, port multiplexing, TCP and UDP.
-                        </div>
-                        <div
-                            style="padding: 1rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;">
-                            <strong style="color: #f87171;">Layer 3 - Network Layer:</strong> IP Addressing, packet
-                            forwarding, routing tables, and global paths.
-                        </div>
-                        <div
-                            style="padding: 1rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;">
-                            <strong style="color: #4ade80;">Layer 2 - Data Link Layer:</strong> MAC addressing, framing,
-                            collision checking, and local LAN delivery.
-                        </div>
-                        <div
-                            style="padding: 1rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;">
-                            <strong style="color: #4a90e2;">Layer 1 - Physical Layer:</strong> Raw bit streams (0s and
-                            1s), physical cables, Wi-Fi hardware, and electrical signals.
-                        </div>
+                        <a href="course.html?id=osi-model&dev=true" class="cta-btn" style="text-align: center;">Enter
+                            Course</a>
                     </div>
 
-                    <h4 style="margin-bottom: 1rem; color: #fff;">Learn to Remember: Popular OSI Acronyms</h4>
-                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">If you are studying for your CCNA or
-                        CompTIA, here are the famous acronyms to remember the layers starting from Layer 7 down to Layer
-                        1:</p>
-                    <ul
-                        style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 2rem; padding-left: 1.5rem;">
-                        <li><strong>A</strong>ll <strong>P</strong>eople <strong>S</strong>eem <strong>T</strong>o
-                            <strong>N</strong>eed <strong>D</strong>ata <strong>P</strong>rotection (Layer 1 -> 7)</li>
-                        <li><strong>P</strong>lease <strong>D</strong>o <strong>N</strong>ot <strong>T</strong>hrow
-                            <strong>S</strong>ausage <strong>P</strong>izza <strong>A</strong>way (Layer 7 -> 1)</li>
-                        <li><strong>P</strong>rogrammers <strong>D</strong>are <strong>N</strong>ot
-                            <strong>T</strong>hrow <strong>S</strong>alty <strong>P</strong>retzels
-                            <strong>A</strong>way (Layer 7 -> 1)</li>
-                    </ul>
-
-                    <a href="course.html?dev=true" class="cta-btn"
-                        style="display: block; text-align: center; margin-top: 1rem; width: 100%;">Enter Interactive
-                        Course Now</a>
+                    <!-- IP Addressing Course -->
+                    <div class="glass-card fade-in"
+                        style="display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <span class="badge" style="color: #4ade80; border-color: #4ade80;">ADVANCED</span>
+                            <h4 style="font-size: 1.8rem; margin: 1.5rem 0 1rem;">IP Addressing & Subnetting</h4>
+                            <p style="color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6;">Master the
+                                logic of network segmentation. Learn Binary, CIDR, and the transition to IPv6.</p>
+                            <ul
+                                style="color: var(--text-secondary); line-height: 2; margin-bottom: 2rem; padding-left: 1rem;">
+                                <li>Binary Fundamentals (Base-2)</li>
+                                <li>VLSM & Subnetting Calculator</li>
+                                <li>IPv6 Structure & Hex Logic</li>
+                            </ul>
+                        </div>
+                        <a href="course.html?id=ip-addressing&dev=true" class="cta-btn"
+                            style="text-align: center;">Enter Course</a>
+                    </div>
                 </div>
             </div>
         </section>

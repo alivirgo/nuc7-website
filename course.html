@@ -89,57 +89,45 @@
         </main>
     </div>
 
+    <script src="course_registry.js"></script>
     <script>
-        const layers = [
-            {
-                "id": 1,
-                "name": "Layer 1: The Physical Layer",
-                "text": "The foundation of all communication. It deals with raw bits (0s and 1s) and physical hardware.",
-                "html": "\n      <h3>Welcome to the Physical Layer</h3>\n      <p style=\"color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.8;\">\n        The Physical Layer is the lowest layer of the OSI model, representing the actual physical hardware and transmission technologies of a network. It provides mechanical, electrical, and other functional aids to transmit raw bits across a physical medium.\n      </p>\n      \n      <div style=\"background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border-left: 4px solid #4a90e2;\">\n        <h4 style=\"margin-bottom: 1rem; color: #4a90e2;\">The Main Analogy: The Infrastructure</h4>\n        <p style=\"color: var(--text-secondary); line-height: 1.6;\">\n          Think of the physical layer as the roads, electrical lines, or railroad tracks connecting cities. The shapes of connectors, frequencies to broadcast on, and modulation schemes are specified here. Whether you use a copper cable, fiber-optic light, or electromagnetic waves (wireless), the physical layer makes it happen.\n        </p>\n      </div>\n\n      <h4>Core Services & Functions</h4>\n      <ul style=\"color: var(--text-secondary); font-size: 1.05rem; line-height: 1.8; margin-bottom: 2rem; padding-left: 1.5rem;\">\n        <li><strong>Transmission of Bits:</strong> Bit-by-bit or symbol-by-symbol delivery across wired or wireless paths.</li>\n        <li><strong>Physical Aspects:</strong> Deals with electrical signals, optical signals (laser/fiber), electromagnetic waves, line coding, and bit synchronization.</li>\n        <li><strong>Network Topology:</strong> Defines whether the network is a bus, ring, mesh, or star setup.</li>\n        <li><strong>Hardware Devices:</strong> Includes cables, plugs, repeaters, hubs, network adapters, amplifiers, and transceivers.</li>\n      </ul>\n    "
-            },
-            {
-                "id": 2,
-                "name": "Layer 2: The Data Link Layer",
-                "text": "Giving bits meaning. The Data Link layer organizes data into frames and handles local delivery.",
-                "html": "\n      <h3>Welcome to the Data Link Layer</h3>\n      <p style=\"color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.8;\">\n        The Data Link Layer ensures reliable, largely error-free transmission between adjacent network nodes. It divides raw bits into blocks called <strong>Frames</strong> and handles media access control (MAC).\n      </p>\n\n      <div style=\"background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border-left: 4px solid #4ade80;\">\n        <h4 style=\"margin-bottom: 1rem; color: #4ade80;\">The Main Analogy: The Local Neighborhood Cop</h4>\n        <p style=\"color: var(--text-secondary); line-height: 1.6;\">\n          The Data Link layer acts like a neighborhood traffic cop, arbitrating between parties contending for access to a medium without concern for their ultimate, global destination. It focuses strictly on local delivery within a LAN or WAN segment.\n        </p>\n      </div>\n\n      <h4>Core Services & Functions</h4>\n      <ul style=\"color: var(--text-secondary); font-size: 1.05rem; line-height: 1.8; margin-bottom: 2rem; padding-left: 1.5rem;\">\n        <li><strong>MAC Addressing:</strong> Uses physical addressing to ensure data reaches the correct recipient on the same local network.</li>\n        <li><strong>Framing & Sync:</strong> Encapsulates data into frames, adding checksums for channel coding. If a frame is corrupt, it is detected and dropped.</li>\n        <li><strong>Logical Link & Flow Control:</strong> Dynamically controls sending speeds to prevent overwhelming a receiver and specifies how devices detect and recover from collisions.</li>\n        <li><strong>Hardware & Protocols:</strong> Network Switches (multiport bridges) and Bridges operate here. Common protocols are Ethernet, PPP, and HDLC. It also handles VLANs.</li>\n      </ul>\n    "
-            },
-            {
-                "id": 3,
-                "name": "Layer 3: The Network Layer",
-                "text": "Routing and global reach. The network layer gets your data across the world using IP Addresses.",
-                "html": "\n      <h3>Welcome to the Network Layer</h3>\n      <p style=\"color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.8;\">\n        The Network Layer is responsible for packet forwarding and routing through intermediate routers. It provides cross-network addresses and manages Quality of Service (QoS) to establish global reach between a source and a destination host.\n      </p>\n\n      <div style=\"background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border-left: 4px solid #f87171;\">\n        <h4 style=\"margin-bottom: 1rem; color: #f87171;\">The Main Analogy: The Global Postal System</h4>\n        <p style=\"color: var(--text-secondary); line-height: 1.6;\">\n          When you send a message, it rarely goes straight to the exact target. Routers look at the destination IP address, search their routing tables, and forward the packet step-by-step (hop-by-hop) across the world until it reaches the destination network.\n        </p>\n      </div>\n\n      <h4>Core Services & Functions</h4>\n      <ul style=\"color: var(--text-secondary); font-size: 1.05rem; line-height: 1.8; margin-bottom: 2rem; padding-left: 1.5rem;\">\n        <li><strong>Host Addressing:</strong> Uses logical addresses like IPv4 and IPv6 to give every host a unique, cross-network identity.</li>\n        <li><strong>Routing & Forwarding:</strong> Builds and updates routing tables to actively forward discrete packets through the best possible path.</li>\n        <li><strong>Fragmentation:</strong> Can fragment data packets if the underlying Layer 2 frame size is too small for a full packet.</li>\n        <li><strong>Protocols:</strong> IP (v4/v6), ICMP (for pings), RIP, OSPF, and BGP.</li>\n      </ul>\n    "
-            },
-            {
-                "id": 4,
-                "name": "Layer 4: The Transport Layer",
-                "text": "End-to-end reliability, multiplexing, and flow control. Sending your data via ports.",
-                "html": "\n      <h3>Welcome to the Transport Layer</h3>\n      <p style=\"color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.8;\">\n        The Transport Layer provides the upper application-oriented layers with a standardized interface to the network. It handles host-to-host communication, segmentation, congestion avoidance, and port multiplexing.\n      </p>\n\n      <div style=\"background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border-left: 4px solid #a78bfa;\">\n        <h4 style=\"margin-bottom: 1rem; color: #a78bfa;\">The Main Analogy: The Certified Courier</h4>\n        <p style=\"color: var(--text-secondary); line-height: 1.6;\">\n          Imagine trying to send an entire encyclopedia. You break it into numbered segments. At the destination, the Courier sorts it back into order, requests re-transmission for missing pages, and guarantees exact placement. It also assigns \"Ports\" so the encyclopedia goes to the right desk.\n        </p>\n      </div>\n\n      <h4>Core Services & Functions</h4>\n      <ul style=\"color: var(--text-secondary); font-size: 1.05rem; line-height: 1.8; margin-bottom: 2rem; padding-left: 1.5rem;\">\n        <li><strong>Two Titans (TCP vs UDP):</strong> TCP provides connection-oriented, highly reliable transmission with stateful design and flow control. UDP provides fast, simple, connectionless messaging.</li>\n        <li><strong>Port Multiplexing:</strong> Assigns layer 4 addresses (ports) to data segments so a single computer can handle web traffic, emails, and gaming simultaneously.</li>\n        <li><strong>Reliability & Order:</strong> Guarantees the same order of delivery and solves transmission bottlenecks with congestion avoidance.</li>\n      </ul>\n    "
-            },
-            {
-                "id": 5,
-                "name": "Layer 5: The Session Layer",
-                "text": "Keeping the conversation organized. The Session layer builds, controls, and synchronizes dialogues.",
-                "html": "\n      <h3>Welcome to the Session Layer</h3>\n      <p style=\"color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.8;\">\n        The Session Layer provides a mechanism for opening, closing, and managing a \"session\" between end-user application processes. It handles the organized and synchronized data exchange that makes up an ongoing dialogue.\n      </p>\n\n      <div style=\"background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border-left: 4px solid #fbbf24;\">\n        <h4 style=\"margin-bottom: 1rem; color: #fbbf24;\">The Main Analogy: The Telephone Operator / Secretary</h4>\n        <p style=\"color: var(--text-secondary); line-height: 1.6;\">\n          Like a secretary managing a difficult meeting, it determines who is allowed to talk and when (full-duplex vs half-duplex), tracks authentication, and provides fail-safes so the meeting doesn't have to restart entirely if interrupted.\n        </p>\n      </div>\n\n      <h4>Core Services & Functions</h4>\n      <ul style=\"color: var(--text-secondary); font-size: 1.05rem; line-height: 1.8; margin-bottom: 2rem; padding-left: 1.5rem;\">\n        <li><strong>Checkpoints (Synchronization Points):</strong> In a massive file transfer, it introduces recovery points. If a connection fails, it can resume precisely from the checkpoint without starting over.</li>\n        <li><strong>Security & State:</strong> Manages Authentication, Authorization, and Session Restoration.</li>\n        <li><strong>Protocols:</strong> RPC (Remote Procedure Call), SCP, and ZIP (Zone Information Protocol).</li>\n      </ul>\n    "
-            },
-            {
-                "id": 6,
-                "name": "Layer 6: The Presentation Layer",
-                "text": "Formatting, decoding, and encryption. Assuring data syntax and semantics are shared.",
-                "html": "\n      <h3>Welcome to the Presentation Layer</h3>\n      <p style=\"color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.8;\">\n        The Presentation Layer sets the system-dependent representation of data into an independent, universal form. It relieves the application layer of syntax differences between end-user systems, enabling smooth exchanges regardless of underlying architecture.\n      </p>\n\n      <div style=\"background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border-left: 4px solid #2dd4bf;\">\n        <h4 style=\"margin-bottom: 1rem; color: #2dd4bf;\">The Main Analogy: The Universal Translator & Encryptor</h4>\n        <p style=\"color: var(--text-secondary); line-height: 1.6;\">\n          If an obsolete mainframe speaks EBCDIC and a modern PC speaks ASCII, Layer 6 translates it. If a bank app requires secrecy, Layer 6 encrypts it before sending and decrypts when receiving. It standardizes the dialect.\n        </p>\n      </div>\n\n      <h4>Core Services & Functions</h4>\n      <ul style=\"color: var(--text-secondary); font-size: 1.05rem; line-height: 1.8; margin-bottom: 2rem; padding-left: 1.5rem;\">\n        <li><strong>Data Conversion & Formatting:</strong> Deals with string representation, character coding, and serialization of complex data structures (like XML, JSON, or ASN.1).</li>\n        <li><strong>Security:</strong> The prime location for Encryption and Decryption (like TLS/SSL for secure banking).</li>\n        <li><strong>Compression:</strong> Squeezes data down for more efficient transit.</li>\n        <li><strong>Sublayers:</strong> Composed of CASE (Common Application Service Element) and SASE (Specific Application Service Element).</li>\n      </ul>\n    "
-            },
-            {
-                "id": 7,
-                "name": "Layer 7: The Application Layer",
-                "text": "The Top Level API. The layer providing user-interface elements and top-level services.",
-                "html": "\n      <h3>Welcome to the Application Layer</h3>\n      <p style=\"color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.8;\">\n        The Application Layer is the top abstraction layer. While TCP/IP views this broadly, the OSI model specifically defines it as the user interface responsible for bringing network services to the applications. It doesn't contain the application itself (like Chrome), but rather the actual network protocols the app relies on.\n      </p>\n\n      <div style=\"background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border-left: 4px solid #f472b6;\">\n        <h4 style=\"margin-bottom: 1rem; color: #f472b6;\">The Main Analogy: The Network Interface</h4>\n        <p style=\"color: var(--text-secondary); line-height: 1.6;\">\n          It is the doorway through which humans and software enter the network. Here is where your web browser speaks HTTP to fetch a website, or your mail client speaks SMTP to send an email. You interact directly with the fruits of Layer 7.\n        </p>\n      </div>\n\n      <h4>Core Services & Functions</h4>\n      <ul style=\"color: var(--text-secondary); font-size: 1.05rem; line-height: 1.8; margin-bottom: 2rem; padding-left: 1.5rem;\">\n        <li><strong>Process-to-Process:</strong> Standardizes communications used by internet hosts and handles data input/output.</li>\n        <li><strong>Services:</strong> Web browsing, application networking, network management, and file transfers.</li>\n        <li><strong>Prominent Protocols:</strong> HTTP/HTTPS, FTP, SMTP/POP3/IMAP, and DNS.</li>\n      </ul>\n    "
-            }
-        ];
+        let currentCourse = null;
+        let layers = []; // Will be populated by dynamic loading
+
         const params = new URLSearchParams(window.location.search);
+        const courseId = params.get('id') || 'osi-model';
         const token = params.get('token');
         const email = params.get('email');
         const BRIDGE_URL = 'https://nuc7-auth-bridge.alivirgo123.workers.dev';
 
+        // Dynamic Loading Logic
+        async function loadCourse() {
+            const courseMeta = courseRegistry[courseId];
+            if (!courseMeta) {
+                alert("Course not found in registry.");
+                return;
+            }
+
+            // Update SEO
+            document.title = courseMeta.seo.title;
+
+            // Load Data Script
+            return new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = courseMeta.script;
+                s.onload = () => {
+                    currentCourse = window[courseMeta.dataVar];
+                    layers = currentCourse.layers;
+                    resolve();
+                };
+                s.onerror = reject;
+                document.head.appendChild(s);
+            });
+        }
+
         window.onload = async () => {
+            await loadCourse(); // Wait for data
+
             if (params.get('dev') === 'true') {
                 document.getElementById('course-portal').style.display = 'flex';
                 init();
@@ -158,8 +146,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, token })
                 });
-
-                if (res.ok) {
+                const data = await res.json();
+                if (data.valid) {
                     document.getElementById('course-portal').style.display = 'flex';
                     init();
                 } else {
@@ -199,26 +187,25 @@
             const list = document.getElementById('chapters');
             list.innerHTML = layers.map(l => `
                 <div class="ch-item" id="nav-${l.id}" onclick="show(${l.id})">
-                    <span style="font-weight: 200; font-size: 0.8rem; display: block; opacity: 0.5;">LAYER 0${l.id}</span>
+                    <span style="font-weight: 200; font-size: 0.8rem; display: block; opacity: 0.5;">MODULE 0${l.id}</span>
                     ${l.name}
                 </div>
             `).join('');
             show(1);
         }
 
-        async function trackProgress(chapterId) {
+        async function trackProgress(id) {
             if (!email || !token) return;
             fetch(`${BRIDGE_URL}/update-progress`, {
                 method: 'POST',
-                mode: 'cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, chapterId: `Layer ${chapterId}`, token })
+                body: JSON.stringify({ email, chapterId: `${courseId}:${id}`, token })
             }).catch(() => { });
         }
 
         function show(id) {
             if (lockedLayers.includes(id)) {
-                alert("Security Clearance Required: You must achieve a perfect score on the previous layer's evaluation to unlock this module.");
+                alert("Security Clearance Required: You must achieve a perfect score on the previous module's evaluation to unlock this one.");
                 return;
             }
             const l = layers.find(x => x.id === id);
@@ -262,7 +249,7 @@
             container.style.display = 'block';
             container.innerHTML = '<p class="fade-in">Loading quiz connection to NUC7 Vault...</p>';
             try {
-                const res = await fetch(`${BRIDGE_URL}/get-questions?layer=${layerId}`);
+                const res = await fetch(`${BRIDGE_URL}/get-questions?course=${courseId}&layer=${layerId}`);
                 if (!res.ok) throw new Error("Vault Connection Error");
                 const questions = await res.json();
                 renderQuiz(questions, layerId);
@@ -273,7 +260,7 @@
 
         function renderQuiz(questions, layerId) {
             const container = document.getElementById('quiz-container');
-            let html = `<h3 style="margin-bottom: 1rem;">Evaluation: Layer ${layerId}</h3>`;
+            let html = `<h3 style="margin-bottom: 1rem;">Evaluation: Module 0${layerId}</h3>`;
             html += '<form id="quiz-form">';
             questions.forEach((q, i) => {
                 html += `<div class="quiz-question" style="margin-bottom: 1.5rem;">
@@ -304,7 +291,7 @@
                     const res = await fetch(`${BRIDGE_URL}/evaluate-quiz`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ answers })
+                        body: JSON.stringify({ course: courseId, answers })
                     });
                     const result = await res.json();
                     showResults(result, layerId);
@@ -323,19 +310,19 @@
             result.results.forEach(r => {
                 if (r.correct) {
                     html += `<div style="margin-bottom: 1rem; padding: 1rem; background: rgba(74, 222, 128, 0.1); border-left: 4px solid #4ade80; border-radius: 0 8px 8px 0;">
-                                <p style="color:#4ade80; margin:0;"><strong>Question ${r.id.split('_')[1]}: Correct</strong></p>
+                                <p style="color:#4ade80; margin:0;"><strong>Correct</strong></p>
                              </div>`;
                 } else {
                     html += `<div style="margin-bottom: 1rem; padding: 1rem; background: rgba(248, 113, 113, 0.1); border-left: 4px solid #f87171; border-radius: 0 8px 8px 0;">
-                                <p style="color:#f87171; margin-bottom: 0.5rem;"><strong>Question ${r.id.split('_')[1]}: Incorrect</strong></p>
-                                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 0.2rem;">Correct Answer: Option ${r.correctAnswer + 1}</p>
+                                <p style="color:#f87171; margin-bottom: 0.5rem;"><strong>Incorrect</strong></p>
+                                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 0.2rem;">Correct Answer: ${r.correctAnswer}</p>
                                 <p style="color: var(--text-secondary); font-size: 0.95rem; margin:0;"><em>Explanation: ${r.explanation}</em></p>
                              </div>`;
                 }
             });
 
             if (result.score === result.total) {
-                html += `<div style="margin-top: 2rem; text-align: center;"><p style="color: #4ade80; font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem;">Perfect Score! Security clearance updated.</p></div>`;
+                html += `<div style="margin-top: 2rem; text-align: center;"><p style="color: #4ade80; font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem;">Perfect Score! Module Unlocked.</p></div>`;
                 container.innerHTML = html;
                 unlockNext(layerId);
             } else {
@@ -358,33 +345,27 @@
 
         // --- CERTIFICATE GENERATION ---
         async function generateCertificate() {
-            // Using a landscape format to match nameXX.png (2000x1414 ratio)
             const doc = new jspdf.jsPDF({
                 orientation: 'landscape',
                 unit: 'px',
                 format: [2000, 1414]
             });
 
-            // 1. Load the background image
             const img = new Image();
-            img.src = 'nameXX.png';
+            img.src = currentCourse.certificateBg || 'nameXX.png';
 
-            // Wait for image to load before drawing
             await new Promise((resolve) => {
                 img.onload = resolve;
-                img.onerror = resolve; // Continue even if image fails to load
+                img.onerror = resolve;
             });
 
             if (img.width > 0) {
-                // Draw the certificate background
                 doc.addImage(img, 'PNG', 0, 0, 2000, 1414);
             } else {
-                // Fallback styling if bg fails to load
                 doc.setFillColor(10, 10, 10);
                 doc.rect(0, 0, 2000, 1414, 'F');
             }
 
-            // 2. Add Student Name (Centered above the line)
             let studentName = "CANDIDATE";
             const safeToken = token || "DEV-BYPASS";
 
@@ -404,33 +385,26 @@
                 }
             }
 
-            doc.setTextColor(0, 0, 0); // Black text
+            doc.setTextColor(0, 0, 0);
             doc.setFont("helvetica", "bold");
             doc.setFontSize(80);
-            // Moved Y from 700 to 660 to sit directly on the center horizontal line
             doc.text(studentName, 1000, 660, { align: 'center' });
 
-            // 3. Add Verification URL & Date (Bottom left, styled black)
             const verifyPath = `/verify.html?token=${safeToken.substring(0, 8)}`;
             const publicUrl = `nuc7.com${verifyPath}`;
             const fullUrl = `https://${publicUrl}`;
-            const date = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            const dateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
             doc.setFontSize(30);
-            doc.setTextColor(0, 0, 0); // Black text
+            doc.setTextColor(0, 0, 0);
 
-            // Draw regular text below the bottom horizontal line (Moved Y from 1200 to 1280)
-            const staticText = `Completed on: ${date}  |  Verify at: `;
+            const staticText = `Completed on: ${dateStr}  |  Verify at: `;
             doc.text(staticText, 100, 1280);
 
-            // Get precise width of the static string so the link aligns flawlessly
             const textWidth = doc.getTextWidth(staticText);
-
-            // Draw clickable link next to it
-            doc.setTextColor(0, 0, 255); // Blue link color
+            doc.setTextColor(0, 0, 255);
             doc.textWithLink(publicUrl, 100 + textWidth, 1280, { url: fullUrl });
 
-            // Trigger automatic download
             doc.save(`NUC7_Certificate_${studentName}.pdf`);
         }
     </script>
