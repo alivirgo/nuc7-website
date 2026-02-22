@@ -388,23 +388,27 @@
             const safeEmail = email || "DEV@NUC7.COM";
             const studentName = (safeEmail.split('@')[0]).toUpperCase();
 
-            doc.setTextColor(255, 255, 255);
+            doc.setTextColor(0, 0, 0); // Black text
             doc.setFont("helvetica", "bold");
             doc.setFontSize(80);
             doc.text(studentName, 1000, 700, { align: 'center' }); // Centered, slightly above mid-point
 
-            // 3. Add Verification URL (Bottom left)
+            // 3. Add Verification URL & Date (Bottom left, styled black)
             const safeToken = token || "DEV-BYPASS";
-            const publicUrl = `nuc7.com/verify/${safeToken.substring(0, 8)}`;
-            doc.setFontSize(30);
-            doc.setTextColor(200, 200, 200);
-            // Left-aligned near the bottom left
-            doc.text(`Verify at: ${publicUrl}`, 100, 1200);
-
-            // 4. Add Date (Centered below the text/line)
+            const verifyPath = `/verify.html?token=${safeToken.substring(0, 8)}`;
+            const publicUrl = `nuc7.com${verifyPath}`;
+            const fullUrl = `https://${publicUrl}`;
             const date = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
             doc.setFontSize(30);
-            doc.text(`Completed on: ${date}`, 1000, 850, { align: 'center' });
+            doc.setTextColor(0, 0, 0); // Black text
+
+            // Draw regular text
+            doc.text(`Completed on: ${date}  |  Verify at: `, 100, 1200);
+
+            // Draw clickable link next to it (estimating width of previous text to be ~550px)
+            doc.setTextColor(0, 0, 255); // Blue link color
+            doc.textWithLink(publicUrl, 650, 1200, { url: fullUrl });
 
             // Trigger automatic download
             doc.save(`NUC7_Certificate_${studentName}.pdf`);
