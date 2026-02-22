@@ -35,10 +35,17 @@ export default {
                 }
 
                 const timestamp = new Date().toISOString();
+                const cf = request.cf || {};
+
                 const hit = {
                     path: hitData.path,
                     referrer: hitData.referrer || 'Direct',
                     userAgent: hitData.userAgent || 'Unknown',
+                    city: cf.city || 'Unknown',
+                    country: cf.country || 'Unknown',
+                    isp: cf.asOrganization || 'Unknown',
+                    datacenter: cf.colo || 'Unknown',
+                    protocol: cf.httpProtocol || 'Unknown',
                     timestamp
                 };
 
