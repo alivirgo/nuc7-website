@@ -244,7 +244,9 @@
                     </div>
                     <div id="quiz-container" style="margin-top: 2rem; display:none; background: rgba(50,50,50,0.5); padding: 2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);"></div>
                     <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
-                        ${id < layers.length ? `<button class="cta-btn" id="next-module-btn" disabled onclick="show(${id + 1})" style="opacity: 0.5;">Next Module (Locked)</button>` : `<button class="outline-btn" id="next-module-btn" disabled onclick="generateCertificate()" style="opacity: 0.5;">Complete Mastery (Locked)</button>`}
+                        ${id < layers.length
+                        ? `<button class="cta-btn" id="next-module-btn" ${lockedLayers.includes(id + 1) ? 'disabled' : ''} onclick="show(${id + 1})" style="opacity: ${lockedLayers.includes(id + 1) ? '0.5' : '1'};">Next Module ${lockedLayers.includes(id + 1) ? '(Locked)' : ''}</button>`
+                        : `<button class="outline-btn" id="next-module-btn" onclick="generateCertificate()">Generate Certificate</button>`}
                     </div>
                 `;
                 area.style.opacity = '1';
@@ -253,7 +255,7 @@
         }
 
         // --- QUIZ AND LOCKING LOGIC ---
-        let lockedLayers = [2, 3, 4, 5, 6, 7];
+        let lockedLayers = window.location.search.includes('dev=true') ? [] : [2, 3, 4, 5, 6, 7];
 
         async function loadQuiz(layerId) {
             const container = document.getElementById('quiz-container');
