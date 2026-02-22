@@ -19,7 +19,7 @@ const [courseId, courseTitle, certBg] = args;
 const dataVar = courseId.replace(/-([a-z])/g, (g) => g[1].toUpperCase()) + 'Data';
 const scriptName = `${courseId.replace(/-/g, '_')}_data.js`;
 
-const template = `const ${dataVar} = {
+const template = `var ${dataVar} = {
     id: "${courseId}",
     title: "${courseTitle}",
     certificateBg: "${certBg}",

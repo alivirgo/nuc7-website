@@ -116,11 +116,22 @@
                 const s = document.createElement('script');
                 s.src = courseMeta.script;
                 s.onload = () => {
-                    currentCourse = window[courseMeta.dataVar];
-                    layers = currentCourse.layers;
-                    resolve();
+                    try {
+                        currentCourse = window[courseMeta.dataVar];
+                        if (!currentCourse) throw new Error(`Data variable ${courseMeta.dataVar} not found in ${courseMeta.script}`);
+                        layers = currentCourse.layers;
+                        resolve();
+                    } catch (err) {
+                        console.error("Data Load Error:", err);
+                        alert("Course Data Error: " + err.message);
+                        reject(err);
+                    }
                 };
-                s.onerror = reject;
+                s.onerror = () => {
+                    console.error("Script Load Error:", courseMeta.script);
+                    alert("Failed to load course script: " + courseMeta.script);
+                    reject(new Error("Script Load Error"));
+                };
                 document.head.appendChild(s);
             });
         }

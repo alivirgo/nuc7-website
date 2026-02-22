@@ -1,13 +1,13 @@
-const osiModelData = {
-    id: "osi-model",
-    title: "OSI Model Mastery",
-    certificateBg: "nameXX.png",
-    layers: [
-        {
-            "id": 1,
-            "name": "Layer 1: The Physical Layer",
-            "text": "The foundation of all communication. It deals with raw bits (0s and 1s) and physical hardware.",
-            "html": `
+var osiModelData = {
+  id: "osi-model",
+  title: "OSI Model Mastery",
+  certificateBg: "nameXX.png",
+  layers: [
+    {
+      "id": 1,
+      "name": "Layer 1: The Physical Layer",
+      "text": "The foundation of all communication. It deals with raw bits (0s and 1s) and physical hardware.",
+      "html": `
       <h3>Welcome to the Physical Layer</h3>
       <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.8;">
         The Physical Layer is the lowest layer of the OSI model, representing the actual physical hardware and transmission technologies of a network. It provides mechanical, electrical, and other functional aids to transmit raw bits across a physical medium.
@@ -28,12 +28,12 @@ const osiModelData = {
         <li><strong>Hardware Devices:</strong> Includes cables, plugs, repeaters, hubs, network adapters, amplifiers, and transceivers.</li>
       </ul>
     `
-        },
-        {
-            "id": 2,
-            "name": "Layer 2: The Data Link Layer",
-            "text": "Giving bits meaning. The Data Link layer organizes data into frames and handles local delivery.",
-            "html": `
+    },
+    {
+      "id": 2,
+      "name": "Layer 2: The Data Link Layer",
+      "text": "Giving bits meaning. The Data Link layer organizes data into frames and handles local delivery.",
+      "html": `
       <h3>Welcome to the Data Link Layer</h3>
       <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.8;">
         The Data Link Layer ensures reliable, largely error-free transmission between adjacent network nodes. It divides raw bits into blocks called <strong>Frames</strong> and handles media access control (MAC).
@@ -54,12 +54,12 @@ const osiModelData = {
         <li><strong>Hardware & Protocols:</strong> Network Switches (multiport bridges) and Bridges operate here. Common protocols are Ethernet, PPP, and HDLC. It also handles VLANs.</li>
       </ul>
     `
-        },
-        {
-            "id": 3,
-            "name": "Layer 3: The Network Layer",
-            "text": "Routing and global reach. The network layer gets your data across the world using IP Addresses.",
-            "html": `
+    },
+    {
+      "id": 3,
+      "name": "Layer 3: The Network Layer",
+      "text": "Routing and global reach. The network layer gets your data across the world using IP Addresses.",
+      "html": `
       <h3>Welcome to the Network Layer</h3>
       <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.8;">
         The Network Layer is responsible for packet forwarding and routing through intermediate routers. It provides cross-network addresses and manages Quality of Service (QoS) to establish global reach between a source and a destination host.
@@ -80,12 +80,12 @@ const osiModelData = {
         <li><strong>Protocols:</strong> IP (v4/v6), ICMP (for pings), RIP, OSPF, and BGP.</li>
       </ul>
     `
-        },
-        {
-            "id": 4,
-            "name": "Layer 4: The Transport Layer",
-            "text": "End-to-end reliability, multiplexing, and flow control. Sending your data via ports.",
-            "html": `
+    },
+    {
+      "id": 4,
+      "name": "Layer 4: The Transport Layer",
+      "text": "End-to-end reliability, multiplexing, and flow control. Sending your data via ports.",
+      "html": `
       <h3>Welcome to the Transport Layer</h3>
       <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.8;">
         The Transport Layer provides the upper application-oriented layers with a standardized interface to the network. It handles host-to-host communication, segmentation, congestion avoidance, and port multiplexing.
@@ -105,12 +105,12 @@ const osiModelData = {
         <li><strong>Reliability & Order:</strong> Guarantees the same order of delivery and solves transmission bottlenecks with congestion avoidance.</li>
       </ul>
     `
-        },
-        {
-            "id": 5,
-            "name": "Layer 5: The Session Layer",
-            "text": "Managing dialogues. The session layer handles connections between applications.",
-            "html": `
+    },
+    {
+      "id": 5,
+      "name": "Layer 5: The Session Layer",
+      "text": "Managing dialogues. The session layer handles connections between applications.",
+      "html": `
       <h3>Welcome to the Session Layer</h3>
       <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.8;">
         The Session Layer manages the setup, coordination, and termination of conversations between applications at each end of a session. It handles session checkpoints and recovery.
@@ -131,12 +131,12 @@ const osiModelData = {
         <li><strong>Checkpointing:</strong> Saving the state of a data transfer.</li>
       </ul>
     `
-        },
-        {
-            "id": 6,
-            "name": "Layer 6: The Presentation Layer",
-            "text": "Translating data. This layer handles encryption, compression, and data formatting.",
-            "html": `
+    },
+    {
+      "id": 6,
+      "name": "Layer 6: The Presentation Layer",
+      "text": "Translating data. This layer handles encryption, compression, and data formatting.",
+      "html": `
       <h3>Welcome to the Presentation Layer</h3>
       <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.8;">
         The Presentation Layer acts as a translator for the network. It ensures that data sent by the application layer of one system can be read by the application layer of another.
@@ -157,12 +157,12 @@ const osiModelData = {
         <li><strong>Formatting:</strong> Ensuring JPG, MP3, etc., are correctly interpreted.</li>
       </ul>
     `
-        },
-        {
-            "id": 7,
-            "name": "Layer 7: The Application Layer",
-            "text": "The interface we see. The application layer provides network services directly to users.",
-            "html": `
+    },
+    {
+      "id": 7,
+      "name": "Layer 7: The Application Layer",
+      "text": "The interface we see. The application layer provides network services directly to users.",
+      "html": `
       <h3>Welcome to the Application Layer</h3>
       <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.8;">
         The Application Layer is the OSI layer closest to the end user. It provides the interface between the user's application and the network services.
@@ -182,6 +182,6 @@ const osiModelData = {
         <li><strong>Network Services:</strong> Email (SMTP), Web (HTTP), File Transfer (FTP), Domain Names (DNS).</li>
       </ul>
     `
-        }
-    ]
+    }
+  ]
 };

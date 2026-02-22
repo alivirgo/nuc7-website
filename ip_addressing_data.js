@@ -1,4 +1,4 @@
-const ipAddressingData = {
+var ipAddressingData = {
     id: "ip-addressing",
     title: "IP Addressing & Subnetting Mastery",
     certificateBg: "nameYY.png",
