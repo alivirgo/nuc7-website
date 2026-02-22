@@ -357,42 +357,50 @@
         }
 
         // --- CERTIFICATE GENERATION ---
-        function generateCertificate() {
-            const doc = new jspdf.jsPDF();
+        async function generateCertificate() {
+            // Using a landscape format to match the PPTX background aspect ratio
+            const doc = new jspdf.jsPDF({
+                orientation: 'landscape',
+                unit: 'px',
+                format: [1204, 853]
+            });
 
-            // Add some styling
-            doc.setFillColor(10, 10, 10);
-            doc.rect(0, 0, 210, 297, 'F'); // A4 black background
+            // 1. Load the background image extracted from nameXX.pptx
+            const img = new Image();
+            img.src = 'certificate_bg.png';
+
+            // Wait for image to load before drawing
+            await new Promise((resolve) => {
+                img.onload = resolve;
+                img.onerror = resolve; // Continue even if image fails to load
+            });
+
+            if (img.width > 0) {
+                // Draw the PPTX background
+                doc.addImage(img, 'PNG', 0, 0, 1204, 853);
+            } else {
+                // Fallback styling if bg fails to load
+                doc.setFillColor(10, 10, 10);
+                doc.rect(0, 0, 1204, 853, 'F');
+            }
+
+            // 2. Add Student Name
+            const studentName = ((email.split('@')[0]) || "CANDIDATE").toUpperCase();
 
             doc.setTextColor(255, 255, 255);
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(28);
-            doc.text('NUC7 NETWORKING MASTERY', 105, 50, { align: 'center' });
+            // Centralize the text where "nameXX" used to be
+            doc.setFontSize(64);
+            doc.text(studentName, 602, 450, { align: 'center' });
 
-            doc.setDrawColor(74, 144, 226); // Blue line
-            doc.setLineWidth(1);
-            doc.line(40, 60, 170, 60);
+            // 3. Add Verification URL
+            const publicUrl = `nuc7.com/verify/${token.substring(0, 8)}`;
+            doc.setFontSize(20);
+            doc.setTextColor(200, 200, 200);
+            doc.text(`Verify at: ${publicUrl}`, 602, 750, { align: 'center' });
 
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(16);
-            doc.text('This certifies that', 105, 90, { align: 'center' });
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(24);
-            doc.text(email.toUpperCase(), 105, 110, { align: 'center' });
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(16);
-            doc.text('has successfully completed the NUC7 7-Layer OSI Curriculum', 105, 130, { align: 'center' });
-            doc.text('and passed all secure evaluations.', 105, 140, { align: 'center' });
-
-            const date = new Date().toLocaleDateString();
-            doc.setFontSize(14);
-            doc.setTextColor(150, 150, 150);
-            doc.text(`Date of Completion: ${date}`, 105, 200, { align: 'center' });
-            doc.text(`Verification ID: ${token.substring(0, 8)}`, 105, 210, { align: 'center' });
-
-            doc.save('NUC7_Certification.pdf');
+            // Trigger automatic download
+            doc.save(`NUC7_Certificate_${studentName}.pdf`);
         }
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
