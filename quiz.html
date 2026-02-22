@@ -63,8 +63,9 @@
             btn.disabled = true;
             btn.textContent = 'Syncing Vault...';
 
+            const courseId = new URLSearchParams(window.location.search).get('course') || 'osi-model';
             try {
-                const res = await fetch(`${BRIDGE_URL}/get-questions`);
+                const res = await fetch(`${BRIDGE_URL}/get-questions?course=${courseId}`);
                 questions = await res.json();
                 document.getElementById('quiz-pre').style.display = 'none';
                 document.getElementById('quiz-run').style.display = 'block';
@@ -145,13 +146,14 @@
             btn.textContent = 'Generating Access Token...';
 
             try {
+                const courseId = new URLSearchParams(window.location.search).get('course') || 'osi-model';
                 const res = await fetch(`${BRIDGE_URL}/get-token`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, score })
+                    body: JSON.stringify({ email, score, courseId })
                 });
                 const { token } = await res.json();
-                location.href = `course.html?token=${token}&email=${encodeURIComponent(email)}`;
+                location.href = `course.html?id=${courseId}&token=${token}&email=${encodeURIComponent(email)}`;
             } catch (err) {
                 alert('Token Generation Failed.');
                 btn.disabled = false;

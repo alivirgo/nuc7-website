@@ -168,7 +168,7 @@
                 const res = await fetch(`${BRIDGE_URL}/validate-token`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, token })
+                    body: JSON.stringify({ email, token, courseId })
                 });
                 const data = await res.json();
                 if (data.valid) {
@@ -397,7 +397,7 @@
                 studentName = "DEV";
             } else {
                 try {
-                    const res = await fetch(`${BRIDGE_URL}/verify-certificate?token=${safeToken.substring(0, 8)}`);
+                    const res = await fetch(`${BRIDGE_URL}/verify-certificate?token=${safeToken.substring(0, 8)}&course=${courseId}`);
                     const data = await res.json();
                     if (data.valid && data.name) {
                         studentName = data.name.toUpperCase();
@@ -414,7 +414,7 @@
             doc.setFontSize(80);
             doc.text(studentName, 1000, 660, { align: 'center' });
 
-            const verifyPath = `/verify.html?token=${safeToken.substring(0, 8)}`;
+            const verifyPath = `/verify.html?token=${safeToken.substring(0, 8)}&course=${courseId}`;
             const publicUrl = `nuc7.com${verifyPath}`;
             const fullUrl = `https://${publicUrl}`;
             const dateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });

@@ -103,6 +103,26 @@
                         <button onclick="selectCourse('ip-addressing')" class="cta-btn"
                             style="text-align: center; width: 100%; border: none; cursor: pointer;">Enroll Now</button>
                     </div>
+                    <!-- Network Fundamentals Course -->
+                    <div class="glass-card fade-in"
+                        style="display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <span class="badge" style="color: #60a5fa; border-color: #60a5fa;">COMPREHENSIVE</span>
+                            <h4 style="font-size: 1.8rem; margin: 1.5rem 0 1rem;">Network Fundamentals</h4>
+                            <p style="color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6;">A massive
+                                20-unit deep dive into the architecture of modern networks. From physical pulses to
+                                software-defined automation.</p>
+                            <ul
+                                style="color: var(--text-secondary); line-height: 2; margin-bottom: 2rem; padding-left: 1rem;">
+                                <li>20 Deeply Explained Units</li>
+                                <li>Switching, Routing, OSPF & EIGRP</li>
+                                <li>IPv6, NAT, ACLs & Network Automation</li>
+                            </ul>
+                        </div>
+                        <button onclick="selectCourse('network-fundamentals')" class="cta-btn"
+                            style="text-align: center; width: 100%; border: none; cursor: pointer; background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);">Enroll
+                            Now</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -192,6 +212,8 @@
                 <button onclick="selectCourse('osi-model')" class="cta-btn">OSI Model Mastery</button>
                 <button onclick="selectCourse('ip-addressing')" class="cta-btn"
                     style="background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);">IP & Subnetting</button>
+                <button onclick="selectCourse('network-fundamentals')" class="cta-btn"
+                    style="background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);">Network Fundamentals</button>
                 <button onclick="closeEnrollModal()" class="outline-btn">Cancel</button>
             </div>
         </div>
@@ -210,7 +232,8 @@
 
         const courseNames = {
             'osi-model': 'OSI Model Mastery',
-            'ip-addressing': 'IP & Subnetting'
+            'ip-addressing': 'IP & Subnetting',
+            'network-fundamentals': 'Network Fundamentals Mastery'
         };
 
         function openEnrollModal() {

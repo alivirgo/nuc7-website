@@ -10,5 +10,11 @@ const courseRegistry = {
         dataVar: "ipAddressingData",
         certificateBg: "nameYY.png",
         seo: { title: "NUC7 | IP Addressing & Subnetting Mastery" }
+    },
+    "network-fundamentals": {
+        script: "network_fundamentals_data.js",
+        dataVar: "networkFundamentalsData",
+        certificateBg: "nameZZ.png",
+        seo: { title: "NUC7 | Network Fundamentals Mastery" }
     }
 };

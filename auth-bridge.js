@@ -174,10 +174,10 @@ export default {
                 }
 
                 // 3. INTEGRATION: SEND EMAIL (SENDGRID)
-                // Note to User: Set env.SENDGRID_API_KEY and env.FRONTEND_URL in Cloudflare dashboard
+                const { courseId } = await request.json().catch(() => ({}));
                 if (env.SENDGRID_API_KEY) {
                     const frontendUrl = env.FRONTEND_URL || url.origin;
-                    const quizUrl = `${frontendUrl}/quiz.html?email=${encodeURIComponent(email)}&token=${token}`;
+                    const quizUrl = `${frontendUrl}/quiz.html?email=${encodeURIComponent(email)}&token=${token}${courseId ? `&course=${courseId}` : ''}`;
                     await fetch('https://api.sendgrid.com/v3/mail/send', {
                         method: 'POST',
                         headers: {
@@ -198,7 +198,7 @@ export default {
 
             // 3.5 GET PRODUCTION TOKEN (After Quiz Success)
             if (path === '/get-token' && request.method === 'POST') {
-                const { email, score } = await request.json();
+                const { email, score, courseId } = await request.json();
 
                 if (score < 7) {
                     return new Response(JSON.stringify({ error: 'Score too low.' }), { status: 403, headers: corsHeaders });
@@ -206,15 +206,18 @@ export default {
 
                 const salt = env.AUTH_SECRET;
                 if (!salt) throw new Error("AUTH_SECRET environment variable is required.");
-                const tokenSource = `${email}:course_access:${salt}`;
+                const tokenSource = `${email}:${courseId || 'osi-model'}:course_access:${salt}`;
                 const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(tokenSource));
                 const token = btoa(Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''));
 
-                // Record Score in Student Profile
+                // Record Score in Student Profile (Per-Course)
                 if (STATS_KV) {
                     let user = await STATS_KV.get(`user:${email}`, 'json');
                     if (user) {
-                        user.progress.score = score;
+                        if (!user.progress.scores) user.progress.scores = {};
+                        user.progress.scores[courseId || 'osi-model'] = score;
+                        // For backward compatibility with verify-certificate (which expects .score)
+                        user.progress.score = Math.max(user.progress.score || 0, score);
                         await STATS_KV.put(`user:${email}`, JSON.stringify(user));
                     }
                 }
@@ -224,12 +227,13 @@ export default {
 
             // 3.6 UPDATE COURSE PROGRESS
             if (path === '/update-progress' && request.method === 'POST') {
-                const { email, chapterId, token } = await request.json();
+                const body = await request.json().catch(() => ({}));
+                const { email, chapterId, token, courseId } = body;
 
                 // Token Validation
                 const salt = env.AUTH_SECRET;
                 if (!salt) throw new Error("AUTH_SECRET environment variable is required.");
-                const tokenSource = `${email}:course_access:${salt}`;
+                const tokenSource = `${email}:${courseId || 'osi-model'}:course_access:${salt}`;
                 const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(tokenSource));
                 const expectedToken = btoa(Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''));
 
@@ -327,10 +331,10 @@ export default {
 
             // 5. VALIDATE TOKEN (Self-Service & Verification)
             if (path === '/validate-token' && request.method === 'POST') {
-                const { email, token } = await request.json();
+                const { email, token, courseId } = await request.json();
                 const salt = env.AUTH_SECRET;
                 if (!salt) throw new Error("AUTH_SECRET environment variable is required.");
-                const tokenSource = `${email}:course_access:${salt}`;
+                const tokenSource = `${email}:${courseId || 'osi-model'}:course_access:${salt}`;
                 const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(tokenSource));
                 const expectedToken = btoa(Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''));
 
@@ -343,6 +347,7 @@ export default {
             // 6. PUBLIC CERTIFICATE VERIFICATION (Lookup by Token Prefix)
             if (path === '/verify-certificate' && request.method === 'GET') {
                 const tokenPrefix = url.searchParams.get('token');
+                const courseIdReq = url.searchParams.get('course') || 'osi-model';
 
                 if (!tokenPrefix || tokenPrefix.length < 8) {
                     return new Response(JSON.stringify({ valid: false, error: 'Invalid Token Format' }), { status: 400, headers: corsHeaders });
@@ -356,7 +361,10 @@ export default {
 
                     for (let key of users.keys) {
                         const email = key.name.replace('user:', '');
-                        const tokenSource = `${email}:course_access:${salt}`;
+
+                        // We need to check against multiple potential course tokens if we don't know the course
+                        // but here we expect the course to be passed or we default to osi-model
+                        const tokenSource = `${email}:${courseIdReq}:course_access:${salt}`;
                         const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(tokenSource));
                         const expectedToken = btoa(Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''));
 
@@ -366,12 +374,15 @@ export default {
                             const userDataStr = await STATS_KV.get(key.name);
                             if (userDataStr) {
                                 const userData = JSON.parse(userDataStr);
-                                // Ensure they actually finished the course (scored perfect 7)
-                                if (userData.progress && userData.progress.score >= 7) {
+                                // Check score for specific course
+                                const courseScore = (userData.progress.scores && userData.progress.scores[courseIdReq]) || (courseIdReq === 'osi-model' ? userData.progress.score : 0);
+
+                                if (courseScore >= 7) {
                                     return new Response(JSON.stringify({
                                         valid: true,
                                         name: userData.name !== 'Anonymous' ? userData.name : email.split('@')[0],
-                                        date: userData.registeredAt
+                                        date: userData.registeredAt,
+                                        course: courseIdReq
                                     }), { headers: corsHeaders });
                                 }
                             }
