@@ -153,6 +153,7 @@
 
                 if (hashHex === '3c6e94e414fdd5287f32997bb2292f72bc9776d50f00c776c11a5b8a5941defc') {
                     document.getElementById('course-portal').style.display = 'flex';
+                    initializeLocks([]);
                     init();
                 } else {
                     alert("Unauthorized access.");
@@ -175,7 +176,22 @@
                 });
                 const data = await res.json();
                 if (data.valid) {
+                    // Fetch Persistent Progress
+                    let completed = [];
+                    try {
+                        const progRes = await fetch(`${BRIDGE_URL}/get-progress`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, token, courseId })
+                        });
+                        if (progRes.ok) {
+                            const progData = await progRes.json();
+                            if (progData.chapters) completed = progData.chapters;
+                        }
+                    } catch (e) { console.warn("Could not fetch progress from bridge."); }
+
                     document.getElementById('course-portal').style.display = 'flex';
+                    initializeLocks(completed);
                     init();
                 } else {
                     document.getElementById('lock-screen').style.display = 'block';
@@ -269,7 +285,25 @@
         }
 
         // --- QUIZ AND LOCKING LOGIC ---
-        let lockedLayers = window.location.search.includes('dev=true') ? [] : [2, 3, 4, 5, 6, 7];
+        let lockedLayers = [];
+
+        function initializeLocks(completedLevels = []) {
+            if (window.location.search.includes('dev=true')) {
+                lockedLayers = [];
+                return;
+            }
+            // Lock all levels natively based on the specific course length
+            lockedLayers = Array.from({ length: layers.length - 1 }, (_, i) => i + 2);
+
+            // Unlock levels based on what the user has completed in the past.
+            completedLevels.forEach(level => {
+                const index = lockedLayers.indexOf(level + 1);
+                if (index > -1) {
+                    lockedLayers.splice(index, 1);
+                }
+            });
+            console.log("Initialized locked modules:", lockedLayers);
+        }
 
         async function loadQuiz(layerId) {
             const container = document.getElementById('quiz-container');
