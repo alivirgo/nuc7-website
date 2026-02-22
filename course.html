@@ -385,7 +385,8 @@
             }
 
             // 2. Add Student Name
-            const studentName = ((email.split('@')[0]) || "CANDIDATE").toUpperCase();
+            const safeEmail = email || "dev@nuc7.com";
+            const studentName = (safeEmail.split('@')[0]).toUpperCase();
 
             doc.setTextColor(255, 255, 255);
             doc.setFont("helvetica", "bold");
@@ -394,7 +395,8 @@
             doc.text(studentName, 602, 450, { align: 'center' });
 
             // 3. Add Verification URL
-            const publicUrl = `nuc7.com/verify/${token.substring(0, 8)}`;
+            const safeToken = token || "DEV-MODE-BYPASS";
+            const publicUrl = `nuc7.com/verify/${safeToken.substring(0, 8)}`;
             doc.setFontSize(20);
             doc.setTextColor(200, 200, 200);
             doc.text(`Verify at: ${publicUrl}`, 602, 750, { align: 'center' });
