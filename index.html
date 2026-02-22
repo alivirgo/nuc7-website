@@ -31,7 +31,7 @@
     <header class="hero">
         <div class="hero-glow"></div>
         <div class="container fade-in">
-            <span class="badge">Version 2.1 | Multi-Course Platform</span>
+            <span class="badge">networking ultimate courses</span>
             <h1 class="logo-large">NUC7</h1>
             <h2 style="font-weight: 200; font-size: 1.5rem; color: var(--text-secondary);">Architectural Networking
                 Mastery</h2>
@@ -179,6 +179,33 @@
             </div>
         </section>
 
+        <section id="net-fundamentals-seo" class="section" style="background: rgba(255,255,255,0.02);">
+            <div class="container">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;">
+                    <div class="fade-in">
+                        <h3 style="font-size: 2.5rem; margin-bottom: 2rem; font-weight: 200;">The Power of <span
+                                style="font-weight: 600;">Networking Fundamentals</span></h3>
+                        <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 1.5rem;">Modern
+                            infrastructure is built on the bedrock of these principles. From internal business systems
+                            to
+                            global cloud platforms, understanding the deep fundamentals of network architecture is no
+                            longer optional—it's essential.</p>
+                        <p style="color: var(--text-secondary); line-height: 1.8;">Our comprehensive 20-unit curriculum
+                            demystifies high-level routing, switching, and automation, transforming you from a user into
+                            an architect of the digital age.</p>
+                    </div>
+                    <div class="glass-card fade-in">
+                        <h4 style="color: #60a5fa; margin-bottom: 1rem;">Full Stack Sovereignty</h4>
+                        <ul style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+                            <li>Master industry-standard OSPF and EIGRP.</li>
+                            <li>Configure advanced ACLs and NAT gateways.</li>
+                            <li>Automate network deployments with Python.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="register" class="section">
             <div class="container">
                 <div class="glass-card fade-in" style="max-width: 500px; margin: 0 auto;">
@@ -188,6 +215,18 @@
                     <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.9rem;">Submit your email
                         to receive your unique assessment link. Qualification is required for course access.</p>
                     <form id="reg-form">
+                        <div style="margin-bottom: 1rem;">
+                            <label
+                                style="display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Desired
+                                Path</label>
+                            <select id="course-select" required
+                                onchange="selectedCourseId = this.value; updateSelectedUI()">
+                                <option value="" disabled selected>Select a Curriculum...</option>
+                                <option value="osi-model">OSI Model Mastery</option>
+                                <option value="ip-addressing">IP & Subnetting</option>
+                                <option value="network-fundamentals">Network Fundamentals</option>
+                            </select>
+                        </div>
                         <input type="text" id="user-name" placeholder="Full Name" required>
                         <input type="email" id="user-email" placeholder="email@address.com" required>
                         <button type="submit" class="cta-btn" style="width: 100%;" id="reg-btn">Request
@@ -244,14 +283,18 @@
             document.getElementById('enroll-modal').style.display = 'none';
         }
 
+        function updateSelectedUI() {
+            if (selectedCourseId) {
+                document.getElementById('course-name-display').textContent = courseNames[selectedCourseId];
+                document.getElementById('selected-path').style.display = 'block';
+                document.getElementById('course-select').value = selectedCourseId;
+            }
+        }
+
         function selectCourse(courseId) {
             selectedCourseId = courseId;
             closeEnrollModal();
-
-            // Update UI
-            document.getElementById('course-name-display').textContent = courseNames[courseId];
-            document.getElementById('selected-path').style.display = 'block';
-
+            updateSelectedUI();
             document.getElementById('register').scrollIntoView({ behavior: 'smooth' });
         }
 
