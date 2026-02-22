@@ -385,8 +385,24 @@
             }
 
             // 2. Add Student Name (Centered above the line)
-            const safeEmail = email || "DEV@NUC7.COM";
-            const studentName = (safeEmail.split('@')[0]).toUpperCase();
+            let studentName = "CANDIDATE";
+            const safeToken = token || "DEV-BYPASS";
+
+            if (safeToken === "DEV-BYPASS") {
+                studentName = "DEV";
+            } else {
+                try {
+                    const res = await fetch(`${BRIDGE_URL}/verify-certificate?token=${safeToken.substring(0, 8)}`);
+                    const data = await res.json();
+                    if (data.valid && data.name) {
+                        studentName = data.name.toUpperCase();
+                    } else if (email) {
+                        studentName = email.split('@')[0].toUpperCase();
+                    }
+                } catch (e) {
+                    if (email) studentName = email.split('@')[0].toUpperCase();
+                }
+            }
 
             doc.setTextColor(0, 0, 0); // Black text
             doc.setFont("helvetica", "bold");
@@ -395,7 +411,6 @@
             doc.text(studentName, 1000, 660, { align: 'center' });
 
             // 3. Add Verification URL & Date (Bottom left, styled black)
-            const safeToken = token || "DEV-BYPASS";
             const verifyPath = `/verify.html?token=${safeToken.substring(0, 8)}`;
             const publicUrl = `nuc7.com${verifyPath}`;
             const fullUrl = `https://${publicUrl}`;
