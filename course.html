@@ -89,7 +89,10 @@
         </main>
     </div>
 
-    <script src="course_registry.js"></script>
+    <script>
+        // Synchronous cache-busting load for registry
+        document.write(`<script src="course_registry.js?v=${Date.now()}"><\/script>`);
+    </script>
     <script>
         let currentCourse = null;
         let layers = []; // Will be populated by dynamic loading
