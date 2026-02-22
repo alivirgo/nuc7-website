@@ -8,6 +8,11 @@
       "id": "0dd27f8bcc504a51b5c8bfde19db00d9"
     }
   ],
+  "vars": {
+    "SENDGRID_API_KEY": "INSERT_KEY_HERE_OR_USE_DASHBOARD",
+    "AUTH_SECRET": "INSERT_SECRET_HERE_OR_USE_DASHBOARD",
+    "FRONTEND_URL": "https://nuc7.com"
+  },
   "observability": {
     "enabled": true
   }
