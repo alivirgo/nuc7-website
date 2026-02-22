@@ -114,7 +114,7 @@
             // Load Data Script
             return new Promise((resolve, reject) => {
                 const s = document.createElement('script');
-                s.src = courseMeta.script;
+                s.src = `${courseMeta.script}?v=${Date.now()}`;
                 s.onload = () => {
                     try {
                         currentCourse = window[courseMeta.dataVar];
