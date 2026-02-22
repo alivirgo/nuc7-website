@@ -2,3 +2,5 @@ vault-tmp/
 node_modules/
 .env
 *.log
+
+nuc7-vault-remote/
