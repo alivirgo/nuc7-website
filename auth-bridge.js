@@ -248,6 +248,7 @@ export default {
 
             // 4. SECURE QUESTION FETCH
             if (path === '/get-questions' && request.method === 'GET') {
+                const layerParam = url.searchParams.get('layer'); // ?layer=1
                 const res = await fetch(`https://api.github.com/repos/alivirgo/nuc7-vault/contents/questions.json`, {
                     headers: {
                         'Authorization': `token ${env.GITHUB_PAT}`,
@@ -257,18 +258,68 @@ export default {
                 });
 
                 if (!res.ok) {
-                    // Fallback questions for demo if vault is not yet ready
-                    const fallback = [
-                        { question: "What is the Physical Layer responsible for?", options: ["Raw bit transmission", "IP Routing", "Error correction", "Session management"], answer: 0 },
-                        { question: "Which layer handles MAC addresses?", options: ["Physical", "Data Link", "Network", "Transport"], answer: 1 },
-                        { question: "Port 80 is associated with which protocol?", options: ["FTP", "SSH", "HTTP", "HTTPS"], answer: 2 }
-                    ];
-                    return new Response(JSON.stringify(fallback), { headers: corsHeaders });
+                    return new Response(JSON.stringify([{ question: "Error loading from vault", options: ["A", "B", "C", "D"], id: "err" }]), { headers: corsHeaders });
                 }
 
-                const allQuestions = await res.json();
-                const shuffled = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 10);
-                return new Response(JSON.stringify(shuffled), { headers: corsHeaders });
+                let allQuestions = await res.json();
+
+                if (layerParam) {
+                    allQuestions = allQuestions.filter(q => q.layer == layerParam);
+                }
+
+                const shuffled = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 5);
+
+                // Strip answers and explanations so the client can't cheat
+                const sanitized = shuffled.map(q => ({
+                    id: q.id,
+                    question: q.question,
+                    options: q.options
+                }));
+
+                return new Response(JSON.stringify(sanitized), { headers: corsHeaders });
+            }
+
+            // 4.5 SECURE QUIZ EVALUATION
+            if (path === '/evaluate-quiz' && request.method === 'POST') {
+                // answers = { "q1_1": 2, "q1_5": 0, ... }
+                const { answers } = await request.json();
+
+                const res = await fetch(`https://api.github.com/repos/alivirgo/nuc7-vault/contents/questions.json`, {
+                    headers: {
+                        'Authorization': `token ${env.GITHUB_PAT}`,
+                        'Accept': 'application/vnd.github.v3.raw',
+                        'User-Agent': 'nuc7-auth-bridge'
+                    }
+                });
+
+                if (!res.ok) {
+                    return new Response(JSON.stringify({ error: "Failed to load vault" }), { status: 500, headers: corsHeaders });
+                }
+
+                let allQuestions = await res.json();
+                let score = 0;
+                let results = [];
+
+                for (let qId in answers) {
+                    const selected = answers[qId];
+                    const actualQ = allQuestions.find(q => q.id === qId);
+
+                    if (actualQ) {
+                        if (actualQ.answer === selected) {
+                            score++;
+                            results.push({ id: qId, correct: true });
+                        } else {
+                            results.push({
+                                id: qId,
+                                correct: false,
+                                explanation: actualQ.explanation,
+                                correctAnswer: actualQ.answer
+                            });
+                        }
+                    }
+                }
+
+                return new Response(JSON.stringify({ score, total: Object.keys(answers).length, results }), { headers: corsHeaders });
             }
 
             // 5. VALIDATE TOKEN (Self-Service & Verification)

@@ -25,6 +25,13 @@ const layers = [
         <li><strong>Network Topology:</strong> Defines whether the network is a bus, ring, mesh, or star setup.</li>
         <li><strong>Hardware Devices:</strong> Includes cables, plugs, repeaters, hubs, network adapters, amplifiers, and transceivers.</li>
       </ul>
+
+      <div style="margin-top: 3rem; padding: 2rem; background: rgba(0, 150, 255, 0.05); border: 1px solid rgba(0, 150, 255, 0.2); border-radius: 12px; position: relative;">
+          <div style="position: absolute; top: -15px; left: 20px; background: #000; padding: 0 10px; color: #4a90e2; font-weight: 600; font-size: 0.9rem; text-transform: uppercase;">Info Pack: The Chaos of Layer 1</div>
+          <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 0;">
+            <strong>Did you know?</strong> Because Layer 1 has zero intelligence, it cannot stop a "Collision." If two devices on an old coaxial cable send voltage at the exact same millisecond, the signals crash and corrupt each other. It's up to higher layers (like Layer 2) to detect this physical chaos and re-transmit! Layer 1 is simply the silent workhorse of the internet.
+          </p>
+      </div>
     `
   },
   {
@@ -51,6 +58,13 @@ const layers = [
         <li><strong>Logical Link & Flow Control:</strong> Dynamically controls sending speeds to prevent overwhelming a receiver and specifies how devices detect and recover from collisions.</li>
         <li><strong>Hardware & Protocols:</strong> Network Switches (multiport bridges) and Bridges operate here. Common protocols are Ethernet, PPP, and HDLC. It also handles VLANs.</li>
       </ul>
+
+      <div style="margin-top: 3rem; padding: 2rem; background: rgba(74, 222, 128, 0.05); border: 1px solid rgba(74, 222, 128, 0.2); border-radius: 12px; position: relative;">
+          <div style="position: absolute; top: -15px; left: 20px; background: #000; padding: 0 10px; color: #4ade80; font-weight: 600; font-size: 0.9rem; text-transform: uppercase;">Info Pack: MAC Addresses & Switch Magic</div>
+          <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 0;">
+            A MAC Address (Media Access Control) is a unique, 12-character hexadecimal identifier burned directly into your device's network card by the manufacturer. Unlike a hub that blindly screams data to everyone, a Layer 2 <strong>Switch</strong> memorizes the MAC addresses of everything plugged into it. When it receives a frame, it intelligently forwards it <em>only</em> to the correct port. This eliminates the collisions that plague Layer 1!
+          </p>
+      </div>
     `
   },
   {
@@ -77,6 +91,13 @@ const layers = [
         <li><strong>Fragmentation:</strong> Can fragment data packets if the underlying Layer 2 frame size is too small for a full packet.</li>
         <li><strong>Protocols:</strong> IP (v4/v6), ICMP (for pings), RIP, OSPF, and BGP.</li>
       </ul>
+
+      <div style="margin-top: 3rem; padding: 2rem; background: rgba(248, 113, 113, 0.05); border: 1px solid rgba(248, 113, 113, 0.2); border-radius: 12px; position: relative;">
+          <div style="position: absolute; top: -15px; left: 20px; background: #000; padding: 0 10px; color: #f87171; font-weight: 600; font-size: 0.9rem; text-transform: uppercase;">Info Pack: The Power of IP Addresses</div>
+          <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 0;">
+            A MAC Address (Layer 2) is like your Social Security Number—it identifies <em>who</em> you are physically. An IP Address (Layer 3) is like your mailing address—it identifies <em>where</em> you are logically on the planet. If you move your laptop from your house to a coffee shop, your MAC address stays the same, but your IP address changes so global routers know where to send your network packets!
+          </p>
+      </div>
     `
   },
   {
@@ -102,6 +123,13 @@ const layers = [
         <li><strong>Port Multiplexing:</strong> Assigns layer 4 addresses (ports) to data segments so a single computer can handle web traffic, emails, and gaming simultaneously.</li>
         <li><strong>Reliability & Order:</strong> Guarantees the same order of delivery and solves transmission bottlenecks with congestion avoidance.</li>
       </ul>
+
+      <div style="margin-top: 3rem; padding: 2rem; background: rgba(167, 139, 250, 0.05); border: 1px solid rgba(167, 139, 250, 0.2); border-radius: 12px; position: relative;">
+          <div style="position: absolute; top: -15px; left: 20px; background: #000; padding: 0 10px; color: #a78bfa; font-weight: 600; font-size: 0.9rem; text-transform: uppercase;">Info Pack: TCP vs UDP</div>
+          <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 0;">
+            <strong>TCP</strong> is like ordering a package with certified signature tracking. Before data is sent, a 3-way handshake (SYN, SYN-ACK, ACK) establishes a connection to guarantee the receiver is ready. If a piece goes missing, TCP requests it again. <br><br><strong>UDP</strong> is like throwing a postcard in the mailbox. It's incredibly fast because there's no handshake or tracking overhead. You use UDP when speed matters more than perfection—like in live video streaming or real-time gaming!
+          </p>
+      </div>
     `
   },
   {
@@ -127,6 +155,13 @@ const layers = [
         <li><strong>Security & State:</strong> Manages Authentication, Authorization, and Session Restoration.</li>
         <li><strong>Protocols:</strong> RPC (Remote Procedure Call), SCP, and ZIP (Zone Information Protocol).</li>
       </ul>
+
+      <div style="margin-top: 3rem; padding: 2rem; background: rgba(251, 191, 36, 0.05); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 12px; position: relative;">
+          <div style="position: absolute; top: -15px; left: 20px; background: #000; padding: 0 10px; color: #fbbf24; font-weight: 600; font-size: 0.9rem; text-transform: uppercase;">Info Pack: The Unsung Hero</div>
+          <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 0;">
+            In modern networks, the Session, Presentation, and Application layers are often grouped together entirely into the TCP/IP "Application Layer." However, understanding Layer 5 is critical. Think about downloading a massive 50GB video game over Wi-Fi. If your router restarts at 49GB, you wouldn't want to start from 0GB again. The Session Layer's "Checkpoints" guarantee you only lose the data after the final sync point!
+          </p>
+      </div>
     `
   },
   {
@@ -153,6 +188,13 @@ const layers = [
         <li><strong>Compression:</strong> Squeezes data down for more efficient transit.</li>
         <li><strong>Sublayers:</strong> Composed of CASE (Common Application Service Element) and SASE (Specific Application Service Element).</li>
       </ul>
+
+      <div style="margin-top: 3rem; padding: 2rem; background: rgba(45, 212, 191, 0.05); border: 1px solid rgba(45, 212, 191, 0.2); border-radius: 12px; position: relative;">
+          <div style="position: absolute; top: -15px; left: 20px; background: #000; padding: 0 10px; color: #2dd4bf; font-weight: 600; font-size: 0.9rem; text-transform: uppercase;">Info Pack: The Translator</div>
+          <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 0;">
+            Without the Presentation Layer, the internet would be highly fragmented. Imagine a developer writing a game server in C++ and a web dashboard in JavaScript. These languages store data very differently in memory. Layer 6 forces them to agree on a universal syntax (like JSON or XML) to ensure that when the server says "Health: 100", the web dashboard actually understands it!
+          </p>
+      </div>
     `
   },
   {
@@ -178,6 +220,13 @@ const layers = [
         <li><strong>Services:</strong> Web browsing, application networking, network management, and file transfers.</li>
         <li><strong>Prominent Protocols:</strong> HTTP/HTTPS, FTP, SMTP/POP3/IMAP, and DNS.</li>
       </ul>
+
+      <div style="margin-top: 3rem; padding: 2rem; background: rgba(244, 114, 182, 0.05); border: 1px solid rgba(244, 114, 182, 0.2); border-radius: 12px; position: relative;">
+          <div style="position: absolute; top: -15px; left: 20px; background: #000; padding: 0 10px; color: #f472b6; font-weight: 600; font-size: 0.9rem; text-transform: uppercase;">Info Pack: The Layer 8 Problem</div>
+          <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 0;">
+            A widespread misconception is that Layer 7 <em>is</em> the software (like Google Chrome or Outlook). Not quite! The software is what the user interacts with, but Layer 7 is the underlying protocol (HTTP or SMTP) that the software uses to reach the network. In IT, when a user makes a mistake trying to use the software, engineers jokingly refer to this as a <strong>Layer 8 Issue</strong> (User Error).
+          </p>
+      </div>
     `
   }
 ];
