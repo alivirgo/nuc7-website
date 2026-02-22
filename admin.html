@@ -68,7 +68,10 @@
                         <tr style="background: rgba(255,255,255,0.05);">
                             <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">TIME (UTC)</th>
                             <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">PATH</th>
-                            <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">REFERRER</th>
+                            <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">LOCATION</th>
+                            <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">ISP / NETWORK
+                            </th>
+                            <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">COLO</th>
                             <th style="padding: 1.2rem; font-weight: 600; color: var(--text-secondary);">AGENT</th>
                         </tr>
                     </thead>
@@ -120,10 +123,12 @@
                         <tr>
                             <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05);">${new Date(h.timestamp).toLocaleTimeString()}</td>
                             <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: #fff;"><code>${h.path}</code></td>
-                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary);">${h.referrer}</td>
+                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary);">${h.city || '?'}, ${h.country || '?'}</td>
+                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary); font-size: 0.75rem;">${h.isp || 'Unknown'}</td>
+                            <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary);">${h.datacenter || '?'}</td>
                             <td style="padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary);">${h.userAgent ? h.userAgent.split(')')[0] + ')' : 'Auto'}</td>
                         </tr>
-                    `).join('') || '<tr><td colspan="4" style="padding: 4rem; text-align: center;">No activity recorded.</td></tr>';
+                    `).join('') || '<tr><td colspan="6" style="padding: 4rem; text-align: center;">No activity recorded.</td></tr>';
 
                     setTimeout(sync, 15000);
                 } else {
