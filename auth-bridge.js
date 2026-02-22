@@ -145,7 +145,8 @@ export default {
 
             // 3. SECURE EMAIL REGISTRATION
             if (path === '/send-registration' && request.method === 'POST') {
-                const { name, email } = await request.json();
+                const body = await request.json();
+                const { name, email, courseId } = body;
                 const ip = request.headers.get('cf-connecting-ip') || 'Unknown';
                 const cf = request.cf || {};
 
@@ -165,7 +166,8 @@ export default {
                         location: `${cf.city || '?'}, ${cf.country || '?'}`,
                         isp: cf.asOrganization || 'Unknown',
                         registeredAt: new Date().toISOString(),
-                        progress: { score: 0, chapters: [] }
+                        selectedCourse: courseId || 'osi-model',
+                        progress: { score: 0, scores: {}, chapters: [] }
                     };
                     await STATS_KV.put(`user:${email}`, JSON.stringify(userData));
 
@@ -174,10 +176,47 @@ export default {
                 }
 
                 // 3. INTEGRATION: SEND EMAIL (SENDGRID)
-                const { courseId } = await request.json().catch(() => ({}));
                 if (env.SENDGRID_API_KEY) {
-                    const frontendUrl = env.FRONTEND_URL || url.origin;
+                    const frontendUrl = env.FRONTEND_URL || 'https://nuc7.com';
                     const quizUrl = `${frontendUrl}/quiz.html?email=${encodeURIComponent(email)}&token=${token}${courseId ? `&course=${courseId}` : ''}`;
+
+                    const courseLabel = {
+                        'osi-model': 'OSI Model Mastery',
+                        'ip-addressing': 'IP Addressing & Subnetting',
+                        'network-fundamentals': 'Network Fundamentals'
+                    }[courseId] || 'Networking Mastery';
+
+                    const studentName = name || 'Candidate';
+
+                    const emailHtml = `
+                    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #e0e0e0; border-radius: 12px; overflow: hidden;">
+                        <div style="background: linear-gradient(135deg, #1a1a2e 0%, #0a0a0a 100%); padding: 40px 30px; text-align: center;">
+                            <h1 style="font-size: 2.5rem; font-weight: 200; color: #ffffff; margin: 0;">NUC7</h1>
+                            <p style="color: #888; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; margin-top: 8px;">networking ultimate courses</p>
+                        </div>
+
+                        <div style="padding: 30px;">
+                            <p style="font-size: 1.1rem; color: #ccc;">Hello <strong style="color: #fff;">${studentName}</strong>,</p>
+                            <p style="color: #999; line-height: 1.7;">Thank you for registering for <strong style="color: #4a90e2;">${courseLabel}</strong>. To gain access to the course portal, you must first pass a short qualification assessment.</p>
+
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="${quizUrl}" style="display: inline-block; padding: 14px 40px; background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 1rem;">Begin Qualification Assessment</a>
+                            </div>
+
+                            <p style="color: #666; font-size: 0.85rem; line-height: 1.6;">If the button doesn't work, copy and paste this link into your browser:</p>
+                            <p style="color: #4a90e2; font-size: 0.8rem; word-break: break-all;">${quizUrl}</p>
+
+                            <hr style="border: none; border-top: 1px solid #222; margin: 25px 0;">
+
+                            <p style="color: #555; font-size: 0.8rem; line-height: 1.5;">This link is unique to you and should not be shared. A minimum score of 7/10 is required for course access. Upon completion, you will receive a verifiable NUC7 certificate.</p>
+                        </div>
+
+                        <div style="background: #050505; padding: 20px 30px; text-align: center;">
+                            <p style="color: #444; font-size: 0.75rem; margin: 0;">&copy; 2026 NUC7 Architecture. All rights reserved.</p>
+                            <p style="color: #333; font-size: 0.7rem; margin-top: 4px;">nuc7.com</p>
+                        </div>
+                    </div>`;
+
                     await fetch('https://api.sendgrid.com/v3/mail/send', {
                         method: 'POST',
                         headers: {
@@ -185,10 +224,10 @@ export default {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            personalizations: [{ to: [{ email }] }],
+                            personalizations: [{ to: [{ email, name: studentName }] }],
                             from: { email: 'noreply@nuc7.com', name: 'NUC7 Course Team' },
-                            subject: 'Your NUC7 Qualification Quiz Link',
-                            content: [{ type: 'text/html', value: `<p>Start your Networking journey: <a href="${quizUrl}">Begin Qualification Test</a></p>` }]
+                            subject: `NUC7 — Your ${courseLabel} Assessment Link`,
+                            content: [{ type: 'text/html', value: emailHtml }]
                         })
                     });
                 }
