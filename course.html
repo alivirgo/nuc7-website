@@ -391,7 +391,8 @@
             doc.setTextColor(0, 0, 0); // Black text
             doc.setFont("helvetica", "bold");
             doc.setFontSize(80);
-            doc.text(studentName, 1000, 700, { align: 'center' }); // Centered, slightly above mid-point
+            // Moved Y from 700 to 660 to sit directly on the center horizontal line
+            doc.text(studentName, 1000, 660, { align: 'center' });
 
             // 3. Add Verification URL & Date (Bottom left, styled black)
             const safeToken = token || "DEV-BYPASS";
@@ -403,12 +404,16 @@
             doc.setFontSize(30);
             doc.setTextColor(0, 0, 0); // Black text
 
-            // Draw regular text
-            doc.text(`Completed on: ${date}  |  Verify at: `, 100, 1200);
+            // Draw regular text below the bottom horizontal line (Moved Y from 1200 to 1280)
+            const staticText = `Completed on: ${date}  |  Verify at: `;
+            doc.text(staticText, 100, 1280);
 
-            // Draw clickable link next to it (estimating width of previous text to be ~550px)
+            // Get precise width of the static string so the link aligns flawlessly
+            const textWidth = doc.getTextWidth(staticText);
+
+            // Draw clickable link next to it
             doc.setTextColor(0, 0, 255); // Blue link color
-            doc.textWithLink(publicUrl, 650, 1200, { url: fullUrl });
+            doc.textWithLink(publicUrl, 100 + textWidth, 1280, { url: fullUrl });
 
             // Trigger automatic download
             doc.save(`NUC7_Certificate_${studentName}.pdf`);
