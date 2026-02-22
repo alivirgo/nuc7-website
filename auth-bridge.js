@@ -529,6 +529,17 @@ export default {
                 }, null, 2), { headers: corsHeaders });
             }
 
+            // 8. VISITOR COUNTER
+            if (path === '/hit-stats' && request.method === 'GET') {
+                let count = 0;
+                if (STATS_KV) {
+                    const currentCount = await STATS_KV.get('total_visitors');
+                    count = parseInt(currentCount || '0') + 1;
+                    await STATS_KV.put('total_visitors', count.toString());
+                }
+                return new Response(JSON.stringify({ count }), { headers: corsHeaders });
+            }
+
             return new Response('NUC7 Bridge: Path Not Found', { status: 404, headers: corsHeaders });
 
         } catch (e) {

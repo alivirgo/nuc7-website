@@ -18,12 +18,18 @@
 <body>
     <nav class="navbar">
         <div class="container nav-container">
-            <span class="nav-logo">NUC7</span>
+            <a href="index.html" class="nav-logo" style="text-decoration: none; color: inherit;">NUC7</a>
             <div class="nav-links">
                 <a href="#catalog">Courses</a>
                 <a href="#about">Philosophy</a>
                 <a href="#register" onclick="openEnrollModal(); return false;">Access</a>
                 <a href="admin.html" style="opacity: 0.1;">.</a>
+            </div>
+            <div id="visitor-stat"
+                style="font-size: 0.7rem; color: var(--text-secondary); opacity: 0.8; letter-spacing: 1px; display: flex; align-items: center; gap: 0.5rem;">
+                <span
+                    style="width: 6px; height: 6px; background: #00ff00; border-radius: 50%; box-shadow: 0 0 10px #00ff00;"></span>
+                LIVE NODES: <span id="visitor-count" style="color: #fff; font-weight: 600;">...</span>
             </div>
         </div>
     </nav>
@@ -32,7 +38,9 @@
         <div class="hero-glow"></div>
         <div class="container fade-in">
             <span class="badge">networking ultimate courses</span>
-            <h1 class="logo-large">NUC7</h1>
+            <a href="index.html" style="text-decoration: none;">
+                <h1 class="logo-large">NUC7</h1>
+            </a>
             <h2 style="font-weight: 200; font-size: 1.5rem; color: var(--text-secondary);">Architectural Networking
                 Mastery</h2>
             <div style="margin-top: 3rem; display: flex; gap: 1.5rem; justify-content: center;">
@@ -348,6 +356,17 @@
                 btn.textContent = 'Request Assessment';
             }
         });
+        async function updateVisitorCount() {
+            try {
+                const res = await fetch(`${BRIDGE_URL}/hit-stats`);
+                const data = await res.json();
+                const countElem = document.getElementById('visitor-count');
+                if (countElem && data.count) {
+                    countElem.textContent = data.count.toLocaleString();
+                }
+            } catch (e) { }
+        }
+        updateVisitorCount();
     </script>
 </body>
 
