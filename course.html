@@ -140,8 +140,21 @@
             await loadCourse(); // Wait for data
 
             if (params.get('dev') === 'true') {
-                document.getElementById('course-portal').style.display = 'flex';
-                init();
+                const pass = prompt("Enter Dev Password:");
+                // SHA-256 for 'nuc7!nuc7!' is '3c6e94e414fdd5287f32997bb2292f72bc9776d50f00c776c11a5b8a5941defc'
+                const encoder = new TextEncoder();
+                const data = encoder.encode(pass);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+                if (hashHex === '3c6e94e414fdd5287f32997bb2292f72bc9776d50f00c776c11a5b8a5941defc') {
+                    document.getElementById('course-portal').style.display = 'flex';
+                    init();
+                } else {
+                    alert("Unauthorized access.");
+                    window.location.href = 'index.html';
+                }
                 return;
             }
 

@@ -62,25 +62,26 @@
                 <h3 style="text-align: center; margin-bottom: 3rem; font-size: 2.5rem; font-weight: 200;">Curriculum
                     <span style="font-weight: 600;">Catalog</span>
                 </h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem;"
+                    id="course-cards">
                     <!-- OSI Model Course -->
                     <div class="glass-card fade-in"
                         style="display: flex; flex-direction: column; justify-content: space-between;">
                         <div>
                             <span class="badge" style="color: #4a90e2; border-color: #4a90e2;">FUNDAMENTALS</span>
                             <h4 style="font-size: 1.8rem; margin: 1.5rem 0 1rem;">OSI Model Mastery</h4>
-                            <p style="color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6;">A deep-dive
-                                into the 7-layer architectural framework of communication. From cables to applications.
-                            </p>
+                            <p style="color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6;">Explore the
+                                7-layer framework that powers the digital world. Learn how data moves from physical bits
+                                to application logic.</p>
                             <ul
                                 style="color: var(--text-secondary); line-height: 2; margin-bottom: 2rem; padding-left: 1rem;">
                                 <li>The 7-Layer ISO/OSI standard</li>
-                                <li>Encapsulation & Peer Processes</li>
-                                <li>Acronym Mastery & Protocols</li>
+                                <li>Data Encapsulation & Life of a Packet</li>
+                                <li>Real-world Networking Protocols</li>
                             </ul>
                         </div>
-                        <a href="course.html?id=osi-model&dev=true" class="cta-btn" style="text-align: center;">Enter
-                            Course</a>
+                        <button onclick="openEnrollModal('osi-model')" class="cta-btn"
+                            style="text-align: center; width: 100%; border: none; cursor: pointer;">Enroll Now</button>
                     </div>
 
                     <!-- IP Addressing Course -->
@@ -90,16 +91,69 @@
                             <span class="badge" style="color: #4ade80; border-color: #4ade80;">ADVANCED</span>
                             <h4 style="font-size: 1.8rem; margin: 1.5rem 0 1rem;">IP Addressing & Subnetting</h4>
                             <p style="color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6;">Master the
-                                logic of network segmentation. Learn Binary, CIDR, and the transition to IPv6.</p>
+                                mathematics of the internet. From binary fundamental to advanced CIDR and IPv6
+                                subnetting.</p>
                             <ul
                                 style="color: var(--text-secondary); line-height: 2; margin-bottom: 2rem; padding-left: 1rem;">
-                                <li>Binary Fundamentals (Base-2)</li>
-                                <li>VLSM & Subnetting Calculator</li>
-                                <li>IPv6 Structure & Hex Logic</li>
+                                <li>Binary Fundamentals & Hexadecimal</li>
+                                <li>Subnetting Logic & CIDR Mastery</li>
+                                <li>IPv6 Transition & Modern Topology</li>
                             </ul>
                         </div>
-                        <a href="course.html?id=ip-addressing&dev=true" class="cta-btn"
-                            style="text-align: center;">Enter Course</a>
+                        <button onclick="openEnrollModal('ip-addressing')" class="cta-btn"
+                            style="text-align: center; width: 100%; border: none; cursor: pointer;">Enroll Now</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="deep-dive" class="section" style="background: rgba(255,255,255,0.02);">
+            <div class="container">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;">
+                    <div class="fade-in">
+                        <h3 style="font-size: 2.5rem; margin-bottom: 2rem; font-weight: 200;">Why <span
+                                style="font-weight: 600;">The OSI Model</span> Matters</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 1.5rem;">The Open
+                            Systems Interconnection (OSI) model is the universal language of computer networking. It
+                            provides a structured framework for understanding how data travels across a network, from
+                            the physical electrical signals to the complex application logic.</p>
+                        <p style="color: var(--text-secondary); line-height: 1.8;">By mastering the 7 layers, you gain
+                            the ability to troubleshoot complex connectivity issues, design scalable network
+                            architectures, and understand the deep protocols that run the modern internet.</p>
+                    </div>
+                    <div class="glass-card fade-in">
+                        <h4 style="color: #4a90e2; margin-bottom: 1rem;">Architectural Clarity</h4>
+                        <ul style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+                            <li>Isolate and solve network failures faster.</li>
+                            <li>Understand vendor-neutral networking standards.</li>
+                            <li>Bridge the gap between hardware and software.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="subnetting-seo" class="section">
+            <div class="container">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;">
+                    <div class="glass-card fade-in" style="order: 2;">
+                        <h4 style="color: #4ade80; margin-bottom: 1rem;">Precision Engineering</h4>
+                        <ul style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+                            <li>Eliminate IP address wastage with CIDR.</li>
+                            <li>Optimize network performance via segmentation.</li>
+                            <li>Prepare for the enterprise IPv6 transition.</li>
+                        </ul>
+                    </div>
+                    <div class="fade-in" style="order: 1;">
+                        <h3 style="font-size: 2.5rem; margin-bottom: 2rem; font-weight: 200;">The Art of <span
+                                style="font-weight: 600;">Subnetting</span></h3>
+                        <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 1.5rem;">IP Addressing
+                            is the geometry of the internet. Subnetting is the process of dividing a network into
+                            smaller, manageable sub-networks, ensuring security, performance, and efficient resource
+                            allocation.</p>
+                        <p style="color: var(--text-secondary); line-height: 1.8;">Our interactive courses help you
+                            master the binary logic behind IPv4 and the hexadecimal complexity of IPv6, giving you the
+                            edge in network engineering and cybersecurity.</p>
                     </div>
                 </div>
             </div>
@@ -125,6 +179,22 @@
         </section>
     </main>
 
+    <!-- Enrollment Modal -->
+    <div id="enroll-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center;">
+        <div class="glass-card" style="max-width: 400px; width: 90%; text-align: center;">
+            <h3 style="margin-bottom: 1rem;">Start Your Journey</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Please choose your desired path to begin the
+                enrollment process.</p>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <button onclick="selectCourse('osi-model')" class="cta-btn">OSI Model Mastery</button>
+                <button onclick="selectCourse('ip-addressing')" class="cta-btn"
+                    style="background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);">IP & Subnetting</button>
+                <button onclick="closeEnrollModal()" class="outline-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <footer class="section" style="padding: 5rem 0; border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
         <div class="container">
             <p style="color: var(--text-secondary); font-size: 0.8rem; letter-spacing: 1px;">&copy; 2026 NUC7
@@ -133,10 +203,24 @@
     </footer>
 
     <script>
-        // CONFIGURATION: Replace with your Cloudflare Worker URL
         const BRIDGE_URL = 'https://nuc7-auth-bridge.alivirgo123.workers.dev';
+        let selectedCourseId = null;
 
-        // Secure Tracking
+        function openEnrollModal(courseId) {
+            selectedCourseId = courseId;
+            document.getElementById('enroll-modal').style.display = 'flex';
+        }
+
+        function closeEnrollModal() {
+            document.getElementById('enroll-modal').style.display = 'none';
+        }
+
+        function selectCourse(courseId) {
+            selectedCourseId = courseId;
+            closeEnrollModal();
+            document.getElementById('register').scrollIntoView({ behavior: 'smooth' });
+        }
+
         async function trackVisitor() {
             const data = {
                 path: window.location.pathname,
@@ -152,7 +236,6 @@
         }
         trackVisitor();
 
-        // Registration Flow
         const regForm = document.getElementById('reg-form');
         const status = document.getElementById('status-msg');
         const btn = document.getElementById('reg-btn');
@@ -171,22 +254,13 @@
                     method: 'POST',
                     mode: 'cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, name })
+                    body: JSON.stringify({ email, name, courseId: selectedCourseId })
                 });
 
                 if (res.ok) {
                     status.style.color = '#44ff44';
                     status.textContent = 'Assessment link dispatched to your inbox.';
                     regForm.style.display = 'none';
-
-                    // Demo skip for user convenience
-                    const skip = document.createElement('a');
-                    skip.href = `quiz.html?email=${encodeURIComponent(email)}`;
-                    skip.className = 'outline-btn';
-                    skip.style.display = 'block';
-                    skip.style.marginTop = '2rem';
-                    skip.textContent = 'Manual Redirect (Dev Mode)';
-                    regForm.parentNode.appendChild(skip);
                 } else {
                     throw new Error();
                 }

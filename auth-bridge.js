@@ -150,7 +150,8 @@ export default {
                 const cf = request.cf || {};
 
                 // 1. Generate Signed Token
-                const salt = env.AUTH_SECRET || 'nuc7_prod_secret';
+                const salt = env.AUTH_SECRET;
+                if (!salt) throw new Error("AUTH_SECRET environment variable is required.");
                 const tokenSource = `${email}:${Date.now()}:${salt}`;
                 const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(tokenSource));
                 const token = btoa(Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''));
@@ -203,7 +204,8 @@ export default {
                     return new Response(JSON.stringify({ error: 'Score too low.' }), { status: 403, headers: corsHeaders });
                 }
 
-                const salt = env.AUTH_SECRET || 'nuc7_prod_secret';
+                const salt = env.AUTH_SECRET;
+                if (!salt) throw new Error("AUTH_SECRET environment variable is required.");
                 const tokenSource = `${email}:course_access:${salt}`;
                 const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(tokenSource));
                 const token = btoa(Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''));
@@ -225,7 +227,8 @@ export default {
                 const { email, chapterId, token } = await request.json();
 
                 // Token Validation
-                const salt = env.AUTH_SECRET || 'nuc7_prod_secret';
+                const salt = env.AUTH_SECRET;
+                if (!salt) throw new Error("AUTH_SECRET environment variable is required.");
                 const tokenSource = `${email}:course_access:${salt}`;
                 const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(tokenSource));
                 const expectedToken = btoa(Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''));
@@ -325,7 +328,8 @@ export default {
             // 5. VALIDATE TOKEN (Self-Service & Verification)
             if (path === '/validate-token' && request.method === 'POST') {
                 const { email, token } = await request.json();
-                const salt = env.AUTH_SECRET || 'nuc7_prod_secret';
+                const salt = env.AUTH_SECRET;
+                if (!salt) throw new Error("AUTH_SECRET environment variable is required.");
                 const tokenSource = `${email}:course_access:${salt}`;
                 const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(tokenSource));
                 const expectedToken = btoa(Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''));
@@ -347,7 +351,8 @@ export default {
                 if (STATS_KV) {
                     // Fetch all users to find the matching prefix
                     const users = await STATS_KV.list({ prefix: 'user:' });
-                    const salt = env.AUTH_SECRET || 'nuc7_prod_secret';
+                    const salt = env.AUTH_SECRET;
+                    if (!salt) throw new Error("AUTH_SECRET environment variable is required.");
 
                     for (let key of users.keys) {
                         const email = key.name.replace('user:', '');
