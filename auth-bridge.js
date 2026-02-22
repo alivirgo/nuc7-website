@@ -217,7 +217,7 @@ export default {
                         </div>
                     </div>`;
 
-                    await fetch('https://api.sendgrid.com/v3/mail/send', {
+                    const sgResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${env.SENDGRID_API_KEY}`,
@@ -225,11 +225,22 @@ export default {
                         },
                         body: JSON.stringify({
                             personalizations: [{ to: [{ email, name: studentName }] }],
-                            from: { email: 'noreply@nuc7.com', name: 'NUC7 Course Team' },
+                            from: { email: env.SENDGRID_FROM_EMAIL || 'noreply@nuc7.com', name: 'NUC7 Course Team' },
                             subject: `NUC7 — Your ${courseLabel} Assessment Link`,
                             content: [{ type: 'text/html', value: emailHtml }]
                         })
                     });
+
+                    if (!sgResponse.ok) {
+                        const sgError = await sgResponse.text();
+                        console.log(`SendGrid Error [${sgResponse.status}]: ${sgError}`);
+                        return new Response(JSON.stringify({
+                            success: true,
+                            message: 'Registered but email dispatch failed.',
+                            emailError: `SendGrid ${sgResponse.status}`,
+                            debug: sgError
+                        }), { headers: corsHeaders });
+                    }
                 }
 
                 return new Response(JSON.stringify({ success: true, message: 'Registry complete. Check email.' }), { headers: corsHeaders });
