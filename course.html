@@ -114,33 +114,35 @@
             // Update SEO
             document.title = courseMeta.seo.title;
 
-            // Load Data Script
-            return new Promise((resolve, reject) => {
-                const s = document.createElement('script');
-                s.src = `${courseMeta.script}?v=${Date.now()}`;
-                s.onload = () => {
-                    try {
-                        currentCourse = window[courseMeta.dataVar];
-                        if (!currentCourse) throw new Error(`Data variable ${courseMeta.dataVar} not found in ${courseMeta.script}`);
-                        layers = currentCourse.layers;
-                        resolve();
-                    } catch (err) {
-                        console.error("Data Load Error:", err);
-                        alert("Course Data Error: " + err.message);
-                        reject(err);
-                    }
-                };
-                s.onerror = () => {
-                    console.error("Script Load Error:", courseMeta.script);
-                    alert("Failed to load course script: " + courseMeta.script);
-                    reject(new Error("Script Load Error"));
-                };
-                document.head.appendChild(s);
-            });
+            // Fetch Secure Data from Bridge
+            try {
+                const res = await fetch(`${BRIDGE_URL}/get-course-data`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email || (window.location.search.includes('dev=true') ? 'dev@nuc7.dev' : null),
+                        token: token || (window.location.search.includes('dev=true') ? 'dev' : null),
+                        courseId
+                    })
+                });
+
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    throw new Error(errData.error || "Vault Connection Error");
+                }
+
+                currentCourse = await res.json();
+                layers = currentCourse.layers;
+            } catch (err) {
+                console.error("Secure Load Error:", err);
+                alert("Critical Security Error: Could not retrieve course content from NUC7 Vault. " + err.message);
+                throw err;
+            }
         }
 
         window.onload = async () => {
-            await loadCourse(); // Wait for data
+            // No early loadCourse() here - we load after auth succeeding
+
 
             if (params.get('dev') === 'true') {
                 const pass = prompt("Enter Dev Password:");
@@ -152,6 +154,7 @@
                 const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
                 if (hashHex === '3c6e94e414fdd5287f32997bb2292f72bc9776d50f00c776c11a5b8a5941defc') {
+                    await loadCourse();
                     document.getElementById('course-portal').style.display = 'flex';
                     initializeLocks([]);
                     init();
@@ -190,6 +193,7 @@
                         }
                     } catch (e) { console.warn("Could not fetch progress from bridge."); }
 
+                    await loadCourse();
                     document.getElementById('course-portal').style.display = 'flex';
                     initializeLocks(completed);
                     init();

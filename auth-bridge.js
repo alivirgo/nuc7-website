@@ -303,6 +303,79 @@ export default {
                 return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
             }
 
+            // 3.7 GET COURSE PROGRESS
+            if (path === '/get-progress' && request.method === 'POST') {
+                const body = await request.json().catch(() => ({}));
+                const { email, token, courseId } = body;
+
+                // Token Validation
+                const salt = env.AUTH_SECRET;
+                if (!salt) throw new Error("AUTH_SECRET environment variable is required.");
+                const tokenSource = `${email}:${courseId || 'osi-model'}:course_access:${salt}`;
+                const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(tokenSource));
+                const expectedToken = btoa(Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''));
+
+                if (token !== expectedToken) {
+                    return new Response(JSON.stringify({ error: 'Invalid Token' }), { status: 403, headers: corsHeaders });
+                }
+
+                let completedChapters = [];
+                if (STATS_KV) {
+                    let user = await STATS_KV.get(`user:${email}`, 'json');
+                    if (user && user.progress && user.progress.chapters) {
+                        // Filter chapters belonging to this course
+                        completedChapters = user.progress.chapters
+                            .filter(ch => ch.startsWith(`${courseId}:`))
+                            .map(ch => parseInt(ch.split(':')[1]));
+                    }
+                }
+                return new Response(JSON.stringify({ chapters: completedChapters }), { headers: corsHeaders });
+            }
+
+            // 3.8 SECURE COURSE DATA FETCH
+            if (path === '/get-course-data' && request.method === 'POST') {
+                const body = await request.json().catch(() => ({}));
+                const { email, token, courseId } = body;
+
+                // Token Validation
+                const salt = env.AUTH_SECRET;
+                if (!salt) throw new Error("AUTH_SECRET environment variable is required.");
+                const tokenSource = `${email}:${courseId || 'osi-model'}:course_access:${salt}`;
+                const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(tokenSource));
+                const expectedToken = btoa(Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''));
+
+                if (token !== expectedToken) {
+                    return new Response(JSON.stringify({ error: 'Invalid Token' }), { status: 403, headers: corsHeaders });
+                }
+
+                // Map courseId to filename in vault
+                const vaultFiles = {
+                    'osi-model': 'osi_model_data.json',
+                    'ip-addressing': 'ip_addressing_data.json',
+                    'network-fundamentals': 'network_fundamentals_data.json'
+                };
+
+                const fileName = vaultFiles[courseId];
+                if (!fileName) {
+                    return new Response(JSON.stringify({ error: 'Course Data Not Found' }), { status: 404, headers: corsHeaders });
+                }
+
+                const res = await fetch(`https://api.github.com/repos/alivirgo/nuc7-vault/contents/${fileName}`, {
+                    headers: {
+                        'Authorization': `token ${env.GITHUB_PAT}`,
+                        'Accept': 'application/vnd.github.v3.raw',
+                        'User-Agent': 'nuc7-auth-bridge'
+                    }
+                });
+
+                if (!res.ok) {
+                    return new Response(JSON.stringify({ error: "Failed to load course data from vault" }), { status: 500, headers: corsHeaders });
+                }
+
+                const data = await res.json();
+                return new Response(JSON.stringify(data), { headers: corsHeaders });
+            }
+
             // 4. SECURE QUESTION FETCH
             if (path === '/get-questions' && request.method === 'GET') {
                 const layerParam = url.searchParams.get('layer'); // ?layer=1
