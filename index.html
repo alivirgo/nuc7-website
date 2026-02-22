@@ -22,7 +22,7 @@
             <div class="nav-links">
                 <a href="#catalog">Courses</a>
                 <a href="#about">Philosophy</a>
-                <a href="#register">Access</a>
+                <a href="#register" onclick="openEnrollModal(); return false;">Access</a>
                 <a href="admin.html" style="opacity: 0.1;">.</a>
             </div>
         </div>
@@ -37,7 +37,7 @@
                 Mastery</h2>
             <div style="margin-top: 3rem; display: flex; gap: 1.5rem; justify-content: center;">
                 <a href="#catalog" class="cta-btn">View Catalog</a>
-                <a href="#register" class="outline-btn">Enroll Now</a>
+                <a href="#register" class="outline-btn" onclick="openEnrollModal(); return false;">Enroll Now</a>
             </div>
         </div>
     </header>
@@ -80,7 +80,7 @@
                                 <li>Real-world Networking Protocols</li>
                             </ul>
                         </div>
-                        <button onclick="openEnrollModal('osi-model')" class="cta-btn"
+                        <button onclick="selectCourse('osi-model')" class="cta-btn"
                             style="text-align: center; width: 100%; border: none; cursor: pointer;">Enroll Now</button>
                     </div>
 
@@ -100,7 +100,7 @@
                                 <li>IPv6 Transition & Modern Topology</li>
                             </ul>
                         </div>
-                        <button onclick="openEnrollModal('ip-addressing')" class="cta-btn"
+                        <button onclick="selectCourse('ip-addressing')" class="cta-btn"
                             style="text-align: center; width: 100%; border: none; cursor: pointer;">Enroll Now</button>
                     </div>
                 </div>
@@ -162,7 +162,9 @@
         <section id="register" class="section">
             <div class="container">
                 <div class="glass-card fade-in" style="max-width: 500px; margin: 0 auto;">
-                    <h3 style="margin-bottom: 1rem;">Entry Qualification</h3>
+                    <h3 style="margin-bottom: 0.5rem;">Entry Qualification</h3>
+                    <p id="selected-path" style="color: #4a90e2; margin-bottom: 1rem; font-weight: 600; display: none;">
+                        Selected Path: <span id="course-name-display"></span></p>
                     <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.9rem;">Submit your email
                         to receive your unique assessment link. Qualification is required for course access.</p>
                     <form id="reg-form">
@@ -206,8 +208,12 @@
         const BRIDGE_URL = 'https://nuc7-auth-bridge.alivirgo123.workers.dev';
         let selectedCourseId = null;
 
-        function openEnrollModal(courseId) {
-            selectedCourseId = courseId;
+        const courseNames = {
+            'osi-model': 'OSI Model Mastery',
+            'ip-addressing': 'IP & Subnetting'
+        };
+
+        function openEnrollModal() {
             document.getElementById('enroll-modal').style.display = 'flex';
         }
 
@@ -218,6 +224,11 @@
         function selectCourse(courseId) {
             selectedCourseId = courseId;
             closeEnrollModal();
+
+            // Update UI
+            document.getElementById('course-name-display').textContent = courseNames[courseId];
+            document.getElementById('selected-path').style.display = 'block';
+
             document.getElementById('register').scrollIntoView({ behavior: 'smooth' });
         }
 
