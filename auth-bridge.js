@@ -336,6 +336,47 @@ export default {
                 return new Response(JSON.stringify({ valid: false }), { status: 403, headers: corsHeaders });
             }
 
+            // 6. PUBLIC CERTIFICATE VERIFICATION (Lookup by Token Prefix)
+            if (path === '/verify-certificate' && request.method === 'GET') {
+                const tokenPrefix = url.searchParams.get('token');
+
+                if (!tokenPrefix || tokenPrefix.length < 8) {
+                    return new Response(JSON.stringify({ valid: false, error: 'Invalid Token Format' }), { status: 400, headers: corsHeaders });
+                }
+
+                if (STATS_KV) {
+                    // Fetch all users to find the matching prefix
+                    const users = await STATS_KV.list({ prefix: 'user:' });
+                    const salt = env.AUTH_SECRET || 'nuc7_prod_secret';
+
+                    for (let key of users.keys) {
+                        const email = key.name.replace('user:', '');
+                        const tokenSource = `${email}:course_access:${salt}`;
+                        const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(tokenSource));
+                        const expectedToken = btoa(Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''));
+
+                        // Check if the first 8 characters match
+                        if (expectedToken.substring(0, tokenPrefix.length) === tokenPrefix) {
+                            // Match found! Get user details
+                            const userDataStr = await STATS_KV.get(key.name);
+                            if (userDataStr) {
+                                const userData = JSON.parse(userDataStr);
+                                // Ensure they actually finished the course (scored perfect 7)
+                                if (userData.progress && userData.progress.score >= 7) {
+                                    return new Response(JSON.stringify({
+                                        valid: true,
+                                        name: userData.name !== 'Anonymous' ? userData.name : email.split('@')[0],
+                                        date: userData.registeredAt
+                                    }), { headers: corsHeaders });
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return new Response(JSON.stringify({ valid: false, error: 'Certificate Not Found' }), { status: 404, headers: corsHeaders });
+            }
+
             return new Response('NUC7 Bridge: Path Not Found', { status: 404, headers: corsHeaders });
 
         } catch (e) {

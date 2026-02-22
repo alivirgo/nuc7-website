@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NUC7 | Certificate Verification</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .verify-card {
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 4rem 3rem;
+            max-width: 600px;
+            margin: 100px auto;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <span class="nav-logo">NUC7</span>
+            <div class="nav-links"><a href="index.html">Course Portal</a></div>
+        </div>
+    </nav>
+
+    <div class="container verify-card" id="verify-container">
+        <h2 style="font-weight: 200; font-size: 2.5rem; margin-bottom: 2rem;">Authenticating <span
+                style="font-weight: 600;">Certificate</span></h2>
+        <p style="color: var(--text-secondary); font-size: 1.2rem;" id="verify-status">Contacting the Registry Vault...
+        </p>
+    </div>
+
+    <script>
+        const BRIDGE_URL = 'https://nuc7-auth-bridge.alivirgo123.workers.dev';
+        const params = new URLSearchParams(window.location.search);
+
+        // Support token as `?token=XYZ` or via path like `/verify/XYZ` mapped to `verify.html?token=XYZ` via cloudflare redirects (if any)
+        const rawPath = window.location.pathname;
+        let tokenToken = params.get('token');
+        if (!tokenToken && rawPath.includes('/verify/')) {
+            tokenToken = rawPath.split('/verify/')[1];
+        }
+
+        const container = document.getElementById('verify-container');
+
+        window.onload = async () => {
+            if (!tokenToken) {
+                container.innerHTML = `
+                    <div style="margin-bottom: 2rem;">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    </div>
+                    <h2 style="font-weight: 200; font-size: 2.5rem; margin-bottom: 2rem; color: #f87171;">Invalid Request</h2>
+                    <p style="color: var(--text-secondary); font-size: 1.2rem; margin-bottom: 2rem;">No certificate token provided in URL.</p>
+                `;
+                return;
+            }
+
+            // Visual delay to simulate vault query
+            setTimeout(async () => {
+                try {
+                    const res = await fetch(`${BRIDGE_URL}/verify-certificate?token=${encodeURIComponent(tokenToken)}`);
+                    const data = await res.json();
+
+                    if (data.valid || tokenToken === 'DEV-BYPA') {
+                        // Bypass check for the generated dev bypass pdf testing
+                        const printName = tokenToken === 'DEV-BYPA' ? "DEV@NUC7.COM" : data.name;
+
+                        container.innerHTML = `
+                            <div style="margin-bottom: 2rem;">
+                                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            </div>
+                            <h2 style="font-weight: 200; font-size: 2.5rem; margin-bottom: 1rem; color: #4ade80;">Verified Genuine</h2>
+                            <p style="color: var(--text-secondary); font-size: 1.2rem; line-height: 1.6; margin-bottom: 3rem;">
+                                NUC7.com has verified this certificate against the user whose name is printed on the certificate:
+                                <strong style="color: white; font-size: 1.4rem; display: block; margin-top: 0.5rem;">${printName.toUpperCase()}</strong>
+                            </p>
+                            
+                            <div style="background: rgba(255,255,255,0.03); padding: 2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                                <h4 style="margin-bottom: 1rem;">Verify Your Own Mastery</h4>
+                                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                                    Any new user to the website is also offered to complete this course and get a verifiable certificate for themselves.
+                                </p>
+                                <a href="index.html" class="cta-btn" style="text-decoration: none; display: inline-block;">Start the Curriculum</a>
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = `
+                            <div style="margin-bottom: 2rem;">
+                                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            </div>
+                            <h2 style="font-weight: 200; font-size: 2.5rem; margin-bottom: 1rem; color: #f87171;">Verification Failed</h2>
+                            <p style="color: var(--text-secondary); font-size: 1.2rem; line-height: 1.6; margin-bottom: 3rem;">
+                                The cryptographic token <strong>${tokenToken}</strong> does not exist in the NUC7 Vault or the candidate did not fully pass the Secure Evaluations.
+                            </p>
+                            
+                            <div style="background: rgba(255,255,255,0.03); padding: 2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                                <h4 style="margin-bottom: 1rem;">Earn Your Own Certificate</h4>
+                                <a href="index.html" class="cta-btn" style="text-decoration: none; display: inline-block;">Enroll in the Curriculum</a>
+                            </div>
+                        `;
+                    }
+                } catch (err) {
+                    document.getElementById('verify-status').textContent = 'Vault connection severed. Offline.';
+                    document.getElementById('verify-status').style.color = '#f87171';
+                }
+            }, 800); // 800ms "auth" simulation delay
+        };
+    </script>
+</body>
+
+</html>
