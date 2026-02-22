@@ -127,7 +127,8 @@
 
                     setTimeout(sync, 15000);
                 } else {
-                    loginErr.textContent = 'Unauthorized: Access Denied';
+                    const errorData = await res.json().catch(() => ({ error: 'Unauthorized: Access Denied' }));
+                    loginErr.textContent = errorData.error || 'Unauthorized: Access Denied';
                 }
             } catch (err) {
                 loginErr.textContent = 'Connection Refused by Bridge';
