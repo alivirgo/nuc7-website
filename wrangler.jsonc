@@ -1,5 +1,5 @@
 {
-  "name": "nuc7-auth-bridge",
+  "name": "nuc7-website-v1",
   "main": "auth-bridge.js",
   "compatibility_date": "2024-04-03",
   "kv_namespaces": [
