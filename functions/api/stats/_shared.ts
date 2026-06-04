@@ -109,10 +109,6 @@ export function dailyKey(date: string) {
 	return `${PREFIX}${date}`;
 }
 
-export function hitKey(hit: StatsHit) {
-	return `${HIT_PREFIX}${hit.date}:${Date.parse(hit.at)}:${crypto.randomUUID()}`;
-}
-
 export function hitPrefix(date: string) {
 	return `${HIT_PREFIX}${date}:`;
 }

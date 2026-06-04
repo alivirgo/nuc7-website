@@ -3,7 +3,6 @@ import {
 	browserFromUserAgent,
 	botSignalFromUserAgent,
 	deviceFromUserAgent,
-	hitKey,
 	increment,
 	normalizeReferrer,
 	operatingSystemFromUserAgent,
@@ -151,6 +150,10 @@ function weekdayBucket(date = new Date()) {
 function requestColo(request: Request) {
 	const cf = (request as Request & { cf?: { colo?: string } }).cf;
 	return cf?.colo || 'Unknown';
+}
+
+function analyticsHitKey(date: string, now: Date) {
+	return `stats:hit:${date}:${now.getTime()}:${crypto.randomUUID().slice(0, 12)}`;
 }
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
@@ -302,7 +305,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 			},
 			...(daily.recentActivity ?? []),
 		].slice(0, MAX_RECENT_ACTIVITY);
-		await env.NUC7_STATS.put(hitKey(hit), JSON.stringify(hit), { expirationTtl: HIT_RETENTION_SECONDS });
+		await env.NUC7_STATS.put(analyticsHitKey(date, now), JSON.stringify(hit), { expirationTtl: HIT_RETENTION_SECONDS });
 	}
 
 	if (payload.type === 'event' && payload.eventName) {
@@ -330,7 +333,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 				},
 				...(daily.recentActivity ?? []),
 			].slice(0, MAX_RECENT_ACTIVITY);
-			await env.NUC7_STATS.put(hitKey(hit), JSON.stringify(hit), { expirationTtl: HIT_RETENTION_SECONDS });
+			await env.NUC7_STATS.put(analyticsHitKey(date, now), JSON.stringify(hit), { expirationTtl: HIT_RETENTION_SECONDS });
 		}
 	}
 
