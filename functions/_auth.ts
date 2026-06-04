@@ -16,6 +16,12 @@ interface SessionPayload {
 	exp: number;
 }
 
+interface StatePayload {
+	mode: 'admin' | 'decap';
+	nextPath: string;
+	exp: number;
+}
+
 function base64UrlEncode(input: string) {
 	return btoa(input).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
 }
@@ -124,12 +130,13 @@ export async function requireAdminSession(request: Request, env: AuthEnv) {
 	return email && email === ownerEmail(env) ? email : null;
 }
 
-export async function createStateCookie(nextPath: string, env: AuthEnv) {
+export async function createStateCookie(nextPath: string, env: AuthEnv, mode: 'admin' | 'decap' = 'admin') {
 	if (!env.SESSION_SECRET) {
 		throw new Error('Missing SESSION_SECRET.');
 	}
 
-	const statePayload = {
+	const statePayload: StatePayload = {
+		mode,
 		nextPath,
 		exp: Math.floor(Date.now() / 1000) + 600,
 	};
@@ -161,12 +168,15 @@ export async function readState(request: Request, state: string | null, env: Aut
 		return null;
 	}
 
-	const payload = JSON.parse(base64UrlDecode(encoded)) as { nextPath?: string; exp?: number };
+	const payload = JSON.parse(base64UrlDecode(encoded)) as Partial<StatePayload>;
 	if (!payload.exp || payload.exp < Math.floor(Date.now() / 1000)) {
 		return null;
 	}
 
-	return payload.nextPath || '/admin/';
+	return {
+		mode: payload.mode === 'decap' ? 'decap' : 'admin',
+		nextPath: payload.nextPath || '/admin/',
+	};
 }
 
 export async function exchangeGithubCodeForToken(code: string, env: AuthEnv) {

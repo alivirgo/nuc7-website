@@ -44,6 +44,10 @@ Set these in the Cloudflare Pages project before production use:
 - `SESSION_SECRET` (long random string used to sign secure owner sessions)
 - `SITE_TIMEZONE` (for daily stats buckets, for example `Asia/Karachi`)
 
+The GitHub OAuth app should use this callback URL:
+
+- `https://nuc7.com/api/auth/callback`
+
 The KV binding is already configured in [wrangler.jsonc](/D:/Learning/nuc7%20website/nuc7-website/wrangler.jsonc).
 
 ## CMS

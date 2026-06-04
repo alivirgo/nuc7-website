@@ -8,11 +8,13 @@ export const onRequestGet: PagesFunction<AuthEnv> = async ({ request, env }) => 
 	const url = new URL(request.url);
 	const nextPath = url.searchParams.get('next') || '/admin/';
 	const { state, cookie } = await createStateCookie(nextPath, env);
+	const redirectUri = new URL('/api/auth/callback', url.origin).toString();
 
 	const params = new URLSearchParams({
 		client_id: env.GITHUB_CLIENT_ID,
 		scope: 'read:user user:email',
 		state,
+		redirect_uri: redirectUri,
 	});
 
 	return new Response(null, {
