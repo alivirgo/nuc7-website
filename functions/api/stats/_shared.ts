@@ -40,6 +40,12 @@ export interface DailyStats {
 	operatingSystems?: Record<string, number>;
 	botSignals?: Record<string, number>;
 	eventLabels?: Record<string, number>;
+	sessions?: number;
+	returningSessions?: number;
+	sessionDepths?: Record<string, number>;
+	sessionAgeBuckets?: Record<string, number>;
+	visitorAgeBuckets?: Record<string, number>;
+	visitCounts?: Record<string, number>;
 	recentActivity?: RecentActivity[];
 }
 
@@ -88,6 +94,11 @@ export interface StatsHit {
 	connectionType?: string;
 	operatingSystem?: string;
 	botSignal?: string;
+	sessionId?: string;
+	sessionPageViews?: number;
+	sessionAgeBucket?: string;
+	visitorAgeBucket?: string;
+	visitCountBucket?: string;
 	eventName?: string;
 	label?: string;
 }
@@ -148,6 +159,12 @@ export function blankDaily(date: string): DailyStats {
 		operatingSystems: {},
 		botSignals: {},
 		eventLabels: {},
+		sessions: 0,
+		returningSessions: 0,
+		sessionDepths: {},
+		sessionAgeBuckets: {},
+		visitorAgeBuckets: {},
+		visitCounts: {},
 		recentActivity: [],
 	};
 }
@@ -186,6 +203,12 @@ export function ensureDailyShape(stats: DailyStats) {
 		operatingSystems: stats.operatingSystems ?? {},
 		botSignals: stats.botSignals ?? {},
 		eventLabels: stats.eventLabels ?? {},
+		sessions: stats.sessions ?? 0,
+		returningSessions: stats.returningSessions ?? 0,
+		sessionDepths: stats.sessionDepths ?? {},
+		sessionAgeBuckets: stats.sessionAgeBuckets ?? {},
+		visitorAgeBuckets: stats.visitorAgeBuckets ?? {},
+		visitCounts: stats.visitCounts ?? {},
 		recentActivity: stats.recentActivity ?? [],
 	};
 }
@@ -283,16 +306,40 @@ export function parseCookies(header: string | null) {
 
 export function visitorCookieState(request: Request, date: string) {
 	const cookies = parseCookies(request.headers.get('cookie'));
+	const now = Date.now();
+	const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
 	const visitorId = cookies.nuc7_vid;
-	const lastSeen = cookies.nuc7_last;
-	const isNewVisitor = !visitorId || lastSeen !== date;
+	const firstSeen = Number(cookies.nuc7_first || now);
+	const lastSeenDate = cookies.nuc7_last;
+	const isNewVisitor = !visitorId || lastSeenDate !== date;
+	const visitCount = Math.max(1, Number(cookies.nuc7_visits || 0) + (isNewVisitor ? 1 : 0));
+	const sessionLastSeen = Number(cookies.nuc7_session_last || 0);
+	const sessionStarted = Number(cookies.nuc7_session_started || now);
+	const existingSessionId = cookies.nuc7_sid;
+	const isNewSession = !existingSessionId || !sessionLastSeen || now - sessionLastSeen > SESSION_TIMEOUT_MS;
+	const finalSessionId = isNewSession ? crypto.randomUUID().slice(0, 18) : existingSessionId;
+	const finalSessionStarted = isNewSession ? now : sessionStarted;
+	const sessionPageViews = isNewSession ? 1 : Math.max(1, Number(cookies.nuc7_session_views || 0) + 1);
 	const finalVisitorId = visitorId || crypto.randomUUID().slice(0, 18);
 
 	return {
 		isNewVisitor,
+		isNewSession,
+		visitorId: finalVisitorId,
+		sessionId: finalSessionId,
+		firstSeen,
+		visitCount,
+		sessionStarted: finalSessionStarted,
+		sessionPageViews,
 		headers: [
 			`nuc7_vid=${finalVisitorId}; Path=/; HttpOnly; Max-Age=31536000; SameSite=Lax; Secure`,
 			`nuc7_last=${date}; Path=/; HttpOnly; Max-Age=172800; SameSite=Lax; Secure`,
+			`nuc7_first=${firstSeen}; Path=/; HttpOnly; Max-Age=31536000; SameSite=Lax; Secure`,
+			`nuc7_visits=${visitCount}; Path=/; HttpOnly; Max-Age=31536000; SameSite=Lax; Secure`,
+			`nuc7_sid=${finalSessionId}; Path=/; HttpOnly; Max-Age=1800; SameSite=Lax; Secure`,
+			`nuc7_session_started=${finalSessionStarted}; Path=/; HttpOnly; Max-Age=1800; SameSite=Lax; Secure`,
+			`nuc7_session_last=${now}; Path=/; HttpOnly; Max-Age=1800; SameSite=Lax; Secure`,
+			`nuc7_session_views=${sessionPageViews}; Path=/; HttpOnly; Max-Age=1800; SameSite=Lax; Secure`,
 		],
 	};
 }

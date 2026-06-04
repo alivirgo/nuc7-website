@@ -133,7 +133,8 @@ function searchTerm(search = '', referrer = '') {
 	if (!referrer) return '';
 	try {
 		const ref = new URL(referrer);
-		return cleanValue(ref.searchParams.get('q') || ref.searchParams.get('query') || ref.searchParams.get('p') || '', 100);
+		const term = ref.searchParams.get('q') || ref.searchParams.get('query') || ref.searchParams.get('p') || '';
+		return term ? cleanValue(term, 100) : '';
 	} catch {
 		return '';
 	}
@@ -150,6 +151,27 @@ function weekdayBucket(date = new Date()) {
 function requestColo(request: Request) {
 	const cf = (request as Request & { cf?: { colo?: string } }).cf;
 	return cf?.colo || 'Unknown';
+}
+
+function ageBucket(ms: number) {
+	const minutes = Math.max(0, Math.floor(ms / 60000));
+	if (minutes < 1) return 'Under 1 minute';
+	if (minutes < 5) return '1-4 minutes';
+	if (minutes < 15) return '5-14 minutes';
+	if (minutes < 30) return '15-29 minutes';
+	if (minutes < 60) return '30-59 minutes';
+	if (minutes < 60 * 24) return '1-23 hours';
+	if (minutes < 60 * 24 * 7) return '1-6 days';
+	if (minutes < 60 * 24 * 30) return '1-4 weeks';
+	return '30+ days';
+}
+
+function countBucket(count: number) {
+	if (count <= 1) return '1';
+	if (count <= 2) return '2';
+	if (count <= 5) return '3-5';
+	if (count <= 10) return '6-10';
+	return '11+';
 }
 
 function analyticsHitKey(date: string, now: Date) {
@@ -218,6 +240,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		const colorScheme = cleanValue(payload.colorScheme || 'Unknown', 20);
 		const connectionType = cleanValue(payload.connectionType || 'Unknown', 30);
 		const category = pageCategory(pathname);
+		const sessionAge = ageBucket(now.getTime() - cookies.sessionStarted);
+		const visitorAge = ageBucket(now.getTime() - cookies.firstSeen);
+		const visitCountBucket = countBucket(cookies.visitCount);
+		const sessionDepth = countBucket(cookies.sessionPageViews);
 		const hit: StatsHit = {
 			date,
 			at: now.toISOString(),
@@ -249,12 +275,24 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 			connectionType,
 			operatingSystem,
 			botSignal,
+			sessionId: cookies.sessionId,
+			sessionPageViews: cookies.sessionPageViews,
+			sessionAgeBucket: sessionAge,
+			visitorAgeBucket: visitorAge,
+			visitCountBucket,
 		};
 
 		if (cookies.isNewVisitor) {
 			daily.visitors += 1;
 		} else {
 			daily.returningVisitors = (daily.returningVisitors ?? 0) + 1;
+		}
+
+		if (cookies.isNewSession) {
+			daily.sessions = (daily.sessions ?? 0) + 1;
+			if (!cookies.isNewVisitor) {
+				daily.returningSessions = (daily.returningSessions ?? 0) + 1;
+			}
 		}
 
 		for (const cookieHeader of cookies.headers) {
@@ -281,6 +319,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		increment(daily.screenSizes ??= {}, screen);
 		increment(daily.colorSchemes ??= {}, colorScheme);
 		increment(daily.connectionTypes ??= {}, connectionType);
+		increment(daily.sessionAgeBuckets ??= {}, sessionAge);
+		increment(daily.visitorAgeBuckets ??= {}, visitorAge);
+		increment(daily.visitCounts ??= {}, visitCountBucket);
+		increment(daily.sessionDepths ??= {}, sessionDepth);
 
 		if (searchSource) increment(daily.searchEngines ??= {}, searchSource);
 		if (social) increment(daily.socialSources ??= {}, social);

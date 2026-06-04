@@ -1,6 +1,6 @@
 import type { DailyStats, Env } from './_shared';
 import { requireAdminSession } from '../../_auth';
-import { ensureDailyShape, hitPrefix, increment, requireStatsToken, topEntries, type StatsHit, unauthorizedResponse } from './_shared';
+import { ensureDailyShape, requireStatsToken, topEntries, unauthorizedResponse } from './_shared';
 
 function clamp(value: number, min: number, max: number) {
 	return Math.max(min, Math.min(max, value));
@@ -39,8 +39,14 @@ function aggregateDays(days: DailyStats[]) {
 		operatingSystems: {} as Record<string, number>,
 		botSignals: {} as Record<string, number>,
 		eventLabels: {} as Record<string, number>,
+		sessionDepths: {} as Record<string, number>,
+		sessionAgeBuckets: {} as Record<string, number>,
+		visitorAgeBuckets: {} as Record<string, number>,
+		visitCounts: {} as Record<string, number>,
 		recentActivity: [] as NonNullable<DailyStats['recentActivity']>,
 		returningVisitors: 0,
+		sessions: 0,
+		returningSessions: 0,
 	};
 
 	for (const rawDay of days) {
@@ -48,6 +54,8 @@ function aggregateDays(days: DailyStats[]) {
 		totals.views += day.pageViews;
 		totals.visitors += day.visitors;
 		totals.returningVisitors += day.returningVisitors ?? 0;
+		totals.sessions += day.sessions ?? 0;
+		totals.returningSessions += day.returningSessions ?? 0;
 
 		for (const [key, value] of Object.entries(day.pages)) totals.pages[key] = (totals.pages[key] ?? 0) + value;
 		for (const [key, value] of Object.entries(day.referrers)) totals.referrers[key] = (totals.referrers[key] ?? 0) + value;
@@ -78,6 +86,10 @@ function aggregateDays(days: DailyStats[]) {
 		for (const [key, value] of Object.entries(day.operatingSystems ?? {})) totals.operatingSystems[key] = (totals.operatingSystems[key] ?? 0) + value;
 		for (const [key, value] of Object.entries(day.botSignals ?? {})) totals.botSignals[key] = (totals.botSignals[key] ?? 0) + value;
 		for (const [key, value] of Object.entries(day.eventLabels ?? {})) totals.eventLabels[key] = (totals.eventLabels[key] ?? 0) + value;
+		for (const [key, value] of Object.entries(day.sessionDepths ?? {})) totals.sessionDepths[key] = (totals.sessionDepths[key] ?? 0) + value;
+		for (const [key, value] of Object.entries(day.sessionAgeBuckets ?? {})) totals.sessionAgeBuckets[key] = (totals.sessionAgeBuckets[key] ?? 0) + value;
+		for (const [key, value] of Object.entries(day.visitorAgeBuckets ?? {})) totals.visitorAgeBuckets[key] = (totals.visitorAgeBuckets[key] ?? 0) + value;
+		for (const [key, value] of Object.entries(day.visitCounts ?? {})) totals.visitCounts[key] = (totals.visitCounts[key] ?? 0) + value;
 		totals.recentActivity.push(...(day.recentActivity ?? []));
 	}
 
@@ -97,96 +109,6 @@ function conversionRows(events: Record<string, number>, views: number) {
 
 function strongest(record: Record<string, number>) {
 	return topEntries(record, 1)[0] ?? null;
-}
-
-async function listHitsForDate(kv: KVNamespace, date: string) {
-	const hits: StatsHit[] = [];
-	let cursor: string | undefined;
-
-	do {
-		const listed = await kv.list({ prefix: hitPrefix(date), cursor, limit: 1000 });
-		cursor = listed.list_complete ? undefined : listed.cursor;
-		const batch = await Promise.all(
-			listed.keys.map(async (entry) => kv.get<StatsHit>(entry.name, 'json')),
-		);
-		hits.push(...(batch.filter(Boolean) as StatsHit[]));
-	} while (cursor);
-
-	return hits;
-}
-
-function dateStatsFromHits(date: string, hits: StatsHit[]) {
-	const stats = ensureDailyShape({
-		date,
-		visitors: 0,
-		pageViews: 0,
-		pages: {},
-		referrers: {},
-		countries: {},
-		devices: {},
-		browsers: {},
-		events: {},
-	});
-
-	for (const hit of hits) {
-		if (hit.type === 'pageview') {
-			stats.pageViews += 1;
-			if (!hit.returningVisitor) stats.visitors += 1;
-			else stats.returningVisitors = (stats.returningVisitors ?? 0) + 1;
-
-			increment(stats.pages, hit.pathname);
-			increment(stats.landingPages ??= {}, hit.pathname);
-			if (hit.referrer) increment(stats.referrers, hit.referrer);
-			if (hit.country) increment(stats.countries, hit.country);
-			if (hit.device) increment(stats.devices, hit.device);
-			if (hit.browser) increment(stats.browsers, hit.browser);
-			if (hit.pageCategory) increment(stats.pageCategories ??= {}, hit.pageCategory);
-			if (hit.searchTerm) increment(stats.searchTerms ??= {}, hit.searchTerm);
-			if (hit.searchEngine) increment(stats.searchEngines ??= {}, hit.searchEngine);
-			if (hit.socialSource) increment(stats.socialSources ??= {}, hit.socialSource);
-			if (hit.trafficSource) increment(stats.trafficSources ??= {}, hit.trafficSource);
-			if (hit.utmSource) increment(stats.utmSources ??= {}, hit.utmSource);
-			if (hit.utmMedium) increment(stats.utmMediums ??= {}, hit.utmMedium);
-			if (hit.utmCampaign) increment(stats.utmCampaigns ??= {}, hit.utmCampaign);
-			if (hit.utmContent) increment(stats.utmContents ??= {}, hit.utmContent);
-			if (hit.utmTerm) increment(stats.utmTerms ??= {}, hit.utmTerm);
-			if (hit.language) increment(stats.languages ??= {}, hit.language);
-			if (hit.timezone) increment(stats.timezones ??= {}, hit.timezone);
-			if (hit.colo) increment(stats.colo ??= {}, hit.colo);
-			if (hit.hour) increment(stats.hours ??= {}, hit.hour);
-			if (hit.weekday) increment(stats.weekdays ??= {}, hit.weekday);
-			if (hit.viewport) increment(stats.viewportSizes ??= {}, hit.viewport);
-			if (hit.screen) increment(stats.screenSizes ??= {}, hit.screen);
-			if (hit.colorScheme) increment(stats.colorSchemes ??= {}, hit.colorScheme);
-			if (hit.connectionType) increment(stats.connectionTypes ??= {}, hit.connectionType);
-			if (hit.operatingSystem) increment(stats.operatingSystems ??= {}, hit.operatingSystem);
-			if (hit.botSignal) increment(stats.botSignals ??= {}, hit.botSignal);
-		}
-
-		if (hit.type === 'event' && hit.eventName) {
-			increment(stats.events, hit.eventName);
-			if (hit.label) increment(stats.eventLabels ??= {}, `${hit.eventName}: ${hit.label}`);
-		}
-
-		stats.recentActivity = [
-			{
-				at: hit.at,
-				type: hit.type,
-				pathname: hit.pathname,
-				referrer: hit.referrer,
-				country: hit.country,
-				device: hit.device,
-				browser: hit.browser,
-				eventName: hit.eventName,
-				label: hit.label,
-				campaign: hit.utmCampaign,
-				source: hit.trafficSource,
-			},
-			...(stats.recentActivity ?? []),
-		].slice(0, 80);
-	}
-
-	return stats;
 }
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
@@ -217,16 +139,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 		}),
 	);
 
-	const hitDays = await Promise.all(
-		dates.map(async (date) => ({
-			date,
-			hits: await listHitsForDate(env.NUC7_STATS, date),
-		})),
-	);
-	const hasHitRecords = hitDays.some((day) => day.hits.length > 0);
-	const validDays = hasHitRecords
-		? hitDays.map((day) => dateStatsFromHits(day.date, day.hits)).filter((day) => day.pageViews || Object.keys(day.events).length)
-		: daily.filter(Boolean).map((day) => ensureDailyShape(day as DailyStats));
+	const validDays = daily.filter(Boolean).map((day) => ensureDailyShape(day as DailyStats));
 	const totals = aggregateDays(validDays);
 	const topPage = strongest(totals.pages);
 	const topReferrer = strongest(totals.referrers);
@@ -241,6 +154,9 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 			visitors: totals.visitors,
 			returningVisitors: totals.returningVisitors,
 			visitorReturnRate: percent(totals.returningVisitors, totals.views),
+			sessions: totals.sessions,
+			returningSessions: totals.returningSessions,
+			sessionReturnRate: percent(totals.returningSessions, totals.sessions),
 			events: Object.values(totals.events).reduce((sum, value) => sum + value, 0),
 			clickRate: percent(Object.values(totals.events).reduce((sum, value) => sum + value, 0), totals.views),
 			daysTracked: validDays.length,
@@ -279,6 +195,10 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 		topColorSchemes: topEntries(totals.colorSchemes, 10),
 		topConnectionTypes: topEntries(totals.connectionTypes, 10),
 		topBotSignals: topEntries(totals.botSignals, 10),
+		topSessionDepths: topEntries(totals.sessionDepths, 10),
+		topSessionAgeBuckets: topEntries(totals.sessionAgeBuckets, 10),
+		topVisitorAgeBuckets: topEntries(totals.visitorAgeBuckets, 10),
+		topVisitCounts: topEntries(totals.visitCounts, 10),
 		topEvents: topEntries(totals.events, 25),
 		topEventLabels: topEntries(totals.eventLabels, 25),
 		topUtmSources: topEntries(totals.utmSources, 25),

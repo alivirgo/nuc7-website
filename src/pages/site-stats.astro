@@ -103,6 +103,13 @@ import Layout from '../layouts/Layout.astro';
 						<div id="stats-color-schemes" style="margin-top: 1rem;"></div>
 					</div>
 					<div class="table-card">
+						<strong>Sessions and Returning Visitors</strong>
+						<div id="stats-session-depths"></div>
+						<div id="stats-session-ages" style="margin-top: 1rem;"></div>
+						<div id="stats-visitor-ages" style="margin-top: 1rem;"></div>
+						<div id="stats-visit-counts" style="margin-top: 1rem;"></div>
+					</div>
+					<div class="table-card">
 						<strong>Tracked Events and Click Rates</strong>
 						<div id="stats-events"></div>
 						<div id="stats-conversions" style="margin-top: 1rem;"></div>
@@ -218,6 +225,9 @@ import Layout from '../layouts/Layout.astro';
 				<div class="stats-card"><strong>Views</strong><span>${summary.views}</span></div>
 				<div class="stats-card"><strong>Events</strong><span>${summary.events}</span></div>
 				<div class="stats-card"><strong>Click Rate</strong><span>${formatRate(summary.clickRate)}</span></div>
+				<div class="stats-card"><strong>Sessions</strong><span>${summary.sessions}</span></div>
+				<div class="stats-card"><strong>Returning Sessions</strong><span>${summary.returningSessions}</span></div>
+				<div class="stats-card"><strong>Returning Session Rate</strong><span>${formatRate(summary.sessionReturnRate)}</span></div>
 				<div class="stats-card"><strong>Returning Signals</strong><span>${summary.returningVisitors}</span></div>
 				<div class="stats-card"><strong>Search Share</strong><span>${formatRate(summary.searchShare)}</span></div>
 				<div class="stats-card"><strong>AI Answer Share</strong><span>${formatRate(summary.aiAnswerShare)}</span></div>
@@ -311,6 +321,10 @@ import Layout from '../layouts/Layout.astro';
 			renderTable('stats-screens', data.topScreenSizes, 'No screen size data yet.');
 			renderTable('stats-connections', data.topConnectionTypes, 'No connection data yet.');
 			renderTable('stats-color-schemes', data.topColorSchemes, 'No color scheme data yet.');
+			renderTable('stats-session-depths', data.topSessionDepths, 'No session depth data yet.');
+			renderTable('stats-session-ages', data.topSessionAgeBuckets, 'No session age data yet.');
+			renderTable('stats-visitor-ages', data.topVisitorAgeBuckets, 'No visitor age data yet.');
+			renderTable('stats-visit-counts', data.topVisitCounts, 'No visit count data yet.');
 			renderTable('stats-bot-signals', data.topBotSignals, 'No bot signal data yet.');
 			renderTable('stats-events', data.topEvents, 'No tracked events yet.');
 			renderRateTable('stats-conversions', data.conversions, 'No conversion-style click rates yet.');
