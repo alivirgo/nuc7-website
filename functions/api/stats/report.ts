@@ -1,6 +1,6 @@
 import type { DailyStats, Env } from './_shared';
 import { requireAdminSession } from '../../_auth';
-import { requireStatsToken, topEntries } from './_shared';
+import { requireStatsToken, topEntries, unauthorizedResponse } from './_shared';
 
 function clamp(value: number, min: number, max: number) {
 	return Math.max(min, Math.min(max, value));
@@ -40,6 +40,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
 	const sessionEmail = await requireAdminSession(request, env);
 	if (!sessionEmail) {
+		if (!env.SITE_STATS_TOKEN) return unauthorizedResponse();
 		const authError = requireStatsToken(request, env);
 		if (authError) return authError;
 	}

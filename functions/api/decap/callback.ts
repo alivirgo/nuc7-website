@@ -1,7 +1,4 @@
-import {
-	clearStateCookie,
-	type AuthEnv,
-} from '../../_auth';
+import type { AuthEnv } from '../../_auth';
 
 export const onRequestGet: PagesFunction<AuthEnv> = async ({ request, env }) => {
 	const url = new URL(request.url);
@@ -12,7 +9,6 @@ export const onRequestGet: PagesFunction<AuthEnv> = async ({ request, env }) => 
 		Location: callbackUrl.toString(),
 		'Cache-Control': 'no-store',
 	});
-	headers.append('Set-Cookie', clearStateCookie());
 
 	return new Response(null, {
 		status: 302,
