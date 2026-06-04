@@ -362,6 +362,25 @@ export function itemListSchema(items: { title: string; href: string }[], url: UR
 	};
 }
 
+export function comparisonFaqs(appName: string, competitorName: string): FAQ[] {
+	return [
+		{
+			question: `Is ${appName} officially connected to ${competitorName}?`,
+			answer: `No. This is an independent NUC7 Studios comparison written to help parents and users understand which app may fit a specific learning or productivity need. ${competitorName} is owned by its respective company.`,
+		},
+		{
+			question: `Should parents use ${appName} instead of ${competitorName}?`,
+			answer:
+				'Not always. The better choice depends on the goal, age, budget, privacy expectations, and whether the family wants broad curriculum coverage or a smaller focused practice tool.',
+		},
+		{
+			question: 'How should parents read app comparison articles?',
+			answer:
+				'Parents should use comparison articles as a starting point, then check the current app store listing, privacy policy, screenshots, and hands-on fit for their own child or household.',
+		},
+	];
+}
+
 export function breadcrumbSchema(items: { name: string; href: string }[], url: URL) {
 	return {
 		'@type': 'BreadcrumbList',

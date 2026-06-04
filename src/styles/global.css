@@ -678,6 +678,28 @@ main {
 	line-height: 1.65;
 }
 
+.competitor-panel {
+	display: grid;
+	gap: 1rem;
+	align-content: start;
+}
+
+.competitor-card {
+	padding: 0.9rem;
+	border: 1px solid rgba(23, 50, 70, 0.1);
+	border-radius: var(--radius);
+	background: rgba(255, 255, 255, 0.78);
+}
+
+.competitor-card strong {
+	display: block;
+	font-family: 'Sora', sans-serif;
+}
+
+.competitor-card p {
+	margin: 0.45rem 0 0;
+}
+
 .comparison-block {
 	display: grid;
 	gap: 1rem;

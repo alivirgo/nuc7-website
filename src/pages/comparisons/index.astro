@@ -1,0 +1,90 @@
+---
+import { getCollection } from 'astro:content';
+import FAQBlock from '../../components/FAQBlock.astro';
+import Footer from '../../components/Footer.astro';
+import GuideCard from '../../components/GuideCard.astro';
+import Header from '../../components/Header.astro';
+import Layout from '../../layouts/Layout.astro';
+import { breadcrumbSchema, faqsToSchema, itemListSchema } from '../../lib/aeo';
+
+const comparisons = (await getCollection('comparisons')).sort((a, b) => a.data.title.localeCompare(b.data.title));
+const pageUrl = new URL(Astro.url.pathname, Astro.site);
+const faqs = [
+	{
+		question: 'Why does NUC7 publish app comparison articles?',
+		answer:
+			'NUC7 publishes independent comparison articles to help parents and users choose between broad learning platforms, focused practice apps, and productivity tools. The goal is practical decision support, not pretending to be another app.',
+	},
+	{
+		question: 'Are these competitor comparisons official partnerships?',
+		answer:
+			'No. Competitor names are used only for identification and comparison. NUC7 Studios is not affiliated with the compared apps unless a page explicitly says otherwise.',
+	},
+	{
+		question: 'How often should comparison pages be reviewed?',
+		answer:
+			'Comparison pages should be reviewed every 60 to 90 days because app features, pricing, privacy details, and availability can change.',
+	},
+];
+const schema = [
+	breadcrumbSchema(
+		[
+			{ name: 'Home', href: '/' },
+			{ name: 'Comparisons', href: '/comparisons/' },
+		],
+		pageUrl,
+	),
+	itemListSchema(
+		comparisons.map((comparison) => ({
+			title: comparison.data.title,
+			href: `/comparisons/${comparison.id}/`,
+		})),
+		pageUrl,
+	),
+	faqsToSchema(faqs, pageUrl),
+];
+---
+
+<Layout
+	title="App Comparisons"
+	description="Independent NUC7 Studios app comparisons for parents choosing kids learning apps, math tools, tracing practice, and parent productivity apps."
+	schema={schema}
+>
+	<Header />
+	<main>
+		<section class="section">
+			<div class="shell">
+				<span class="eyebrow">App Comparisons</span>
+				<h1 class="section-title">Choose the app that fits the job.</h1>
+				<p class="section-copy">
+					These pages compare NUC7 apps with popular learning and productivity tools so parents can
+					see when a focused NUC7 app makes sense, and when a broader app may be the better fit.
+				</p>
+			</div>
+		</section>
+
+		<section class="section tone-paper">
+			<div class="shell guide-grid">
+				{comparisons.map((comparison) => (
+					<GuideCard
+						href={`/comparisons/${comparison.id}/`}
+						title={comparison.data.title}
+						summary={comparison.data.summary}
+						label={comparison.data.eyebrow}
+					/>
+				))}
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="shell">
+				<FAQBlock
+					title="About these comparisons"
+					intro="A clear note on how to read competitor comparisons responsibly."
+					faqs={faqs}
+				/>
+			</div>
+		</section>
+	</main>
+	<Footer />
+</Layout>

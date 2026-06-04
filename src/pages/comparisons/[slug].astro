@@ -1,0 +1,173 @@
+---
+import { getCollection, render } from 'astro:content';
+import CompetitorMatrix from '../../components/CompetitorMatrix.astro';
+import DirectAnswer from '../../components/DirectAnswer.astro';
+import FAQBlock from '../../components/FAQBlock.astro';
+import Footer from '../../components/Footer.astro';
+import GuideCard from '../../components/GuideCard.astro';
+import Header from '../../components/Header.astro';
+import RelatedApps from '../../components/RelatedApps.astro';
+import Layout from '../../layouts/Layout.astro';
+import { breadcrumbSchema, comparisonFaqs, faqsToSchema, itemListSchema } from '../../lib/aeo';
+import { sortApps } from '../../lib/catalog';
+
+const allApps = (await getCollection('apps')).sort(sortApps);
+const allComparisons = await getCollection('comparisons');
+
+export async function getStaticPaths() {
+	const comparisons = await getCollection('comparisons');
+	return comparisons.map((comparison) => ({
+		params: { slug: comparison.id },
+		props: { comparison },
+	}));
+}
+
+const { comparison } = Astro.props;
+const { Content } = await render(comparison);
+const ourApp = allApps.find((app) => app.id === comparison.data.ourApp);
+const relatedApps = comparison.data.relatedApps
+	.map((id) => allApps.find((app) => app.id === id))
+	.filter(Boolean);
+const relatedComparisons = allComparisons
+	.filter((entry) => entry.id !== comparison.id && entry.data.relatedApps.some((id) => comparison.data.relatedApps.includes(id)))
+	.slice(0, 3);
+const competitorLabel = comparison.data.competitors.map((competitor) => competitor.name).join(' / ');
+const faqs = comparison.data.faqs.length > 0
+	? comparison.data.faqs
+	: comparisonFaqs(ourApp?.data.title ?? 'the NUC7 app', competitorLabel);
+const pageUrl = new URL(Astro.url.pathname, Astro.site);
+const schema = [
+	{
+		'@type': 'Article',
+		'@id': `${pageUrl.href}#article`,
+		headline: comparison.data.title,
+		description: comparison.data.summary,
+		image: new URL(comparison.data.heroImage, Astro.site).href,
+		dateModified: comparison.data.lastReviewed ?? '2026-06-04',
+		author: {
+			'@type': 'Organization',
+			name: 'NUC7 Studios',
+		},
+		publisher: {
+			'@type': 'Organization',
+			name: 'NUC7 Studios',
+		},
+		mainEntityOfPage: pageUrl.href,
+		about: comparison.data.competitors.map((competitor) => competitor.name).concat(ourApp?.data.title ?? []),
+	},
+	breadcrumbSchema(
+		[
+			{ name: 'Home', href: '/' },
+			{ name: 'Comparisons', href: '/comparisons/' },
+			{ name: comparison.data.title, href: `/comparisons/${comparison.id}/` },
+		],
+		pageUrl,
+	),
+	itemListSchema(
+		relatedApps.map((app) => ({
+			title: app.data.title,
+			href: `/apps/${app.id}/`,
+		})),
+		pageUrl,
+	),
+	faqsToSchema(faqs, pageUrl),
+];
+---
+
+<Layout title={comparison.data.title} description={comparison.data.summary} image={comparison.data.heroImage} schema={schema}>
+	<Header />
+	<main>
+		<section class="section">
+			<div class="shell hero-grid">
+				<div class="hero-copy">
+					<span class="eyebrow">{comparison.data.eyebrow}</span>
+					<h1 class="section-title">{comparison.data.title}</h1>
+					<p class="section-copy">{comparison.data.summary}</p>
+					<DirectAnswer answer={comparison.data.directAnswer} points={comparison.data.answerPoints} />
+				</div>
+
+				<div class="hero-visual">
+					<div class="hero-image-frame compact">
+						<img src={comparison.data.heroImage} alt={comparison.data.title} />
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="section tone-paper">
+			<div class="shell split-grid">
+				<article class="info-card page-prose">
+					<p class="notice">
+						<strong>Independent comparison:</strong> NUC7 Studios is not affiliated with the compared
+						apps unless stated otherwise. Competitor names are used only to help parents identify
+						which products are being compared.
+					</p>
+					<p><strong>Quick verdict:</strong> {comparison.data.verdict}</p>
+					{comparison.data.lastReviewed && <p><strong>Last reviewed:</strong> {comparison.data.lastReviewed}</p>}
+					<Content />
+				</article>
+
+				<aside class="info-card competitor-panel">
+					<h3>Compared apps</h3>
+					{comparison.data.competitors.map((competitor) => (
+						<div class="competitor-card">
+							<strong>{competitor.url ? <a href={competitor.url} rel="nofollow noopener" target="_blank">{competitor.name}</a> : competitor.name}</strong>
+							<p>{competitor.bestFor}</p>
+							<p><em>May be better for:</em> {competitor.mayBeBetterFor}</p>
+						</div>
+					))}
+					<h3>Search questions covered</h3>
+					<ul class="answer-points">
+						{comparison.data.searchIntents.map((intent) => <li>{intent}</li>)}
+					</ul>
+				</aside>
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="shell">
+				<CompetitorMatrix
+					rows={comparison.data.comparisonRows}
+					nuc7Label={ourApp?.data.title ?? 'NUC7 app'}
+					competitorLabel={competitorLabel}
+				/>
+			</div>
+		</section>
+
+		<section class="section tone-paper">
+			<div class="shell">
+				<RelatedApps apps={relatedApps} />
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="shell">
+				<FAQBlock
+					title="Comparison questions"
+					intro="Practical answers for parents and users comparing these apps."
+					faqs={faqs}
+				/>
+			</div>
+		</section>
+
+		{relatedComparisons.length > 0 && (
+			<section class="section tone-paper">
+				<div class="shell">
+					<span class="eyebrow">More comparisons</span>
+					<h2 class="section-title">Related app decisions.</h2>
+					<div class="guide-grid" style="margin-top: 1.5rem;">
+						{relatedComparisons.map((entry) => (
+							<GuideCard
+								href={`/comparisons/${entry.id}/`}
+								title={entry.data.title}
+								summary={entry.data.summary}
+								label={entry.data.eyebrow}
+							/>
+						))}
+					</div>
+				</div>
+			</section>
+		)}
+	</main>
+	<Footer />
+</Layout>

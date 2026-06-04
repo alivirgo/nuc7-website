@@ -1,0 +1,45 @@
+---
+interface Row {
+	criterion: string;
+	nuc7: string;
+	competitor: string;
+	parentTakeaway: string;
+}
+
+interface Props {
+	rows: Row[];
+	nuc7Label: string;
+	competitorLabel: string;
+}
+
+const { rows, nuc7Label, competitorLabel } = Astro.props;
+---
+
+{rows.length > 0 && (
+	<section class="comparison-block">
+		<span class="eyebrow">Feature fit</span>
+		<h2 class="section-title">Side-by-side parent decision table.</h2>
+		<div class="comparison-scroll">
+			<table class="comparison-table">
+				<thead>
+					<tr>
+						<th>Decision point</th>
+						<th>{nuc7Label}</th>
+						<th>{competitorLabel}</th>
+						<th>Parent takeaway</th>
+					</tr>
+				</thead>
+				<tbody>
+					{rows.map((row) => (
+						<tr>
+							<td><strong>{row.criterion}</strong></td>
+							<td>{row.nuc7}</td>
+							<td>{row.competitor}</td>
+							<td>{row.parentTakeaway}</td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+		</div>
+	</section>
+)}

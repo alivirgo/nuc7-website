@@ -156,3 +156,83 @@ collections:
         field: { label: "Question or Intent", name: "intent", widget: "string" }
       - { label: "Last Reviewed", name: "lastReviewed", widget: "string", required: false }
       - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: comparisons
+    label: App Comparisons
+    label_singular: App Comparison
+    folder: src/content/comparisons
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Summary", name: "summary", widget: "text" }
+      - { label: "Eyebrow", name: "eyebrow", widget: "string", default: "Independent comparison" }
+      - { label: "Direct Answer", name: "directAnswer", widget: "text" }
+      - { label: "Verdict", name: "verdict", widget: "text" }
+      - label: Answer Points
+        name: answerPoints
+        widget: list
+        required: false
+        field: { label: "Point", name: "point", widget: "string" }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        default: "parents"
+        options:
+          - { label: "Kids Home Schooling", value: "kids" }
+          - { label: "Parent Productivity", value: "adults" }
+          - { label: "Parents", value: "parents" }
+          - { label: "Privacy", value: "privacy" }
+      - label: "Comparison Type"
+        name: comparisonType
+        widget: "select"
+        default: "versus"
+        options:
+          - { label: "Versus", value: "versus" }
+          - { label: "Alternative", value: "alternative" }
+          - { label: "Best List", value: "best-list" }
+      - { label: "NUC7 App Slug", name: "ourApp", widget: "string", hint: "Example: tracelearn-kids" }
+      - { label: "Hero Image", name: "heroImage", widget: "image", default: "/images/hero-studio.png" }
+      - label: Competitors
+        name: competitors
+        widget: list
+        min: 1
+        fields:
+          - { label: "Name", name: "name", widget: "string" }
+          - { label: "Official URL", name: "url", widget: "string", required: false }
+          - { label: "Best For", name: "bestFor", widget: "text" }
+          - { label: "May Be Better For", name: "mayBeBetterFor", widget: "text" }
+      - label: Comparison Rows
+        name: comparisonRows
+        widget: list
+        min: 3
+        fields:
+          - { label: "Criterion", name: "criterion", widget: "string" }
+          - { label: "NUC7", name: "nuc7", widget: "text" }
+          - { label: "Competitor", name: "competitor", widget: "text" }
+          - { label: "Parent Takeaway", name: "parentTakeaway", widget: "text" }
+      - label: FAQs
+        name: faqs
+        widget: list
+        required: false
+        fields:
+          - { label: "Question", name: "question", widget: "string" }
+          - { label: "Answer", name: "answer", widget: "text" }
+      - label: Related Apps
+        name: relatedApps
+        widget: list
+        required: false
+        field: { label: "App Slug", name: "app", widget: "string" }
+      - label: Related Guides
+        name: relatedGuides
+        widget: list
+        required: false
+        field: { label: "Guide Slug", name: "guide", widget: "string" }
+      - label: Search Intents
+        name: searchIntents
+        widget: list
+        required: false
+        field: { label: "Question or Intent", name: "intent", widget: "string" }
+      - { label: "Last Reviewed", name: "lastReviewed", widget: "string", required: false }
+      - { label: "Body", name: "body", widget: "markdown" }

@@ -53,7 +53,7 @@ const answerPageSchema = z.object({
 	relatedApps: z.array(z.string()).default([]),
 	relatedGuides: z.array(z.string()).default([]),
 	searchIntents: z.array(z.string()).default([]),
-	lastReviewed: z.string().optional(),
+	lastReviewed: z.coerce.string().optional(),
 });
 
 const hubs = defineCollection({
@@ -68,10 +68,42 @@ const guides = defineCollection({
 	}),
 });
 
+const comparisons = defineCollection({
+	loader: glob({ base: './src/content/comparisons', pattern: '**/*.md' }),
+	schema: answerPageSchema.extend({
+		comparisonType: z.enum(['versus', 'alternative', 'best-list']).default('versus'),
+		ourApp: z.string(),
+		competitors: z.array(
+			z.object({
+				name: z.string(),
+				url: z.string().url().optional(),
+				bestFor: z.string(),
+				mayBeBetterFor: z.string(),
+			}),
+		),
+		verdict: z.string(),
+		comparisonRows: z.array(
+			z.object({
+				criterion: z.string(),
+				nuc7: z.string(),
+				competitor: z.string(),
+				parentTakeaway: z.string(),
+			}),
+		),
+		faqs: z.array(
+			z.object({
+				question: z.string(),
+				answer: z.string(),
+			}),
+		).default([]),
+	}),
+});
+
 export const collections = {
 	apps,
 	pages,
 	privacy,
 	hubs,
 	guides,
+	comparisons,
 };
