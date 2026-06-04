@@ -73,11 +73,46 @@
 		</div>
 		<script src="https://unpkg.com/decap-cms@^3.13.0/dist/decap-cms.js"></script>
 		<script>
+			function replayDirectTabAuthorization() {
+				const message = localStorage.getItem('nuc7_decap_authorization');
+				const createdAt = Number(localStorage.getItem('nuc7_decap_authorization_created_at') || 0);
+				const isFresh = createdAt && Date.now() - createdAt < 2 * 60 * 1000;
+
+				if (typeof message !== 'string' || !message.startsWith('authorization:github:success') || !isFresh) {
+					localStorage.removeItem('nuc7_decap_authorization');
+					localStorage.removeItem('nuc7_decap_authorization_created_at');
+					return;
+				}
+
+				const note = document.getElementById('nuc7-admin-note');
+				if (note) {
+					note.querySelector('strong').textContent = 'GitHub approved. Loading the CMS...';
+					const detail = note.querySelector('p');
+					if (detail) {
+						detail.textContent = 'The admin page received the GitHub editing token and is handing it to Decap now.';
+					}
+				}
+
+				let attempts = 0;
+				const replay = window.setInterval(() => {
+					window.postMessage(message, window.location.origin);
+					attempts += 1;
+
+					if (attempts >= 12) {
+						window.clearInterval(replay);
+						localStorage.removeItem('nuc7_decap_authorization');
+						localStorage.removeItem('nuc7_decap_authorization_created_at');
+					}
+				}, 250);
+			}
+
 			window.addEventListener('message', (event) => {
 				if (typeof event.data === 'string' && event.data.startsWith('authorization:github:success')) {
 					document.getElementById('nuc7-admin-note')?.remove();
 				}
 			});
+
+			replayDirectTabAuthorization();
 		</script>
 	</body>
 </html>
