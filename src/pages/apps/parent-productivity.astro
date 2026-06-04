@@ -1,0 +1,80 @@
+---
+import { getCollection } from 'astro:content';
+import AppCard from '../../components/AppCard.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import DirectAnswer from '../../components/DirectAnswer.astro';
+import FAQBlock from '../../components/FAQBlock.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import Layout from '../../layouts/Layout.astro';
+import { adultsCategoryFaqs, breadcrumbSchema, faqsToSchema, itemListSchema } from '../../lib/aeo';
+import { byCategory, categoryMeta, sortApps } from '../../lib/catalog';
+
+const apps = byCategory((await getCollection('apps')).sort(sortApps), 'adults');
+const meta = categoryMeta.adults;
+const pageUrl = new URL(Astro.url.pathname, Astro.site);
+const schema = [
+	breadcrumbSchema(
+		[
+			{ name: 'Home', href: '/' },
+			{ name: 'Apps', href: '/apps/' },
+			{ name: meta.title, href: '/apps/parent-productivity/' },
+		],
+		pageUrl,
+	),
+	itemListSchema(
+		apps.map((app) => ({
+			title: app.data.title,
+			href: `/apps/${app.id}/`,
+		})),
+		pageUrl,
+	),
+	faqsToSchema(adultsCategoryFaqs, pageUrl),
+];
+---
+
+<Layout title={meta.title} description={meta.copy} image={meta.image} schema={schema}>
+	<Header />
+	<main>
+		<section class="section">
+			<div class="shell">
+				<span class="eyebrow">Parent Productivity</span>
+				<h1 class="section-title">{meta.title}</h1>
+				<p class="section-copy">{meta.copy}</p>
+				<DirectAnswer
+					eyebrow="Productivity Answer"
+					title="Which parent productivity app fits the job?"
+					answer="Why Did I Open My Phone? fits intentional phone use and focus recovery for busy parents. AI Maths Calculator fits practical math help for parents, older students, and everyday problem-solving."
+				/>
+				<div class="page-banner">
+					<img src={meta.image} alt={meta.title} />
+				</div>
+			</div>
+		</section>
+
+		<section class="section tone-paper">
+			<div class="shell">
+				<div class="app-grid">
+					{apps.map((app) => <AppCard app={app} showCategory={false} />)}
+				</div>
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="shell">
+				<ComparisonTable apps={apps} />
+			</div>
+		</section>
+
+		<section class="section tone-paper">
+			<div class="shell">
+				<FAQBlock
+					title="Parent productivity app questions"
+					intro="Answers for parents comparing focus, phone-use intention, math help, and app availability."
+					faqs={adultsCategoryFaqs}
+				/>
+			</div>
+		</section>
+	</main>
+	<Footer />
+</Layout>

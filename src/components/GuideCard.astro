@@ -1,0 +1,16 @@
+---
+interface Props {
+	href: string;
+	title: string;
+	summary: string;
+	label?: string;
+}
+
+const { href, title, summary, label = 'Guide' } = Astro.props;
+---
+
+<a class="guide-card" href={href} data-stats-event="guide-card-click">
+	<span>{label}</span>
+	<h3>{title}</h3>
+	<p>{summary}</p>
+</a>

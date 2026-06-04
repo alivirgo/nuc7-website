@@ -1,0 +1,27 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import AppCard from './AppCard.astro';
+
+interface Props {
+	apps: CollectionEntry<'apps'>[];
+	title?: string;
+	copy?: string;
+}
+
+const {
+	apps,
+	title = 'Recommended NUC7 apps',
+	copy = 'These apps are the closest fit for the question this page answers.',
+} = Astro.props;
+---
+
+{apps.length > 0 && (
+	<section class="related-apps">
+		<span class="eyebrow">Recommended Apps</span>
+		<h2 class="section-title">{title}</h2>
+		<p class="section-copy">{copy}</p>
+		<div class="app-grid" style="margin-top: 1.5rem;">
+			{apps.map((app) => <AppCard app={app} />)}
+		</div>
+	</section>
+)}

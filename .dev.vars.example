@@ -1,0 +1,6 @@
+GITHUB_CLIENT_ID=your_github_oauth_app_client_id
+GITHUB_CLIENT_SECRET=your_github_oauth_app_client_secret
+GITHUB_REPO_ID=optional_repository_id_for_finer_oauth_scope
+OWNER_GITHUB_EMAIL=alivirgo123@live.com
+SESSION_SECRET=generate_a_long_random_secret_for_signed_admin_sessions
+SITE_TIMEZONE=Asia/Karachi

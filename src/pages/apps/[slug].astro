@@ -1,0 +1,187 @@
+---
+import { getCollection, render } from 'astro:content';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import DirectAnswer from '../../components/DirectAnswer.astro';
+import FAQBlock from '../../components/FAQBlock.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import StatusPill from '../../components/StatusPill.astro';
+import StoreButtons from '../../components/StoreButtons.astro';
+import Layout from '../../layouts/Layout.astro';
+import { appAnswerProfiles, appToSoftwareSchema, breadcrumbSchema, faqsToSchema } from '../../lib/aeo';
+import { categoryMeta, sortApps, statusLabels } from '../../lib/catalog';
+
+const apps = (await getCollection('apps')).sort(sortApps);
+
+export async function getStaticPaths() {
+	const entries = await getCollection('apps');
+	return entries.map((app) => ({
+		params: { slug: app.id },
+		props: { app },
+	}));
+}
+
+const { app } = Astro.props;
+const { Content } = await render(app);
+const category = categoryMeta[app.data.category];
+const relatedApps = apps
+	.filter((entry) => entry.data.category === app.data.category && entry.id !== app.id)
+	.slice(0, 3);
+const privacyHref = app.data.privacySlug ? `/privacy-policies/${app.data.privacySlug}/` : undefined;
+const answerProfile = appAnswerProfiles[app.id];
+const pageUrl = new URL(Astro.url.pathname, Astro.site);
+const schema = [
+	appToSoftwareSchema(app, pageUrl),
+	breadcrumbSchema(
+		[
+			{ name: 'Home', href: '/' },
+			{ name: 'Apps', href: '/apps/' },
+			{ name: app.data.title, href: `/apps/${app.id}/` },
+		],
+		pageUrl,
+	),
+	...(answerProfile ? [faqsToSchema(answerProfile.faqs, pageUrl)] : []),
+];
+---
+
+<Layout title={app.data.title} description={app.data.summary} image={app.data.heroImage} schema={schema}>
+	<Header />
+	<main>
+		<section class="section">
+			<div class="shell hero-grid">
+				<div class="hero-copy">
+					<span class="eyebrow">{category.title}</span>
+					<h1 class="section-title">{app.data.title}</h1>
+					<p class="section-copy">{app.data.summary}</p>
+					{answerProfile && (
+						<DirectAnswer
+							eyebrow="Best For"
+							title={`Is ${app.data.title} right for my needs?`}
+							answer={answerProfile.bestFor}
+							points={answerProfile.skills}
+						/>
+					)}
+
+					<div class="card-meta" style="margin-top: 1rem;">
+						<StatusPill kind={app.data.status} label={statusLabels[app.data.status]} />
+						<StatusPill kind={app.data.category} label={category.title} />
+					</div>
+
+					<StoreButtons
+						detailsHref={`/apps/${app.id}/`}
+						playStoreUrl={app.data.playStoreUrl}
+						privacyHref={privacyHref}
+					/>
+				</div>
+
+				<div class="hero-visual">
+					<div class="hero-image-frame">
+						<img src={app.data.heroImage} alt={app.data.title} />
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="section tone-paper">
+			<div class="shell split-grid">
+				<article class="info-card page-prose">
+					<h3>What this app is for</h3>
+					<Content />
+				</article>
+
+				<aside class="info-card">
+					<h3>Highlights</h3>
+					<ul class="highlights">
+						{app.data.highlights.map((item) => <li>{item}</li>)}
+					</ul>
+
+					{app.data.packageName && (
+						<p style="margin-top: 1rem;">
+							<strong>Package name:</strong><br />
+							<span class="muted">{app.data.packageName}</span>
+						</p>
+					)}
+
+					{app.data.availabilityNote && (
+						<div class="notice" style="margin-top: 1rem;">
+							<strong>Availability</strong>
+							<p>{app.data.availabilityNote}</p>
+						</div>
+					)}
+
+					{!privacyHref && (
+						<div class="notice" style="margin-top: 1rem;">
+							<strong>Privacy policy</strong>
+							<p>
+								This app does not yet have a published public privacy page on the new site. The
+								policy should be finalized before public launch.
+							</p>
+						</div>
+					)}
+				</aside>
+			</div>
+		</section>
+
+		{answerProfile && (
+			<section class="section">
+				<div class="shell split-grid">
+					<article class="info-card">
+						<h3>Parent and user fit</h3>
+						<p><strong>Age or audience:</strong> {answerProfile.ageRange}</p>
+						<p><strong>How to use it:</strong> {answerProfile.homeUse}</p>
+						<p><strong>Privacy note:</strong> {answerProfile.privacyNote}</p>
+					</article>
+
+					<article class="info-card">
+						<h3>How it compares</h3>
+						<p>{answerProfile.comparison}</p>
+					</article>
+				</div>
+			</section>
+		)}
+
+		{answerProfile && (
+			<section class="section tight">
+				<div class="shell">
+					<ComparisonTable apps={[app, ...relatedApps]} title="Compare related NUC7 apps" />
+				</div>
+			</section>
+		)}
+
+		{answerProfile && (
+			<section class="section tone-paper">
+				<div class="shell">
+					<FAQBlock
+						title={`Questions about ${app.data.title}`}
+						intro="Direct answers for parents, users, app-store visitors, and search engines comparing fit, privacy, age, and use cases."
+						faqs={answerProfile.faqs}
+					/>
+				</div>
+			</section>
+		)}
+
+		{relatedApps.length > 0 && (
+			<section class="section">
+				<div class="shell">
+					<span class="eyebrow">More In {category.title}</span>
+					<h2 class="section-title">Keep browsing the line.</h2>
+					<div class="app-grid" style="margin-top: 1.5rem;">
+						{relatedApps.map((entry) => (
+							<article class="app-card">
+								<div class="app-card-image">
+									<img src={entry.data.heroImage} alt={entry.data.title} loading="lazy" />
+								</div>
+								<div class="app-card-body">
+									<h3>{entry.data.title}</h3>
+									<p>{entry.data.tagline}</p>
+									<a class="button" href={`/apps/${entry.id}/`}>View app</a>
+								</div>
+							</article>
+						))}
+					</div>
+				</div>
+			</section>
+		)}
+	</main>
+	<Footer />
+</Layout>

@@ -1,0 +1,181 @@
+---
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+	title="Site Stats"
+	description="Detailed NUC7 Studios website statistics, including visitors, views, referrers, devices, and top pages."
+>
+	<Header />
+	<main>
+		<section class="section">
+			<div class="shell">
+				<span class="eyebrow">Site Stats</span>
+				<h1 class="section-title">A WordPress-style stats view for the new site.</h1>
+				<p class="section-copy">
+					This dashboard is powered by Cloudflare Functions and KV, so it can track visitors, page
+					views, top pages, referrers, countries, browsers, devices, and key click events without
+					adding another analytics vendor.
+				</p>
+
+				<form class="stats-form" id="stats-form">
+					<select id="stats-days" name="days" aria-label="Stats range">
+						<option value="7">Last 7 days</option>
+						<option value="30" selected>Last 30 days</option>
+						<option value="90">Last 90 days</option>
+					</select>
+					<button class="button" type="submit">Load stats</button>
+					<a class="button button-secondary" href="/api/auth/logout?next=/">Sign out</a>
+				</form>
+			</div>
+		</section>
+
+		<section class="section tone-paper">
+			<div class="shell">
+				<div class="stats-grid" id="stats-summary">
+					<div class="stats-card"><strong>Visitors</strong><span>--</span></div>
+					<div class="stats-card"><strong>Views</strong><span>--</span></div>
+					<div class="stats-card"><strong>Tracked Days</strong><span>--</span></div>
+					<div class="stats-card"><strong>Avg. Views / Day</strong><span>--</span></div>
+				</div>
+
+				<div class="trend-card" style="margin-top: 1rem;">
+					<strong id="stats-trend-title">30-day trend</strong>
+					<div class="trend-list" id="stats-trend" style="margin-top: 1rem;"></div>
+				</div>
+
+				<div class="stats-table-grid" style="margin-top: 1rem;">
+					<div class="table-card">
+						<strong>Top Pages</strong>
+						<div id="stats-pages"></div>
+					</div>
+					<div class="table-card">
+						<strong>Top Referrers</strong>
+						<div id="stats-referrers"></div>
+					</div>
+					<div class="table-card">
+						<strong>Countries</strong>
+						<div id="stats-countries"></div>
+					</div>
+					<div class="table-card">
+						<strong>Devices and Browsers</strong>
+						<div id="stats-devices"></div>
+						<div id="stats-browsers" style="margin-top: 1rem;"></div>
+					</div>
+					<div class="table-card">
+						<strong>Tracked Events</strong>
+						<div id="stats-events"></div>
+					</div>
+				</div>
+
+				<div class="notice" id="stats-status" style="margin-top: 1rem;">
+					<strong>Status</strong>
+					<p>Waiting for analytics data.</p>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<Footer />
+
+	<script is:inline>
+		const renderTable = (targetId, rows, emptyLabel) => {
+			const target = document.getElementById(targetId);
+			if (!target) return;
+
+			if (!rows?.length) {
+				target.innerHTML = `<p class="muted">${emptyLabel}</p>`;
+				return;
+			}
+
+			target.innerHTML = `<table class="stats-table">${rows
+				.map((row) => `<tr><td>${row.label}</td><td>${row.count}</td></tr>`)
+				.join('')}</table>`;
+		};
+
+		const renderTrend = (series) => {
+			const target = document.getElementById('stats-trend');
+			if (!target) return;
+
+			if (!series?.length) {
+				target.innerHTML = '<p class="muted">No tracked days yet.</p>';
+				return;
+			}
+
+			const maxViews = Math.max(...series.map((item) => item.views), 1);
+			target.innerHTML = series
+				.map(
+					(item) => `
+						<div class="trend-row">
+							<strong>${item.date}</strong>
+							<div class="trend-bar">
+								<div class="trend-bar-fill" style="width: ${(item.views / maxViews) * 100}%"></div>
+							</div>
+							<span>${item.views} views</span>
+							<span>${item.visitors} visitors</span>
+						</div>
+					`,
+				)
+				.join('');
+		};
+
+		const renderSummary = (summary) => {
+			const target = document.getElementById('stats-summary');
+			if (!target) return;
+
+			target.innerHTML = `
+				<div class="stats-card"><strong>Visitors</strong><span>${summary.visitors}</span></div>
+				<div class="stats-card"><strong>Views</strong><span>${summary.views}</span></div>
+				<div class="stats-card"><strong>Tracked Days</strong><span>${summary.daysTracked}</span></div>
+				<div class="stats-card"><strong>Avg. Views / Day</strong><span>${summary.averageViewsPerDay}</span></div>
+			`;
+		};
+
+		const setStatus = (title, body) => {
+			const target = document.getElementById('stats-status');
+			if (!target) return;
+			target.innerHTML = `<strong>${title}</strong><p>${body}</p>`;
+		};
+
+		const loadStats = async (days = '30') => {
+			setStatus('Loading', 'Fetching the most recent analytics snapshot.');
+			const query = `?days=${encodeURIComponent(days)}`;
+			const response = await fetch(`/api/stats/report${query}`, { credentials: 'include' });
+
+			if (response.status === 401) {
+				setStatus('Access required', 'Your owner session has expired. Sign in again to continue.');
+				return;
+			}
+
+			if (!response.ok) {
+				setStatus('Error', `Stats endpoint returned ${response.status}.`);
+				return;
+			}
+
+			const data = await response.json();
+			const trendTitle = document.getElementById('stats-trend-title');
+			if (trendTitle) {
+				trendTitle.textContent = `${days}-day trend`;
+			}
+			renderSummary(data.summary);
+			renderTrend(data.series);
+			renderTable('stats-pages', data.topPages, 'No page views yet.');
+			renderTable('stats-referrers', data.topReferrers, 'No referrers yet.');
+			renderTable('stats-countries', data.topCountries, 'No country data yet.');
+			renderTable('stats-devices', data.topDevices, 'No device data yet.');
+			renderTable('stats-browsers', data.topBrowsers, 'No browser data yet.');
+			renderTable('stats-events', data.topEvents, 'No tracked events yet.');
+			setStatus('Ready', 'Analytics data loaded successfully.');
+		};
+
+		document.getElementById('stats-form')?.addEventListener('submit', (event) => {
+			event.preventDefault();
+			const days = document.getElementById('stats-days')?.value ?? '30';
+			loadStats(days);
+		});
+
+		loadStats();
+	</script>
+</Layout>

@@ -1,0 +1,42 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { categoryMeta, statusLabels } from '../lib/catalog';
+
+interface Props {
+	apps: CollectionEntry<'apps'>[];
+	title?: string;
+}
+
+const { apps, title = 'Which app should a parent choose?' } = Astro.props;
+---
+
+{apps.length > 0 && (
+	<section class="comparison-block">
+		<span class="eyebrow">Compare</span>
+		<h2 class="section-title">{title}</h2>
+		<div class="comparison-scroll">
+			<table class="comparison-table">
+				<thead>
+					<tr>
+						<th>App</th>
+						<th>Best fit</th>
+						<th>Category</th>
+						<th>Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					{apps.map((app) => (
+						<tr>
+							<td>
+								<a href={`/apps/${app.id}/`}>{app.data.title}</a>
+							</td>
+							<td>{app.data.tagline}</td>
+							<td>{categoryMeta[app.data.category].title}</td>
+							<td>{statusLabels[app.data.status]}</td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+		</div>
+	</section>
+)}

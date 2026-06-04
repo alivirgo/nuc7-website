@@ -1,6 +1,23 @@
 {
+  "name": "nuc7-website",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "dev:cms": "decap-server",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
   "dependencies": {
-    "pdf-parse": "^1.1.1",
-    "puppeteer": "^24.37.5"
+    "@astrojs/sitemap": "^3.6.0",
+    "astro": "^6.4.4"
+  },
+  "devDependencies": {
+    "decap-server": "^3.8.0"
   }
 }

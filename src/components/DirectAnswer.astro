@@ -1,0 +1,21 @@
+---
+interface Props {
+	eyebrow?: string;
+	title?: string;
+	answer: string;
+	points?: string[];
+}
+
+const { eyebrow = 'Direct Answer', title = 'Quick answer', answer, points = [] } = Astro.props;
+---
+
+<section class="answer-box" aria-label={title}>
+	<span class="answer-eyebrow">{eyebrow}</span>
+	<h2>{title}</h2>
+	<p>{answer}</p>
+	{points.length > 0 && (
+		<ul class="answer-points">
+			{points.map((point) => <li>{point}</li>)}
+		</ul>
+	)}
+</section>

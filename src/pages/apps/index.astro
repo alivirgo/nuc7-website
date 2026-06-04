@@ -1,0 +1,78 @@
+---
+import { getCollection } from 'astro:content';
+import AppCard from '../../components/AppCard.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import DirectAnswer from '../../components/DirectAnswer.astro';
+import FAQBlock from '../../components/FAQBlock.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import Layout from '../../layouts/Layout.astro';
+import { breadcrumbSchema, faqsToSchema, itemListSchema, siteFaqs } from '../../lib/aeo';
+import { sortApps } from '../../lib/catalog';
+
+const apps = (await getCollection('apps')).sort(sortApps);
+const pageUrl = new URL(Astro.url.pathname, Astro.site);
+const schema = [
+	breadcrumbSchema(
+		[
+			{ name: 'Home', href: '/' },
+			{ name: 'Apps', href: '/apps/' },
+		],
+		pageUrl,
+	),
+	itemListSchema(
+		apps.map((app) => ({
+			title: app.data.title,
+			href: `/apps/${app.id}/`,
+		})),
+		pageUrl,
+	),
+	faqsToSchema(siteFaqs, pageUrl),
+];
+---
+
+<Layout
+	title="Apps"
+	description="Browse the full NUC7 Studios app lineup across kids home-schooling and parent productivity."
+	schema={schema}
+>
+	<Header />
+	<main>
+		<section class="section">
+			<div class="shell">
+				<span class="eyebrow">All Apps</span>
+				<h1 class="section-title">Everything in the NUC7 Studios lineup.</h1>
+				<p class="section-copy">
+					Public releases and closed-testing apps live together here so the studio reads like a
+					connected body of work rather than isolated launches.
+				</p>
+				<DirectAnswer
+					eyebrow="App Finder"
+					title="Which NUC7 app fits this need?"
+					answer="Parents should start with TraceLearn Kids for tracing, English 1 for early vocabulary, Math 1 for first-number confidence, and Curiosity 1 for exploration. Parent productivity users should look at Why Did I Open My Phone for intentional device use and AI Maths Calculator for practical math help."
+				/>
+
+				<div class="app-grid" style="margin-top: 1.5rem;">
+					{apps.map((app) => <AppCard app={app} />)}
+				</div>
+			</div>
+		</section>
+
+		<section class="section tone-paper">
+			<div class="shell">
+				<ComparisonTable apps={apps} />
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="shell">
+				<FAQBlock
+					title="Questions before choosing an app"
+					intro="Use these answers to narrow the catalog by skill, age, category, and availability."
+					faqs={siteFaqs}
+				/>
+			</div>
+		</section>
+	</main>
+	<Footer />
+</Layout>

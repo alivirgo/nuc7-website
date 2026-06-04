@@ -1,0 +1,73 @@
+---
+import { getCollection } from 'astro:content';
+import FAQBlock from '../../components/FAQBlock.astro';
+import Footer from '../../components/Footer.astro';
+import GuideCard from '../../components/GuideCard.astro';
+import Header from '../../components/Header.astro';
+import Layout from '../../layouts/Layout.astro';
+import { breadcrumbSchema, faqsToSchema, itemListSchema, siteFaqs } from '../../lib/aeo';
+
+const guides = (await getCollection('guides')).sort((a, b) => a.data.title.localeCompare(b.data.title));
+const pageUrl = new URL(Astro.url.pathname, Astro.site);
+const schema = [
+	breadcrumbSchema(
+		[
+			{ name: 'Home', href: '/' },
+			{ name: 'Guides', href: '/guides/' },
+		],
+		pageUrl,
+	),
+	itemListSchema(
+		guides.map((guide) => ({
+			title: guide.data.title,
+			href: `/guides/${guide.id}/`,
+		})),
+		pageUrl,
+	),
+	faqsToSchema(siteFaqs, pageUrl),
+];
+---
+
+<Layout
+	title="Parent Guides"
+	description="Practical NUC7 Studios guides for parents choosing learning apps for tracing, preschool, home-schooling, privacy, English, math, and short routines."
+	schema={schema}
+>
+	<Header />
+	<main>
+		<section class="section">
+			<div class="shell">
+				<span class="eyebrow">Parent Guides</span>
+				<h1 class="section-title">Answers before parents have to guess.</h1>
+				<p class="section-copy">
+					These guides are written around real parent questions: what app to choose, what age it
+					fits, how to use it at home, and how to keep practice calm and privacy-aware.
+				</p>
+			</div>
+		</section>
+
+		<section class="section tone-paper">
+			<div class="shell guide-grid">
+				{guides.map((guide) => (
+					<GuideCard
+						href={`/guides/${guide.id}/`}
+						title={guide.data.title}
+						summary={guide.data.summary}
+						label={guide.data.eyebrow}
+					/>
+				))}
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="shell">
+				<FAQBlock
+					title="Parent app-choosing questions"
+					intro="Start here if you are not sure which NUC7 app fits your child."
+					faqs={siteFaqs}
+				/>
+			</div>
+		</section>
+	</main>
+	<Footer />
+</Layout>

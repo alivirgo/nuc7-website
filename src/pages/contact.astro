@@ -1,0 +1,43 @@
+---
+import { getEntry, render } from 'astro:content';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import Layout from '../layouts/Layout.astro';
+
+const contact = await getEntry('pages', 'contact');
+if (!contact) {
+	throw new Error('Contact page content is missing.');
+}
+const { Content } = await render(contact);
+---
+
+<Layout title={contact.data.title} description={contact.data.summary}>
+	<Header />
+	<main>
+		<section class="section">
+			<div class="shell">
+				<span class="eyebrow">Contact</span>
+				<h1 class="section-title">{contact.data.title}</h1>
+				<p class="section-copy">{contact.data.summary}</p>
+			</div>
+		</section>
+
+		<section class="section tone-paper">
+			<div class="shell contact-grid">
+				<article class="contact-card page-prose">
+					<Content />
+				</article>
+
+				<div class="contact-card">
+					<strong>Support email</strong>
+					<p><a href="mailto:support@nuc7.com">support@nuc7.com</a></p>
+					<p class="muted">
+						Use the app name and device details when you are reporting a bug or asking for help
+						with a Play Store build.
+					</p>
+				</div>
+			</div>
+		</section>
+	</main>
+	<Footer />
+</Layout>

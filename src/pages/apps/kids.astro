@@ -1,0 +1,105 @@
+---
+import { getCollection } from 'astro:content';
+import AppCard from '../../components/AppCard.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import DirectAnswer from '../../components/DirectAnswer.astro';
+import FAQBlock from '../../components/FAQBlock.astro';
+import Footer from '../../components/Footer.astro';
+import GuideCard from '../../components/GuideCard.astro';
+import Header from '../../components/Header.astro';
+import Layout from '../../layouts/Layout.astro';
+import { breadcrumbSchema, faqsToSchema, itemListSchema, kidsCategoryFaqs } from '../../lib/aeo';
+import { byCategory, categoryMeta, sortApps } from '../../lib/catalog';
+
+const apps = byCategory((await getCollection('apps')).sort(sortApps), 'kids');
+const guides = (await getCollection('guides')).filter((guide) =>
+	[
+		'best-learning-apps-for-preschoolers',
+		'how-to-teach-letter-tracing-at-home',
+		'how-to-choose-a-safe-kids-learning-app',
+	].includes(guide.id),
+);
+const meta = categoryMeta.kids;
+const pageUrl = new URL(Astro.url.pathname, Astro.site);
+const schema = [
+	breadcrumbSchema(
+		[
+			{ name: 'Home', href: '/' },
+			{ name: 'Apps', href: '/apps/' },
+			{ name: meta.title, href: '/apps/kids/' },
+		],
+		pageUrl,
+	),
+	itemListSchema(
+		apps.map((app) => ({
+			title: app.data.title,
+			href: `/apps/${app.id}/`,
+		})),
+		pageUrl,
+	),
+	faqsToSchema(kidsCategoryFaqs, pageUrl),
+];
+---
+
+<Layout title={meta.title} description={meta.copy} image={meta.image} schema={schema}>
+	<Header />
+	<main>
+		<section class="section">
+			<div class="shell">
+				<span class="eyebrow">Kids Home Schooling</span>
+				<h1 class="section-title">{meta.title}</h1>
+				<p class="section-copy">{meta.copy}</p>
+				<DirectAnswer
+					eyebrow="Parent Answer"
+					title="Best NUC7 kids app by learning goal"
+					answer="TraceLearn Kids is the best first choice for tracing and handwriting readiness. English 1 is the best fit for early English vocabulary, Math 1 for number confidence, and Curiosity 1 for parent-guided discovery."
+				/>
+				<div class="page-banner">
+					<img src={meta.image} alt={meta.title} />
+				</div>
+			</div>
+		</section>
+
+		<section class="section tone-paper">
+			<div class="shell">
+				<div class="app-grid">
+					{apps.map((app) => <AppCard app={app} showCategory={false} />)}
+				</div>
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="shell">
+				<ComparisonTable apps={apps} />
+			</div>
+		</section>
+
+		<section class="section tone-mint">
+			<div class="shell">
+				<span class="eyebrow">Parent Guides</span>
+				<h2 class="section-title">Helpful next answers for families.</h2>
+				<div class="guide-grid" style="margin-top: 1.5rem;">
+					{guides.map((guide) => (
+						<GuideCard
+							href={`/guides/${guide.id}/`}
+							title={guide.data.title}
+							summary={guide.data.summary}
+							label={guide.data.eyebrow}
+						/>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="shell">
+				<FAQBlock
+					title="Kids learning app questions"
+					intro="Answers for parents comparing tracing, English, math, privacy, and short practice."
+					faqs={kidsCategoryFaqs}
+				/>
+			</div>
+		</section>
+	</main>
+	<Footer />
+</Layout>

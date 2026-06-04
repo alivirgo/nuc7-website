@@ -1,0 +1,129 @@
+---
+import '../styles/global.css';
+import JsonLd from '../components/JsonLd.astro';
+
+interface Props {
+	title?: string;
+	description?: string;
+	image?: string;
+	schema?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+	title = 'NUC7 Studios',
+	description = 'NUC7 Studios builds thoughtful home-schooling and productivity apps that respect attention, privacy, and everyday routines.',
+	image = '/images/hero-studio.png',
+	schema = [],
+} = Astro.props;
+
+const pageTitle = title === 'NUC7 Studios' ? title : `${title} | NUC7 Studios`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const socialImage = new URL(image, Astro.site);
+const schemaItems = Array.isArray(schema) ? schema : [schema];
+const baseSchema = [
+	{
+		'@type': 'Organization',
+		'@id': `${Astro.site}#organization`,
+		name: 'NUC7 Studios',
+		url: Astro.site?.toString(),
+		logo: new URL('/favicon.svg', Astro.site).href,
+		description:
+			'NUC7 Studios builds kids home-schooling apps and parent productivity applications.',
+	},
+	{
+		'@type': 'WebSite',
+		'@id': `${Astro.site}#website`,
+		name: 'NUC7 Studios',
+		url: Astro.site?.toString(),
+		publisher: { '@id': `${Astro.site}#organization` },
+	},
+	{
+		'@type': 'WebPage',
+		'@id': `${canonical.href}#webpage`,
+		url: canonical.href,
+		name: pageTitle,
+		description,
+		isPartOf: { '@id': `${Astro.site}#website` },
+		primaryImageOfPage: socialImage.href,
+	},
+].concat(schemaItems.filter(Boolean));
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+			rel="stylesheet"
+		/>
+		<meta name="generator" content={Astro.generator} />
+		<title>{pageTitle}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<meta property="og:title" content={pageTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={socialImage} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={pageTitle} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={socialImage} />
+		<JsonLd data={baseSchema} />
+	</head>
+	<body>
+		<slot />
+		<script is:inline>
+			(() => {
+				if (typeof window === 'undefined' || window.__nuc7StatsLoaded) return;
+				window.__nuc7StatsLoaded = true;
+				const ignoredPrefixes = ['/admin', '/site-stats'];
+				if (ignoredPrefixes.some((prefix) => window.location.pathname.startsWith(prefix))) return;
+
+				const send = (payload) => {
+					const data = JSON.stringify(payload);
+					if (navigator.sendBeacon) {
+						navigator.sendBeacon('/api/stats/track', new Blob([data], { type: 'application/json' }));
+						return;
+					}
+
+					fetch('/api/stats/track', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: data,
+						credentials: 'include',
+						keepalive: true,
+					}).catch(() => {});
+				};
+
+				send({
+					type: 'pageview',
+					pathname: window.location.pathname,
+					referrer: document.referrer || '',
+				});
+
+				document.addEventListener(
+					'click',
+					(event) => {
+						const target = event.target instanceof Element ? event.target.closest('[data-stats-event]') : null;
+						if (!target) return;
+
+						send({
+							type: 'event',
+							pathname: window.location.pathname,
+							eventName: target.getAttribute('data-stats-event'),
+							label: target.getAttribute('href') || target.textContent?.trim() || '',
+						});
+					},
+					true,
+				);
+			})();
+		</script>
+	</body>
+</html>

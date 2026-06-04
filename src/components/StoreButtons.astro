@@ -1,0 +1,29 @@
+---
+interface Props {
+	playStoreUrl?: string;
+	privacyHref?: string;
+	detailsHref: string;
+}
+
+const { playStoreUrl, privacyHref, detailsHref } = Astro.props;
+---
+
+<div class="button-row">
+	<a class="button" href={detailsHref} data-stats-event="app-details-click">View app</a>
+	{
+		playStoreUrl ? (
+			<a
+				class="button alt"
+				href={playStoreUrl}
+				target="_blank"
+				rel="noreferrer"
+				data-stats-event="play-store-click"
+			>
+				Google Play
+			</a>
+		) : (
+			<span class="button disabled">Closed testing</span>
+		)
+	}
+	{privacyHref && <a class="button ghost" href={privacyHref} data-stats-event="privacy-policy-click">Privacy policy</a>}
+</div>

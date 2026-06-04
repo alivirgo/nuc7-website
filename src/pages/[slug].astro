@@ -1,0 +1,126 @@
+---
+import { getCollection, render } from 'astro:content';
+import ComparisonTable from '../components/ComparisonTable.astro';
+import DirectAnswer from '../components/DirectAnswer.astro';
+import FAQBlock from '../components/FAQBlock.astro';
+import Footer from '../components/Footer.astro';
+import GuideCard from '../components/GuideCard.astro';
+import Header from '../components/Header.astro';
+import RelatedApps from '../components/RelatedApps.astro';
+import Layout from '../layouts/Layout.astro';
+import { breadcrumbSchema, faqsToSchema, hubFaqs, itemListSchema } from '../lib/aeo';
+import { sortApps } from '../lib/catalog';
+
+const allApps = (await getCollection('apps')).sort(sortApps);
+const allGuides = await getCollection('guides');
+
+export async function getStaticPaths() {
+	const hubs = await getCollection('hubs');
+	return hubs.map((hub) => ({
+		params: { slug: hub.id },
+		props: { hub },
+	}));
+}
+
+const { hub } = Astro.props;
+const { Content } = await render(hub);
+const faqs = hubFaqs[hub.id] ?? [];
+const relatedApps = hub.data.relatedApps
+	.map((id) => allApps.find((app) => app.id === id))
+	.filter(Boolean);
+const relatedGuides = hub.data.relatedGuides
+	.map((id) => allGuides.find((guide) => guide.id === id))
+	.filter(Boolean);
+const pageUrl = new URL(Astro.url.pathname, Astro.site);
+const schema = [
+	breadcrumbSchema(
+		[
+			{ name: 'Home', href: '/' },
+			{ name: hub.data.title, href: `/${hub.id}/` },
+		],
+		pageUrl,
+	),
+	itemListSchema(
+		relatedApps.map((app) => ({
+			title: app.data.title,
+			href: `/apps/${app.id}/`,
+		})),
+		pageUrl,
+	),
+	...(faqs.length ? [faqsToSchema(faqs, pageUrl)] : []),
+];
+---
+
+<Layout title={hub.data.title} description={hub.data.summary} image={hub.data.heroImage} schema={schema}>
+	<Header />
+	<main>
+		<section class="section">
+			<div class="shell hero-grid">
+				<div class="hero-copy">
+					<span class="eyebrow">{hub.data.eyebrow}</span>
+					<h1 class="section-title">{hub.data.title}</h1>
+					<p class="section-copy">{hub.data.summary}</p>
+					<DirectAnswer answer={hub.data.directAnswer} points={hub.data.answerPoints} />
+				</div>
+
+				<div class="hero-visual">
+					<div class="hero-image-frame compact">
+						<img src={hub.data.heroImage} alt={hub.data.title} />
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="section tone-paper">
+			<div class="shell split-grid">
+				<article class="info-card page-prose">
+					<Content />
+				</article>
+
+				<aside class="info-card">
+					<h3>Questions this page answers</h3>
+					<ul class="answer-points">
+						{hub.data.searchIntents.map((intent) => <li>{intent}</li>)}
+					</ul>
+				</aside>
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="shell">
+				<ComparisonTable apps={relatedApps} />
+			</div>
+		</section>
+
+		<section class="section tone-mint">
+			<div class="shell">
+				<RelatedApps apps={relatedApps} />
+			</div>
+		</section>
+
+		{relatedGuides.length > 0 && (
+			<section class="section">
+				<div class="shell">
+					<span class="eyebrow">Related Guides</span>
+					<h2 class="section-title">Keep going with parent-focused answers.</h2>
+					<div class="guide-grid" style="margin-top: 1.5rem;">
+						{relatedGuides.map((guide) => (
+							<GuideCard
+								href={`/guides/${guide.id}/`}
+								title={guide.data.title}
+								summary={guide.data.summary}
+							/>
+						))}
+					</div>
+				</div>
+			</section>
+		)}
+
+		<section class="section tone-paper">
+			<div class="shell">
+				<FAQBlock faqs={faqs} />
+			</div>
+		</section>
+	</main>
+	<Footer />
+</Layout>

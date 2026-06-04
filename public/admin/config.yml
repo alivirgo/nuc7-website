@@ -1,0 +1,158 @@
+backend:
+  name: github
+  repo: alivirgo/nuc7-website
+  branch: main
+  site_domain: nuc7.com
+  base_url: https://nuc7.com/api/decap
+  auth_endpoint: auth
+  commit_messages:
+    create: "cms(create): {{collection}} {{slug}}"
+    update: "cms(update): {{collection}} {{slug}}"
+    delete: "cms(delete): {{collection}} {{slug}}"
+
+logo_url: /favicon.svg
+display_url: https://nuc7.com
+publish_mode: simple
+show_preview_links: true
+local_backend: true
+media_folder: public/images/uploads
+public_folder: /images/uploads
+
+collections:
+  - name: apps
+    label: Apps
+    label_singular: App
+    folder: src/content/apps
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}} - {{category}} - {{status}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options:
+          - { label: "Kids Home Schooling", value: "kids" }
+          - { label: "Parent Productivity", value: "adults" }
+      - { label: "Status", name: "status", widget: "select", options: ["public", "closed-testing"] }
+      - { label: "Order", name: "order", widget: "number", value_type: "int", min: 1 }
+      - { label: "Featured on Home", name: "featured", widget: "boolean", default: false }
+      - { label: "Tagline", name: "tagline", widget: "string" }
+      - { label: "Summary", name: "summary", widget: "text" }
+      - { label: "Package Name", name: "packageName", widget: "string", required: false }
+      - { label: "Google Play URL", name: "playStoreUrl", widget: "string", required: false }
+      - { label: "Privacy Policy Slug", name: "privacySlug", widget: "string", required: false, hint: "Example: english-1-mnm-home-schooling" }
+      - { label: "Hero Image", name: "heroImage", widget: "image" }
+      - label: "Accent"
+        name: "accent"
+        widget: "select"
+        options:
+          - { label: "Kids Home Schooling", value: "kids" }
+          - { label: "Parent Productivity", value: "adults" }
+      - { label: "Availability Note", name: "availabilityNote", widget: "text", required: false }
+      - label: Highlights
+        name: highlights
+        widget: list
+        min: 2
+        max: 5
+        field: { label: "Highlight", name: "highlight", widget: "string" }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: pages
+    label: Pages
+    folder: src/content/pages
+    create: false
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Summary", name: "summary", widget: "text" }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: hubs
+    label: Parent Answer Hubs
+    folder: src/content/hubs
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Summary", name: "summary", widget: "text" }
+      - { label: "Eyebrow", name: "eyebrow", widget: "string" }
+      - { label: "Direct Answer", name: "directAnswer", widget: "text" }
+      - label: Answer Points
+        name: answerPoints
+        widget: list
+        required: false
+        field: { label: "Point", name: "point", widget: "string" }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        default: "parents"
+        options:
+          - { label: "Kids Home Schooling", value: "kids" }
+          - { label: "Parent Productivity", value: "adults" }
+          - { label: "Parents", value: "parents" }
+          - { label: "Privacy", value: "privacy" }
+      - { label: "Hero Image", name: "heroImage", widget: "image", default: "/images/hero-studio.png" }
+      - label: Related Apps
+        name: relatedApps
+        widget: list
+        required: false
+        field: { label: "App Slug", name: "app", widget: "string" }
+      - label: Related Guides
+        name: relatedGuides
+        widget: list
+        required: false
+        field: { label: "Guide Slug", name: "guide", widget: "string" }
+      - label: Search Intents
+        name: searchIntents
+        widget: list
+        required: false
+        field: { label: "Question or Intent", name: "intent", widget: "string" }
+      - { label: "Last Reviewed", name: "lastReviewed", widget: "string", required: false }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: guides
+    label: Parent Guides
+    folder: src/content/guides
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Summary", name: "summary", widget: "text" }
+      - { label: "Eyebrow", name: "eyebrow", widget: "string" }
+      - { label: "Direct Answer", name: "directAnswer", widget: "text" }
+      - label: Answer Points
+        name: answerPoints
+        widget: list
+        required: false
+        field: { label: "Point", name: "point", widget: "string" }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        default: "parents"
+        options:
+          - { label: "Kids Home Schooling", value: "kids" }
+          - { label: "Parent Productivity", value: "adults" }
+          - { label: "Parents", value: "parents" }
+          - { label: "Privacy", value: "privacy" }
+      - { label: "Age Range", name: "ageRange", widget: "string", required: false }
+      - { label: "Hero Image", name: "heroImage", widget: "image", default: "/images/hero-studio.png" }
+      - label: Related Apps
+        name: relatedApps
+        widget: list
+        required: false
+        field: { label: "App Slug", name: "app", widget: "string" }
+      - label: Related Guides
+        name: relatedGuides
+        widget: list
+        required: false
+        field: { label: "Guide Slug", name: "guide", widget: "string" }
+      - label: Search Intents
+        name: searchIntents
+        widget: list
+        required: false
+        field: { label: "Question or Intent", name: "intent", widget: "string" }
+      - { label: "Last Reviewed", name: "lastReviewed", widget: "string", required: false }
+      - { label: "Body", name: "body", widget: "markdown" }

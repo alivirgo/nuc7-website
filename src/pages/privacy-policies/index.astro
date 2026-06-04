@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import Layout from '../../layouts/Layout.astro';
+
+const policies = await getCollection('privacy');
+const missingPolicies = [
+	'Curiosity 1 - MnM Home Schooling',
+	'AI Maths Calculator',
+];
+---
+
+<Layout title="Privacy Policies" description="Public privacy policies for NUC7 Studios applications.">
+	<Header />
+	<main>
+		<section class="section">
+			<div class="shell">
+				<span class="eyebrow">Legal</span>
+				<h1 class="section-title">Privacy policies stay easy to find.</h1>
+				<p class="section-copy">
+					These routes are kept stable for Google Play listings and support links. Existing public
+					policy URLs are preserved.
+				</p>
+			</div>
+		</section>
+
+		<section class="section tone-paper">
+			<div class="shell policy-grid">
+				{policies.map((policy) => (
+					<a class="policy-card" href={`/privacy-policies/${policy.id}/`}>
+						<h3>{policy.data.appName}</h3>
+						<p>{policy.data.description}</p>
+						<p class="muted">Last updated: {policy.data.lastUpdated}</p>
+					</a>
+				))}
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="shell">
+				<div class="notice">
+					<strong>Policies not yet published on the new site</strong>
+					<p>
+						{missingPolicies.join(' and ')} are visible in the studio roadmap, but their public
+						privacy pages should be finalized before wider release.
+					</p>
+				</div>
+			</div>
+		</section>
+	</main>
+	<Footer />
+</Layout>

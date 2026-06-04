@@ -1,0 +1,239 @@
+---
+import { getCollection } from 'astro:content';
+import AppCard from '../components/AppCard.astro';
+import DirectAnswer from '../components/DirectAnswer.astro';
+import FAQBlock from '../components/FAQBlock.astro';
+import Footer from '../components/Footer.astro';
+import GuideCard from '../components/GuideCard.astro';
+import Header from '../components/Header.astro';
+import Layout from '../layouts/Layout.astro';
+import { breadcrumbSchema, faqsToSchema, itemListSchema, siteFaqs } from '../lib/aeo';
+import { byCategory, categoryMeta, sortApps } from '../lib/catalog';
+
+const apps = (await getCollection('apps')).sort(sortApps);
+const guides = (await getCollection('guides')).filter((guide) =>
+	[
+		'best-learning-apps-for-preschoolers',
+		'how-to-choose-a-safe-kids-learning-app',
+		'how-to-build-a-5-minute-learning-routine',
+	].includes(guide.id),
+);
+const featuredApps = apps.filter((app) => app.data.featured);
+const kidsApps = byCategory(apps, 'kids');
+const adultApps = byCategory(apps, 'adults');
+const upcomingApps = apps.filter((app) => app.data.status === 'closed-testing');
+const pageUrl = new URL(Astro.url.pathname, Astro.site);
+const schema = [
+	breadcrumbSchema([{ name: 'Home', href: '/' }], pageUrl),
+	itemListSchema(
+		apps.map((app) => ({
+			title: app.data.title,
+			href: `/apps/${app.id}/`,
+		})),
+		pageUrl,
+	),
+	faqsToSchema(siteFaqs, pageUrl),
+];
+---
+
+<Layout schema={schema}>
+	<Header />
+
+	<main>
+		<section class="hero">
+			<div class="shell hero-grid">
+				<div class="hero-copy">
+					<span class="eyebrow">NUC7 Studios</span>
+					<h1 class="hero-title">Apps for calmer learning and cleaner focus.</h1>
+					<p class="hero-summary">
+						NUC7 Studios builds bright home-schooling companions for young learners and
+						practical productivity tools for parents who want less friction on the devices they
+						already use every day.
+					</p>
+
+					<div class="hero-actions">
+						<a class="button" href="/for-parents/" data-stats-event="hero-parents-click">Start as a parent</a>
+						<a class="button" href="/apps/kids/" data-stats-event="hero-kids-click">Explore kids apps</a>
+						<a class="button alt" href="/apps/parent-productivity/" data-stats-event="hero-parent-productivity-click">Explore parent productivity</a>
+						<a class="button ghost" href="/privacy-policies/" data-stats-event="hero-privacy-click">Privacy policies</a>
+					</div>
+
+					<div class="hero-notes">
+						<div class="hero-note">
+							<strong>Small tools, clear jobs</strong>
+							<span>Each app is focused enough to feel friendly instead of overwhelming.</span>
+						</div>
+						<div class="hero-note">
+							<strong>Privacy-first by default</strong>
+							<span>Especially for child-centered products, we keep the legal surface explicit.</span>
+						</div>
+						<div class="hero-note">
+							<strong>Built around daily routines</strong>
+							<span>Morning practice, quiet focus, and repeat use matter more than novelty.</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="hero-visual">
+					<div class="hero-image-frame">
+						<img
+							src="/images/hero-studio.png"
+							alt="Illustrated NUC7 studio scene showing kids learning and parent productivity tools"
+						/>
+					</div>
+
+					<div class="hero-kicker">
+						<div>
+							<strong>{kidsApps.length} Kids titles</strong>
+							<span>Tracing, counting, and curiosity-led home practice.</span>
+						</div>
+						<div>
+							<strong>{adultApps.length} Parent tools</strong>
+							<span>Parent productivity tools for attention, intent, and follow-through.</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="section tight">
+			<div class="shell">
+				<DirectAnswer
+					eyebrow="Parent Answer"
+					title="Which NUC7 app should I choose first?"
+					answer="For most parents starting with early learning, TraceLearn Kids is the best first NUC7 app because tracing supports letters, numbers, patterns, and handwriting readiness. Choose English 1 when the goal is early vocabulary, Math 1 for number confidence, and Curiosity 1 for parent-guided exploration."
+					points={[
+						'Tracing and handwriting readiness: TraceLearn Kids',
+						'Early English vocabulary: English 1 - MnM Home Schooling',
+						'Counting and first-number confidence: Math 1 - MnM Home Schooling',
+						'Discovery and observation prompts: Curiosity 1 - MnM Home Schooling',
+					]}
+				/>
+			</div>
+		</section>
+
+		<section class="section tone-paper">
+			<div class="shell">
+				<span class="eyebrow">Two Domains</span>
+				<h2 class="section-title">One studio, two different rhythms.</h2>
+				<p class="section-copy">
+					The kids line is playful, guided, and routine-friendly. The parent productivity line is
+					calmer and more practical, aimed at reducing distraction rather than adding more life admin.
+				</p>
+
+				<div class="split-grid" style="margin-top: 1.5rem;">
+					<a class="category-card" href="/apps/kids/" data-stats-event="category-kids-click">
+						<div class="category-visual">
+							<img src={categoryMeta.kids.image} alt={categoryMeta.kids.title} loading="lazy" />
+						</div>
+						<div>
+							<h3>{categoryMeta.kids.title}</h3>
+							<p>{categoryMeta.kids.copy}</p>
+						</div>
+					</a>
+
+					<a class="category-card" href="/apps/parent-productivity/" data-stats-event="category-parent-productivity-click">
+						<div class="category-visual">
+							<img
+								src={categoryMeta.adults.image}
+								alt={categoryMeta.adults.title}
+								loading="lazy"
+							/>
+						</div>
+						<div>
+							<h3>{categoryMeta.adults.title}</h3>
+							<p>{categoryMeta.adults.copy}</p>
+						</div>
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="shell">
+				<span class="eyebrow">Public Apps</span>
+				<h2 class="section-title">Ready for families right now.</h2>
+				<p class="section-copy">
+					The current public releases set the tone for the studio: approachable, legible, and
+					focused on the moment when a learner actually picks up the device.
+				</p>
+
+				<div class="app-grid" style="margin-top: 1.5rem;">
+					{featuredApps.map((app) => <AppCard app={app} />)}
+				</div>
+			</div>
+		</section>
+
+		<section class="section tone-sun">
+			<div class="shell">
+				<span class="eyebrow">In Testing</span>
+				<h2 class="section-title">The next wave is already taking shape.</h2>
+				<p class="section-copy">
+					Closed-testing apps are already part of the studio story, even before they reach open
+					release. The website is ready to surface them without pretending they are already
+					generally available.
+				</p>
+
+				<div class="app-grid" style="margin-top: 1.5rem;">
+					{upcomingApps.map((app) => <AppCard app={app} />)}
+				</div>
+			</div>
+		</section>
+
+		<section class="section tight tone-mint">
+			<div class="shell">
+				<div class="value-grid">
+					<div class="value-tile">
+						<strong>Designed for repeat use</strong>
+						<span>We care about what an app feels like on the tenth session, not just the first.</span>
+					</div>
+					<div class="value-tile">
+						<strong>Friendly to non-technical parents</strong>
+						<span>Families should be able to find the right tool without decoding jargon.</span>
+					</div>
+					<div class="value-tile">
+						<strong>Progress without noise</strong>
+						<span>Parent productivity tools are built to protect attention instead of gamifying every task.</span>
+					</div>
+					<div class="value-tile">
+						<strong>Legal clarity stays visible</strong>
+						<span>Privacy policies remain easy to find because trust should not hide in the footer.</span>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="shell">
+				<span class="eyebrow">Parent Guides</span>
+				<h2 class="section-title">Useful answers before app choice.</h2>
+				<p class="section-copy">
+					These guides turn common parent searches into practical recommendations, routines,
+					and safety checks.
+				</p>
+				<div class="guide-grid" style="margin-top: 1.5rem;">
+					{guides.map((guide) => (
+						<GuideCard
+							href={`/guides/${guide.id}/`}
+							title={guide.data.title}
+							summary={guide.data.summary}
+							label={guide.data.eyebrow}
+						/>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<section class="section tone-paper">
+			<div class="shell">
+				<FAQBlock
+					title="Fast answers for parents"
+					intro="Natural answers to the questions parents are most likely to ask before choosing a kids learning app."
+					faqs={siteFaqs}
+				/>
+			</div>
+		</section>
+	</main>
+
+	<Footer />
+</Layout>

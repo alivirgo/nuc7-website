@@ -1,0 +1,45 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { categoryMeta, statusLabels } from '../lib/catalog';
+import StatusPill from './StatusPill.astro';
+import StoreButtons from './StoreButtons.astro';
+
+interface Props {
+	app: CollectionEntry<'apps'>;
+	showCategory?: boolean;
+}
+
+const { app, showCategory = true } = Astro.props;
+const category = categoryMeta[app.data.category];
+const privacyHref = app.data.privacySlug ? `/privacy-policies/${app.data.privacySlug}/` : undefined;
+---
+
+<article class="app-card">
+	<div class="app-card-image">
+		<img src={app.data.heroImage} alt={app.data.title} loading="lazy" />
+	</div>
+
+	<div class="app-card-body">
+		<div class="card-meta">
+			<StatusPill kind={app.data.status} label={statusLabels[app.data.status]} />
+			{showCategory && <StatusPill kind={app.data.category} label={category.title} />}
+		</div>
+
+		<div>
+			<h3>{app.data.title}</h3>
+			<p>{app.data.tagline}</p>
+		</div>
+
+		<p>{app.data.summary}</p>
+
+		<ul class="highlights">
+			{app.data.highlights.slice(0, 3).map((item) => <li>{item}</li>)}
+		</ul>
+
+		<StoreButtons
+			detailsHref={`/apps/${app.id}/`}
+			playStoreUrl={app.data.playStoreUrl}
+			privacyHref={privacyHref}
+		/>
+	</div>
+</article>

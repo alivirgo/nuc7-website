@@ -1,0 +1,59 @@
+---
+import { getCollection, render } from 'astro:content';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+	const entries = await getCollection('privacy');
+	return entries.map((policy) => ({
+		params: { slug: policy.id },
+		props: { policy },
+	}));
+}
+
+const { policy } = Astro.props;
+const { Content } = await render(policy);
+---
+
+<Layout title={`Privacy Policy - ${policy.data.appName}`} description={policy.data.description}>
+	<Header />
+	<main>
+		<section class="section">
+			<div class="shell">
+				<span class="eyebrow">Privacy Policy</span>
+				<h1 class="section-title">{policy.data.appName}</h1>
+				<p class="section-copy">{policy.data.description}</p>
+			</div>
+		</section>
+
+		<section class="section tone-paper">
+			<div class="shell privacy-layout">
+				<article class="info-card privacy-prose">
+					<p><strong>Last updated:</strong> {policy.data.lastUpdated}</p>
+					<Content />
+				</article>
+
+				<aside class="info-card">
+					<h3>Quick details</h3>
+					<p>
+						<strong>Audience:</strong>
+						{' '}
+						{policy.data.audience === 'kids' ? 'Children and parents' : 'General users'}
+					</p>
+					{policy.data.packageName && (
+						<p>
+							<strong>Package name:</strong><br />
+							<span class="muted">{policy.data.packageName}</span>
+						</p>
+					)}
+					<p>
+						<strong>Support:</strong><br />
+						<a href="mailto:support@nuc7.com">support@nuc7.com</a>
+					</p>
+				</aside>
+			</div>
+		</section>
+	</main>
+	<Footer />
+</Layout>
