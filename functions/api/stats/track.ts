@@ -62,7 +62,18 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		return Response.json({ error: 'Too many requests.' }, { status: 429 });
 	}
 
-	const payload = (await request.json().catch(() => null)) as TrackPayload | null;
+	const rawPayload = await request.text();
+	if (rawPayload.length > MAX_BODY_BYTES) {
+		return Response.json({ error: 'Payload too large.' }, { status: 413 });
+	}
+
+	const payload = (() => {
+		try {
+			return (JSON.parse(rawPayload || 'null') as TrackPayload | null) ?? null;
+		} catch {
+			return null;
+		}
+	})();
 	if (!payload || (payload.type !== 'pageview' && payload.type !== 'event')) {
 		return Response.json({ error: 'Invalid payload.' }, { status: 400 });
 	}

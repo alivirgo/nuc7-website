@@ -57,7 +57,11 @@ function isAdminSurface(pathname: string) {
 
 export function addSecurityHeaders(response: Response, request: Request) {
 	const url = new URL(request.url);
-	const secured = new Response(response.body, response);
+	const secured = new Response(response.body, {
+		status: response.status,
+		statusText: response.statusText,
+		headers: new Headers(response.headers),
+	});
 
 	for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
 		secured.headers.set(name, value);
