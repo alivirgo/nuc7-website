@@ -71,7 +71,7 @@ export function parseCookies(header: string | null) {
 }
 
 export function clearSessionCookie() {
-	return `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=0`;
+	return `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Strict; Secure; Max-Age=0`;
 }
 
 export function clearStateCookie() {
@@ -89,7 +89,7 @@ export async function createSessionCookie(email: string, env: AuthEnv) {
 	};
 	const encodedPayload = base64UrlEncode(JSON.stringify(payload));
 	const signature = await signValue(encodedPayload, env.SESSION_SECRET);
-	return `${SESSION_COOKIE}=${encodedPayload}.${signature}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=${SESSION_MAX_AGE}`;
+	return `${SESSION_COOKIE}=${encodedPayload}.${signature}; Path=/; HttpOnly; SameSite=Strict; Secure; Max-Age=${SESSION_MAX_AGE}`;
 }
 
 export async function getSessionEmail(request: Request, env: AuthEnv) {

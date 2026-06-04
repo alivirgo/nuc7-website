@@ -117,8 +117,8 @@ export function visitorCookieState(request: Request, date: string) {
 	return {
 		isNewVisitor,
 		headers: [
-			`nuc7_vid=${finalVisitorId}; Path=/; Max-Age=31536000; SameSite=Lax; Secure`,
-			`nuc7_last=${date}; Path=/; Max-Age=172800; SameSite=Lax; Secure`,
+			`nuc7_vid=${finalVisitorId}; Path=/; HttpOnly; Max-Age=31536000; SameSite=Lax; Secure`,
+			`nuc7_last=${date}; Path=/; HttpOnly; Max-Age=172800; SameSite=Lax; Secure`,
 		],
 	};
 }

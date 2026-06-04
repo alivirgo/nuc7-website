@@ -1,4 +1,5 @@
 import { requireAdminSession } from './_auth';
+import { addSecurityHeaders } from './_security';
 
 interface Env {
 	OWNER_GITHUB_EMAIL?: string;
@@ -20,18 +21,21 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 	const url = new URL(request.url);
 
 	if (!shouldProtect(url.pathname)) {
-		return next();
+		return addSecurityHeaders(await next(), request);
 	}
 
 	const email = await requireAdminSession(request, env);
 	if (email) {
-		return next();
+		return addSecurityHeaders(await next(), request);
 	}
 
 	if (url.pathname === '/api/stats/report') {
-		return Response.json({ error: 'Unauthorized' }, { status: 401 });
+		return addSecurityHeaders(Response.json({ error: 'Unauthorized' }, { status: 401 }), request);
 	}
 
 	const nextPath = `${url.pathname}${url.search}`;
-	return Response.redirect(new URL(`/api/auth/login?next=${encodeURIComponent(nextPath)}`, url.origin), 302);
+	return addSecurityHeaders(
+		Response.redirect(new URL(`/api/auth/login?next=${encodeURIComponent(nextPath)}`, url.origin), 302),
+		request,
+	);
 };

@@ -10,6 +10,9 @@ import {
 	writeDaily,
 } from './_shared';
 
+const MAX_BODY_BYTES = 2048;
+const MAX_TRACK_REQUESTS_PER_MINUTE = 45;
+
 interface TrackPayload {
 	type: 'pageview' | 'event';
 	pathname?: string;
@@ -18,9 +21,45 @@ interface TrackPayload {
 	label?: string;
 }
 
+function clientIp(request: Request) {
+	return request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+}
+
+async function isRateLimited(kv: KVNamespace, request: Request) {
+	const minute = Math.floor(Date.now() / 60000);
+	const ip = clientIp(request);
+	const key = `rate:stats-track:${minute}:${ip}`;
+	const current = Number((await kv.get(key)) || '0');
+
+	if (current >= MAX_TRACK_REQUESTS_PER_MINUTE) {
+		return true;
+	}
+
+	await kv.put(key, String(current + 1), { expirationTtl: 180 });
+	return false;
+}
+
+function cleanPathname(pathname = '/') {
+	if (!pathname.startsWith('/')) return '/';
+	return pathname.slice(0, 240);
+}
+
+function cleanEventName(eventName = '') {
+	return eventName.replace(/[^a-z0-9._:-]/gi, '').slice(0, 80);
+}
+
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 	if (!env.NUC7_STATS) {
 		return Response.json({ error: 'Missing NUC7_STATS binding.' }, { status: 500 });
+	}
+
+	const contentLength = Number(request.headers.get('content-length') || 0);
+	if (contentLength > MAX_BODY_BYTES) {
+		return Response.json({ error: 'Payload too large.' }, { status: 413 });
+	}
+
+	if (await isRateLimited(env.NUC7_STATS, request)) {
+		return Response.json({ error: 'Too many requests.' }, { status: 429 });
 	}
 
 	const payload = (await request.json().catch(() => null)) as TrackPayload | null;
@@ -36,7 +75,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 	});
 
 	if (payload.type === 'pageview') {
-		const pathname = payload.pathname || '/';
+		const pathname = cleanPathname(payload.pathname);
 		const userAgent = request.headers.get('user-agent') ?? '';
 		const country = request.headers.get('cf-ipcountry') ?? 'Unknown';
 		const cookies = visitorCookieState(request, date);
@@ -58,7 +97,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 	}
 
 	if (payload.type === 'event' && payload.eventName) {
-		increment(daily.events, payload.eventName);
+		const eventName = cleanEventName(payload.eventName);
+		if (eventName) {
+			increment(daily.events, eventName);
+		}
 	}
 
 	await writeDaily(env.NUC7_STATS, daily);
