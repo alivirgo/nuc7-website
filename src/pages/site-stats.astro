@@ -13,11 +13,10 @@ import Layout from '../layouts/Layout.astro';
 		<section class="section">
 			<div class="shell">
 				<span class="eyebrow">Site Stats</span>
-				<h1 class="section-title">A WordPress-style stats view for the new site.</h1>
+				<h1 class="section-title">A detailed traffic intelligence dashboard for NUC7 Studios.</h1>
 				<p class="section-copy">
-					This dashboard is powered by Cloudflare Functions and KV, so it can track visitors, page
-					views, top pages, referrers, countries, browsers, devices, and key click events without
-					adding another analytics vendor.
+					This owner-only dashboard tracks traffic sources, campaigns, search signals, countries,
+					devices, click events, time patterns, and recent activity through Cloudflare Functions and KV.
 				</p>
 
 				<form class="stats-form" id="stats-form">
@@ -25,6 +24,7 @@ import Layout from '../layouts/Layout.astro';
 						<option value="7">Last 7 days</option>
 						<option value="30" selected>Last 30 days</option>
 						<option value="90">Last 90 days</option>
+						<option value="120">Last 120 days</option>
 					</select>
 					<button class="button" type="submit">Load stats</button>
 					<a class="button button-secondary" href="/api/auth/logout?next=/">Sign out</a>
@@ -41,6 +41,17 @@ import Layout from '../layouts/Layout.astro';
 					<div class="stats-card"><strong>Avg. Views / Day</strong><span>--</span></div>
 				</div>
 
+				<div class="stats-table-grid stats-table-grid-compact" style="margin-top: 1rem;">
+					<div class="table-card">
+						<strong>Executive Readout</strong>
+						<div id="stats-insights"></div>
+					</div>
+					<div class="table-card">
+						<strong>Traffic Mix</strong>
+						<div id="stats-traffic-sources"></div>
+					</div>
+				</div>
+
 				<div class="trend-card" style="margin-top: 1rem;">
 					<strong id="stats-trend-title">30-day trend</strong>
 					<div class="trend-list" id="stats-trend" style="margin-top: 1rem;"></div>
@@ -52,21 +63,65 @@ import Layout from '../layouts/Layout.astro';
 						<div id="stats-pages"></div>
 					</div>
 					<div class="table-card">
+						<strong>Landing Pages</strong>
+						<div id="stats-landing-pages"></div>
+					</div>
+					<div class="table-card">
 						<strong>Top Referrers</strong>
 						<div id="stats-referrers"></div>
 					</div>
 					<div class="table-card">
-						<strong>Countries</strong>
-						<div id="stats-countries"></div>
+						<strong>Search and AI Signals</strong>
+						<div id="stats-search-terms"></div>
+						<div id="stats-search-engines" style="margin-top: 1rem;"></div>
+						<div id="stats-social-sources" style="margin-top: 1rem;"></div>
 					</div>
 					<div class="table-card">
-						<strong>Devices and Browsers</strong>
+						<strong>Campaigns</strong>
+						<div id="stats-utm-campaigns"></div>
+						<div id="stats-utm-sources" style="margin-top: 1rem;"></div>
+						<div id="stats-utm-mediums" style="margin-top: 1rem;"></div>
+						<div id="stats-utm-terms" style="margin-top: 1rem;"></div>
+					</div>
+					<div class="table-card">
+						<strong>Countries and Languages</strong>
+						<div id="stats-countries"></div>
+						<div id="stats-languages" style="margin-top: 1rem;"></div>
+						<div id="stats-timezones" style="margin-top: 1rem;"></div>
+					</div>
+					<div class="table-card">
+						<strong>Devices, Browsers, and OS</strong>
 						<div id="stats-devices"></div>
 						<div id="stats-browsers" style="margin-top: 1rem;"></div>
+						<div id="stats-os" style="margin-top: 1rem;"></div>
 					</div>
 					<div class="table-card">
-						<strong>Tracked Events</strong>
+						<strong>Technical Context</strong>
+						<div id="stats-viewports"></div>
+						<div id="stats-screens" style="margin-top: 1rem;"></div>
+						<div id="stats-connections" style="margin-top: 1rem;"></div>
+						<div id="stats-color-schemes" style="margin-top: 1rem;"></div>
+					</div>
+					<div class="table-card">
+						<strong>Tracked Events and Click Rates</strong>
 						<div id="stats-events"></div>
+						<div id="stats-conversions" style="margin-top: 1rem;"></div>
+						<div id="stats-event-labels" style="margin-top: 1rem;"></div>
+					</div>
+					<div class="table-card">
+						<strong>Page Categories and Bot Signal</strong>
+						<div id="stats-page-categories"></div>
+						<div id="stats-bot-signals" style="margin-top: 1rem;"></div>
+						<div id="stats-colo" style="margin-top: 1rem;"></div>
+					</div>
+					<div class="table-card">
+						<strong>Time Patterns</strong>
+						<div id="stats-hours"></div>
+						<div id="stats-weekdays" style="margin-top: 1rem;"></div>
+					</div>
+					<div class="table-card">
+						<strong>Recent Activity</strong>
+						<div id="stats-recent"></div>
 					</div>
 				</div>
 
@@ -81,6 +136,16 @@ import Layout from '../layouts/Layout.astro';
 	<Footer />
 
 	<script is:inline>
+		const escapeHtml = (value) =>
+			String(value ?? '')
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/"/g, '&quot;')
+				.replace(/'/g, '&#039;');
+
+		const formatRate = (value) => `${Number(value || 0).toFixed(1).replace('.0', '')}%`;
+
 		const renderTable = (targetId, rows, emptyLabel) => {
 			const target = document.getElementById(targetId);
 			if (!target) return;
@@ -91,8 +156,30 @@ import Layout from '../layouts/Layout.astro';
 			}
 
 			target.innerHTML = `<table class="stats-table">${rows
-				.map((row) => `<tr><td>${row.label}</td><td>${row.count}</td></tr>`)
+				.map((row) => `<tr><td>${escapeHtml(row.label)}</td><td>${row.count}</td></tr>`)
 				.join('')}</table>`;
+		};
+
+		const renderRateTable = (targetId, rows, emptyLabel) => {
+			const target = document.getElementById(targetId);
+			if (!target) return;
+
+			if (!rows?.length) {
+				target.innerHTML = `<p class="muted">${emptyLabel}</p>`;
+				return;
+			}
+
+			target.innerHTML = `<table class="stats-table">${rows
+				.map((row) => `<tr><td>${escapeHtml(row.label)}</td><td>${row.count} · ${formatRate(row.rate)}</td></tr>`)
+				.join('')}</table>`;
+		};
+
+		const renderInsights = (insights = []) => {
+			const target = document.getElementById('stats-insights');
+			if (!target) return;
+			target.innerHTML = insights.length
+				? `<ul class="stats-list">${insights.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
+				: '<p class="muted">Insights will appear after the site has enough tracked visits.</p>';
 		};
 
 		const renderTrend = (series) => {
@@ -115,6 +202,7 @@ import Layout from '../layouts/Layout.astro';
 							</div>
 							<span>${item.views} views</span>
 							<span>${item.visitors} visitors</span>
+							<span>${item.events || 0} events</span>
 						</div>
 					`,
 				)
@@ -128,9 +216,47 @@ import Layout from '../layouts/Layout.astro';
 			target.innerHTML = `
 				<div class="stats-card"><strong>Visitors</strong><span>${summary.visitors}</span></div>
 				<div class="stats-card"><strong>Views</strong><span>${summary.views}</span></div>
+				<div class="stats-card"><strong>Events</strong><span>${summary.events}</span></div>
+				<div class="stats-card"><strong>Click Rate</strong><span>${formatRate(summary.clickRate)}</span></div>
+				<div class="stats-card"><strong>Returning Signals</strong><span>${summary.returningVisitors}</span></div>
+				<div class="stats-card"><strong>Search Share</strong><span>${formatRate(summary.searchShare)}</span></div>
+				<div class="stats-card"><strong>AI Answer Share</strong><span>${formatRate(summary.aiAnswerShare)}</span></div>
 				<div class="stats-card"><strong>Tracked Days</strong><span>${summary.daysTracked}</span></div>
 				<div class="stats-card"><strong>Avg. Views / Day</strong><span>${summary.averageViewsPerDay}</span></div>
+				<div class="stats-card"><strong>Top Country</strong><span>${escapeHtml(summary.topCountry)}</span></div>
+				<div class="stats-card"><strong>Top Source</strong><span>${escapeHtml(summary.topTrafficSource)}</span></div>
+				<div class="stats-card"><strong>Top Page</strong><span>${escapeHtml(summary.topPage)}</span></div>
 			`;
+		};
+
+		const renderRecent = (items = []) => {
+			const target = document.getElementById('stats-recent');
+			if (!target) return;
+
+			if (!items.length) {
+				target.innerHTML = '<p class="muted">No recent activity yet.</p>';
+				return;
+			}
+
+			target.innerHTML = `<div class="activity-list">${items
+				.map((item) => {
+					const when = new Date(item.at).toLocaleString();
+					const title =
+						item.type === 'event'
+							? `${item.eventName || 'event'} on ${item.pathname}`
+							: `${item.pathname} from ${item.source || item.referrer || 'unknown source'}`;
+					const detail = [
+						item.country,
+						item.device,
+						item.browser,
+						item.campaign ? `campaign: ${item.campaign}` : '',
+						item.label ? `label: ${item.label}` : '',
+					]
+						.filter(Boolean)
+						.join(' · ');
+					return `<div class="activity-row"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(when)}</span><p>${escapeHtml(detail)}</p></div>`;
+				})
+				.join('')}</div>`;
 		};
 
 		const setStatus = (title, body) => {
@@ -160,13 +286,38 @@ import Layout from '../layouts/Layout.astro';
 				trendTitle.textContent = `${days}-day trend`;
 			}
 			renderSummary(data.summary);
+			renderInsights(data.insights);
 			renderTrend(data.series);
 			renderTable('stats-pages', data.topPages, 'No page views yet.');
+			renderTable('stats-landing-pages', data.topLandingPages, 'No landing page data yet.');
+			renderTable('stats-page-categories', data.topPageCategories, 'No page category data yet.');
 			renderTable('stats-referrers', data.topReferrers, 'No referrers yet.');
+			renderTable('stats-traffic-sources', data.topTrafficSources, 'No source mix yet.');
+			renderTable('stats-search-terms', data.topSearchTerms, 'No search terms or UTM terms yet.');
+			renderTable('stats-search-engines', data.topSearchEngines, 'No search engine referrers yet.');
+			renderTable('stats-social-sources', data.topSocialSources, 'No social referrers yet.');
+			renderTable('stats-utm-campaigns', data.topUtmCampaigns, 'No UTM campaign data yet.');
+			renderTable('stats-utm-sources', data.topUtmSources, 'No UTM source data yet.');
+			renderTable('stats-utm-mediums', data.topUtmMediums, 'No UTM medium data yet.');
+			renderTable('stats-utm-terms', data.topUtmTerms, 'No UTM term data yet.');
 			renderTable('stats-countries', data.topCountries, 'No country data yet.');
+			renderTable('stats-languages', data.topLanguages, 'No language data yet.');
+			renderTable('stats-timezones', data.topTimezones, 'No timezone data yet.');
+			renderTable('stats-colo', data.topColo, 'No Cloudflare edge data yet.');
 			renderTable('stats-devices', data.topDevices, 'No device data yet.');
 			renderTable('stats-browsers', data.topBrowsers, 'No browser data yet.');
+			renderTable('stats-os', data.topOperatingSystems, 'No operating system data yet.');
+			renderTable('stats-viewports', data.topViewportSizes, 'No viewport data yet.');
+			renderTable('stats-screens', data.topScreenSizes, 'No screen size data yet.');
+			renderTable('stats-connections', data.topConnectionTypes, 'No connection data yet.');
+			renderTable('stats-color-schemes', data.topColorSchemes, 'No color scheme data yet.');
+			renderTable('stats-bot-signals', data.topBotSignals, 'No bot signal data yet.');
 			renderTable('stats-events', data.topEvents, 'No tracked events yet.');
+			renderRateTable('stats-conversions', data.conversions, 'No conversion-style click rates yet.');
+			renderTable('stats-event-labels', data.topEventLabels, 'No event labels yet.');
+			renderTable('stats-hours', data.hourly, 'No hourly data yet.');
+			renderTable('stats-weekdays', data.weekdays, 'No weekday data yet.');
+			renderRecent(data.recentActivity);
 			setStatus('Ready', 'Analytics data loaded successfully.');
 		};
 

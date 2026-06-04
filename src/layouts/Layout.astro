@@ -102,10 +102,30 @@ const baseSchema = [
 					}).catch(() => {});
 				};
 
+				const params = new URLSearchParams(window.location.search);
+				const nav = navigator;
+				const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
+				const viewport = `${window.innerWidth}x${window.innerHeight}`;
+				const screenSize = window.screen ? `${window.screen.width}x${window.screen.height}` : '';
+				const colorScheme = window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+
 				send({
 					type: 'pageview',
 					pathname: window.location.pathname,
+					search: window.location.search,
 					referrer: document.referrer || '',
+					title: document.title,
+					language: nav.language || '',
+					timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+					colorScheme,
+					screen: screenSize,
+					viewport,
+					connectionType: connection?.effectiveType || connection?.type || '',
+					utmSource: params.get('utm_source') || '',
+					utmMedium: params.get('utm_medium') || '',
+					utmCampaign: params.get('utm_campaign') || '',
+					utmContent: params.get('utm_content') || '',
+					utmTerm: params.get('utm_term') || '',
 				});
 
 				document.addEventListener(
