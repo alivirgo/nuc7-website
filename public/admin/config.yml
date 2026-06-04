@@ -3,8 +3,8 @@ backend:
   repo: alivirgo/nuc7-website
   branch: main
   site_domain: nuc7.com
-  base_url: https://nuc7.com/api/decap
-  auth_endpoint: auth
+  base_url: https://nuc7.com
+  auth_endpoint: api/decap/auth
   commit_messages:
     create: "cms(create): {{collection}} {{slug}}"
     update: "cms(update): {{collection}} {{slug}}"
