@@ -3,11 +3,13 @@ import {
 	browserFromUserAgent,
 	botSignalFromUserAgent,
 	deviceFromUserAgent,
+	hitKey,
 	increment,
 	normalizeReferrer,
 	operatingSystemFromUserAgent,
 	readDaily,
 	sourceGroup,
+	type StatsHit,
 	todayKey,
 	visitorCookieState,
 	writeDaily,
@@ -16,6 +18,7 @@ import {
 const MAX_BODY_BYTES = 2048;
 const MAX_TRACK_REQUESTS_PER_MINUTE = 45;
 const MAX_RECENT_ACTIVITY = 80;
+const HIT_RETENTION_SECONDS = 60 * 60 * 24 * 180;
 
 interface TrackPayload {
 	type: 'pageview' | 'event';
@@ -198,6 +201,52 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		const term = searchTerm(payload.search ?? '', referrer);
 		const searchSource = searchEngine(referrer);
 		const social = socialSource(referrer);
+		const device = deviceFromUserAgent(userAgent);
+		const browser = browserFromUserAgent(userAgent);
+		const operatingSystem = operatingSystemFromUserAgent(userAgent);
+		const botSignal = botSignalFromUserAgent(userAgent);
+		const language = cleanValue(payload.language || request.headers.get('accept-language')?.split(',')[0] || 'Unknown', 60);
+		const timezone = cleanValue(payload.timezone || 'Unknown', 80);
+		const colo = requestColo(request);
+		const hour = hourBucket(now);
+		const weekday = weekdayBucket(now);
+		const viewport = cleanValue(payload.viewport || 'Unknown', 40);
+		const screen = cleanValue(payload.screen || 'Unknown', 40);
+		const colorScheme = cleanValue(payload.colorScheme || 'Unknown', 20);
+		const connectionType = cleanValue(payload.connectionType || 'Unknown', 30);
+		const category = pageCategory(pathname);
+		const hit: StatsHit = {
+			date,
+			at: now.toISOString(),
+			type: 'pageview',
+			pathname,
+			referrer: normalizeReferrer(referrer),
+			country,
+			device,
+			browser,
+			returningVisitor: !cookies.isNewVisitor,
+			pageCategory: category,
+			searchTerm: term || undefined,
+			searchEngine: searchSource || undefined,
+			socialSource: social || undefined,
+			trafficSource: source,
+			utmSource: payload.utmSource ? cleanValue(payload.utmSource) : undefined,
+			utmMedium: payload.utmMedium ? cleanValue(payload.utmMedium) : undefined,
+			utmCampaign: payload.utmCampaign ? cleanValue(payload.utmCampaign) : undefined,
+			utmContent: payload.utmContent ? cleanValue(payload.utmContent) : undefined,
+			utmTerm: payload.utmTerm ? cleanValue(payload.utmTerm) : undefined,
+			language,
+			timezone,
+			colo,
+			hour,
+			weekday,
+			viewport,
+			screen,
+			colorScheme,
+			connectionType,
+			operatingSystem,
+			botSignal,
+		};
 
 		if (cookies.isNewVisitor) {
 			daily.visitors += 1;
@@ -212,23 +261,23 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 		daily.pageViews += 1;
 		increment(daily.pages, pathname);
 		increment(daily.landingPages ??= {}, pathname);
-		increment(daily.pageCategories ??= {}, pageCategory(pathname));
+		increment(daily.pageCategories ??= {}, category);
 		increment(daily.referrers, normalizeReferrer(referrer));
 		increment(daily.trafficSources ??= {}, source);
 		increment(daily.countries, country);
-		increment(daily.devices, deviceFromUserAgent(userAgent));
-		increment(daily.browsers, browserFromUserAgent(userAgent));
-		increment(daily.operatingSystems ??= {}, operatingSystemFromUserAgent(userAgent));
-		increment(daily.botSignals ??= {}, botSignalFromUserAgent(userAgent));
-		increment(daily.languages ??= {}, cleanValue(payload.language || request.headers.get('accept-language')?.split(',')[0] || 'Unknown', 60));
-		increment(daily.timezones ??= {}, cleanValue(payload.timezone || 'Unknown', 80));
-		increment(daily.colo ??= {}, requestColo(request));
-		increment(daily.hours ??= {}, hourBucket(now));
-		increment(daily.weekdays ??= {}, weekdayBucket(now));
-		increment(daily.viewportSizes ??= {}, cleanValue(payload.viewport || 'Unknown', 40));
-		increment(daily.screenSizes ??= {}, cleanValue(payload.screen || 'Unknown', 40));
-		increment(daily.colorSchemes ??= {}, cleanValue(payload.colorScheme || 'Unknown', 20));
-		increment(daily.connectionTypes ??= {}, cleanValue(payload.connectionType || 'Unknown', 30));
+		increment(daily.devices, device);
+		increment(daily.browsers, browser);
+		increment(daily.operatingSystems ??= {}, operatingSystem);
+		increment(daily.botSignals ??= {}, botSignal);
+		increment(daily.languages ??= {}, language);
+		increment(daily.timezones ??= {}, timezone);
+		increment(daily.colo ??= {}, colo);
+		increment(daily.hours ??= {}, hour);
+		increment(daily.weekdays ??= {}, weekday);
+		increment(daily.viewportSizes ??= {}, viewport);
+		increment(daily.screenSizes ??= {}, screen);
+		increment(daily.colorSchemes ??= {}, colorScheme);
+		increment(daily.connectionTypes ??= {}, connectionType);
 
 		if (searchSource) increment(daily.searchEngines ??= {}, searchSource);
 		if (social) increment(daily.socialSources ??= {}, social);
@@ -246,31 +295,42 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 				pathname,
 				referrer: normalizeReferrer(referrer),
 				country,
-				device: deviceFromUserAgent(userAgent),
-				browser: browserFromUserAgent(userAgent),
+				device,
+				browser,
 				campaign: payload.utmCampaign ? cleanValue(payload.utmCampaign) : undefined,
 				source,
 			},
 			...(daily.recentActivity ?? []),
 		].slice(0, MAX_RECENT_ACTIVITY);
+		await env.NUC7_STATS.put(hitKey(hit), JSON.stringify(hit), { expirationTtl: HIT_RETENTION_SECONDS });
 	}
 
 	if (payload.type === 'event' && payload.eventName) {
 		const pathname = cleanPathname(payload.pathname);
 		const eventName = cleanEventName(payload.eventName);
 		if (eventName) {
+			const label = payload.label ? cleanValue(payload.label, 140) : undefined;
+			const hit: StatsHit = {
+				date,
+				at: now.toISOString(),
+				type: 'event',
+				pathname,
+				eventName,
+				label,
+			};
 			increment(daily.events, eventName);
-			if (payload.label) increment(daily.eventLabels ??= {}, cleanValue(`${eventName}: ${payload.label}`, 180));
+			if (label) increment(daily.eventLabels ??= {}, cleanValue(`${eventName}: ${label}`, 180));
 			daily.recentActivity = [
 				{
 					at: now.toISOString(),
 					type: 'event',
 					pathname,
 					eventName,
-					label: payload.label ? cleanValue(payload.label, 140) : undefined,
+					label,
 				},
 				...(daily.recentActivity ?? []),
 			].slice(0, MAX_RECENT_ACTIVITY);
+			await env.NUC7_STATS.put(hitKey(hit), JSON.stringify(hit), { expirationTtl: HIT_RETENTION_SECONDS });
 		}
 	}
 

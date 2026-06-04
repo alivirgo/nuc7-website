@@ -57,7 +57,43 @@ export interface RecentActivity {
 	source?: string;
 }
 
+export interface StatsHit {
+	date: string;
+	at: string;
+	type: 'pageview' | 'event';
+	pathname: string;
+	referrer?: string;
+	country?: string;
+	device?: string;
+	browser?: string;
+	returningVisitor?: boolean;
+	pageCategory?: string;
+	searchTerm?: string;
+	searchEngine?: string;
+	socialSource?: string;
+	trafficSource?: string;
+	utmSource?: string;
+	utmMedium?: string;
+	utmCampaign?: string;
+	utmContent?: string;
+	utmTerm?: string;
+	language?: string;
+	timezone?: string;
+	colo?: string;
+	hour?: string;
+	weekday?: string;
+	viewport?: string;
+	screen?: string;
+	colorScheme?: string;
+	connectionType?: string;
+	operatingSystem?: string;
+	botSignal?: string;
+	eventName?: string;
+	label?: string;
+}
+
 const PREFIX = 'stats:daily:';
+const HIT_PREFIX = 'stats:hit:';
 
 export function todayKey(timeZone = 'UTC') {
 	const formatter = new Intl.DateTimeFormat('en-CA', {
@@ -71,6 +107,14 @@ export function todayKey(timeZone = 'UTC') {
 
 export function dailyKey(date: string) {
 	return `${PREFIX}${date}`;
+}
+
+export function hitKey(hit: StatsHit) {
+	return `${HIT_PREFIX}${hit.date}:${Date.parse(hit.at)}:${crypto.randomUUID()}`;
+}
+
+export function hitPrefix(date: string) {
+	return `${HIT_PREFIX}${date}:`;
 }
 
 export function blankDaily(date: string): DailyStats {

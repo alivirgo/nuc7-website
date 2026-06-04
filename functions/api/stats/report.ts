@@ -1,6 +1,6 @@
 import type { DailyStats, Env } from './_shared';
 import { requireAdminSession } from '../../_auth';
-import { ensureDailyShape, requireStatsToken, topEntries, unauthorizedResponse } from './_shared';
+import { ensureDailyShape, hitPrefix, increment, requireStatsToken, topEntries, type StatsHit, unauthorizedResponse } from './_shared';
 
 function clamp(value: number, min: number, max: number) {
 	return Math.max(min, Math.min(max, value));
@@ -99,6 +99,96 @@ function strongest(record: Record<string, number>) {
 	return topEntries(record, 1)[0] ?? null;
 }
 
+async function listHitsForDate(kv: KVNamespace, date: string) {
+	const hits: StatsHit[] = [];
+	let cursor: string | undefined;
+
+	do {
+		const listed = await kv.list({ prefix: hitPrefix(date), cursor, limit: 1000 });
+		cursor = listed.list_complete ? undefined : listed.cursor;
+		const batch = await Promise.all(
+			listed.keys.map(async (entry) => kv.get<StatsHit>(entry.name, 'json')),
+		);
+		hits.push(...(batch.filter(Boolean) as StatsHit[]));
+	} while (cursor);
+
+	return hits;
+}
+
+function dateStatsFromHits(date: string, hits: StatsHit[]) {
+	const stats = ensureDailyShape({
+		date,
+		visitors: 0,
+		pageViews: 0,
+		pages: {},
+		referrers: {},
+		countries: {},
+		devices: {},
+		browsers: {},
+		events: {},
+	});
+
+	for (const hit of hits) {
+		if (hit.type === 'pageview') {
+			stats.pageViews += 1;
+			if (!hit.returningVisitor) stats.visitors += 1;
+			else stats.returningVisitors = (stats.returningVisitors ?? 0) + 1;
+
+			increment(stats.pages, hit.pathname);
+			increment(stats.landingPages ??= {}, hit.pathname);
+			if (hit.referrer) increment(stats.referrers, hit.referrer);
+			if (hit.country) increment(stats.countries, hit.country);
+			if (hit.device) increment(stats.devices, hit.device);
+			if (hit.browser) increment(stats.browsers, hit.browser);
+			if (hit.pageCategory) increment(stats.pageCategories ??= {}, hit.pageCategory);
+			if (hit.searchTerm) increment(stats.searchTerms ??= {}, hit.searchTerm);
+			if (hit.searchEngine) increment(stats.searchEngines ??= {}, hit.searchEngine);
+			if (hit.socialSource) increment(stats.socialSources ??= {}, hit.socialSource);
+			if (hit.trafficSource) increment(stats.trafficSources ??= {}, hit.trafficSource);
+			if (hit.utmSource) increment(stats.utmSources ??= {}, hit.utmSource);
+			if (hit.utmMedium) increment(stats.utmMediums ??= {}, hit.utmMedium);
+			if (hit.utmCampaign) increment(stats.utmCampaigns ??= {}, hit.utmCampaign);
+			if (hit.utmContent) increment(stats.utmContents ??= {}, hit.utmContent);
+			if (hit.utmTerm) increment(stats.utmTerms ??= {}, hit.utmTerm);
+			if (hit.language) increment(stats.languages ??= {}, hit.language);
+			if (hit.timezone) increment(stats.timezones ??= {}, hit.timezone);
+			if (hit.colo) increment(stats.colo ??= {}, hit.colo);
+			if (hit.hour) increment(stats.hours ??= {}, hit.hour);
+			if (hit.weekday) increment(stats.weekdays ??= {}, hit.weekday);
+			if (hit.viewport) increment(stats.viewportSizes ??= {}, hit.viewport);
+			if (hit.screen) increment(stats.screenSizes ??= {}, hit.screen);
+			if (hit.colorScheme) increment(stats.colorSchemes ??= {}, hit.colorScheme);
+			if (hit.connectionType) increment(stats.connectionTypes ??= {}, hit.connectionType);
+			if (hit.operatingSystem) increment(stats.operatingSystems ??= {}, hit.operatingSystem);
+			if (hit.botSignal) increment(stats.botSignals ??= {}, hit.botSignal);
+		}
+
+		if (hit.type === 'event' && hit.eventName) {
+			increment(stats.events, hit.eventName);
+			if (hit.label) increment(stats.eventLabels ??= {}, `${hit.eventName}: ${hit.label}`);
+		}
+
+		stats.recentActivity = [
+			{
+				at: hit.at,
+				type: hit.type,
+				pathname: hit.pathname,
+				referrer: hit.referrer,
+				country: hit.country,
+				device: hit.device,
+				browser: hit.browser,
+				eventName: hit.eventName,
+				label: hit.label,
+				campaign: hit.utmCampaign,
+				source: hit.trafficSource,
+			},
+			...(stats.recentActivity ?? []),
+		].slice(0, 80);
+	}
+
+	return stats;
+}
+
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 	if (!env.NUC7_STATS) {
 		return Response.json({ error: 'Missing NUC7_STATS binding.' }, { status: 500 });
@@ -127,7 +217,16 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 		}),
 	);
 
-	const validDays = daily.filter(Boolean).map((day) => ensureDailyShape(day as DailyStats));
+	const hitDays = await Promise.all(
+		dates.map(async (date) => ({
+			date,
+			hits: await listHitsForDate(env.NUC7_STATS, date),
+		})),
+	);
+	const hasHitRecords = hitDays.some((day) => day.hits.length > 0);
+	const validDays = hasHitRecords
+		? hitDays.map((day) => dateStatsFromHits(day.date, day.hits)).filter((day) => day.pageViews || Object.keys(day.events).length)
+		: daily.filter(Boolean).map((day) => ensureDailyShape(day as DailyStats));
 	const totals = aggregateDays(validDays);
 	const topPage = strongest(totals.pages);
 	const topReferrer = strongest(totals.referrers);
