@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>AI Strong Password Generator | NUC7 Studios</title>
+		<meta
+			name="description"
+			content="Generate strong random passwords or memorable passphrases locally in your browser. Test password strength with a bcrypt-10 cracking-time estimate."
+		/>
+		<link rel="canonical" href="https://nuc7.com/tools/ai-strong-password-generator/" />
+		<meta property="og:title" content="AI Strong Password Generator | NUC7 Studios" />
+		<meta
+			property="og:description"
+			content="A private browser-based password generator with random and memorable modes, live strength feedback, and cracking-time estimates."
+		/>
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://nuc7.com/tools/ai-strong-password-generator/" />
+		<meta name="twitter:card" content="summary" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<link rel="stylesheet" href="./style.css" />
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "FAQPage",
+				"mainEntity": [
+					{
+						"@type": "Question",
+						"name": "Is it safe to use an online password generator?",
+						"acceptedAnswer": {
+							"@type": "Answer",
+							"text": "A password generator is safest when generation happens locally in your browser and the password is never transmitted to a server. This NUC7 Studios tool creates and evaluates passwords client-side only."
+						}
+					},
+					{
+						"@type": "Question",
+						"name": "How long should a strong password be?",
+						"acceptedAnswer": {
+							"@type": "Answer",
+							"text": "For most accounts, use at least 12 random characters with uppercase letters, lowercase letters, numbers, and symbols. For memorable passphrases, use three or four unrelated words with a number or symbol."
+						}
+					},
+					{
+						"@type": "Question",
+						"name": "Are memorable passphrases better than random passwords?",
+						"acceptedAnswer": {
+							"@type": "Answer",
+							"text": "Random passwords are usually strongest for password managers. Memorable passphrases are useful when you must type or remember the password, especially when the words are unrelated and include separators, numbers, or symbols."
+						}
+					},
+					{
+						"@type": "Question",
+						"name": "Does NUC7 Studios store passwords from this generator?",
+						"acceptedAnswer": {
+							"@type": "Answer",
+							"text": "No. Password generation, copying, and strength estimation run in the browser. The password value is not stored, tracked, or transmitted by this tool."
+						}
+					}
+				]
+			}
+		</script>
+	</head>
+	<body>
+		<header class="site-header">
+			<a class="brand" href="/" aria-label="NUC7 Studios home">
+				<span class="brand-mark">N7</span>
+				<span>
+					<strong>NUC7 Studios</strong>
+					<small>Home-schooling and productivity apps</small>
+				</span>
+			</a>
+			<nav class="nav-links" aria-label="Primary navigation">
+				<a href="/">Home</a>
+				<a href="/for-parents/">Parents</a>
+				<a href="/apps/">Apps</a>
+				<a href="/guides/">Guides</a>
+				<a href="/comparisons/">Compare</a>
+				<a href="/tools/ai-strong-password-generator/" aria-current="page">Tools</a>
+			</nav>
+		</header>
+
+		<main>
+			<section class="hero-section">
+				<div class="hero-copy">
+					<p class="eyebrow">Private Security Tool</p>
+					<h1>AI Strong Password Generator</h1>
+					<p>
+						Create strong random passwords or readable passphrases instantly. The tool also
+						acts as a password strength tester, estimating brute-force cracking time with an
+						attacker-friendly bcrypt-10 model.
+					</p>
+				</div>
+				<div class="trust-card" aria-label="Privacy assurance">
+					<strong>100% Local &amp; Private.</strong>
+					<span>We do not store, track, or transmit your passwords.</span>
+				</div>
+			</section>
+
+			<section class="generator-shell" aria-labelledby="generator-title">
+				<div class="generator-card">
+					<div class="tool-heading">
+						<div>
+							<p class="eyebrow">Generator</p>
+							<h2 id="generator-title">Build a safer password</h2>
+						</div>
+						<div class="score-pill" id="strength-label">Ready</div>
+					</div>
+
+					<label class="password-label" for="password-output">Generated password or test password</label>
+					<div class="password-display">
+						<input
+							id="password-output"
+							type="text"
+							autocomplete="off"
+							spellcheck="false"
+							aria-describedby="crack-time strength-details"
+						/>
+						<span class="emoji-meter" id="emoji-meter" aria-live="polite" aria-label="Password strength">😐</span>
+					</div>
+
+					<div class="feedback-wrap">
+						<div class="feedback-bar" aria-hidden="true">
+							<span id="feedback-fill"></span>
+						</div>
+						<p id="crack-time" class="crack-time">Time to crack: waiting for a password.</p>
+						<p id="strength-details" class="strength-details">
+							Estimate assumes 12x RTX 5090 GPUs attacking bcrypt-10 hashes.
+						</p>
+					</div>
+
+					<div class="control-grid">
+						<fieldset class="control-panel length-panel">
+							<legend>Password length</legend>
+							<div class="range-row">
+								<input id="length-slider" type="range" min="4" max="18" value="12" />
+								<output id="length-value" for="length-slider">12</output>
+							</div>
+						</fieldset>
+
+						<fieldset class="control-panel">
+							<legend>Generation type</legend>
+							<div class="segmented">
+								<label>
+									<input type="radio" name="generation-type" value="random" checked />
+									<span>Random</span>
+								</label>
+								<label>
+									<input type="radio" name="generation-type" value="memorable" />
+									<span>Memorable</span>
+								</label>
+							</div>
+						</fieldset>
+
+						<fieldset class="control-panel option-panel">
+							<legend>Character options</legend>
+							<label><input id="include-uppercase" type="checkbox" checked /> Uppercase A-Z</label>
+							<label><input id="include-lowercase" type="checkbox" checked /> Lowercase a-z</label>
+							<label><input id="include-numbers" type="checkbox" checked /> Numbers 0-9</label>
+							<label><input id="include-symbols" type="checkbox" checked /> Symbols !@#$%</label>
+						</fieldset>
+					</div>
+
+					<div class="action-row">
+						<button id="generate-button" class="primary-action" type="button">Generate Password</button>
+						<button id="copy-button" class="secondary-action" type="button">Copy to Clipboard</button>
+					</div>
+					<p id="status-message" class="status-message" aria-live="polite"></p>
+				</div>
+			</section>
+
+			<section class="info-section" aria-labelledby="why-title">
+				<div>
+					<p class="eyebrow">Why it matters</p>
+					<h2 id="why-title">Strong passwords reduce the easiest account attacks.</h2>
+				</div>
+				<div class="info-grid">
+					<article>
+						<h3>Longer beats clever</h3>
+						<p>
+							Attackers automate guesses. Extra length and a wider character set raise the
+							number of possibilities much faster than human-looking substitutions.
+						</p>
+					</article>
+					<article>
+						<h3>Random for managers</h3>
+						<p>
+							Use random strings for accounts saved in a password manager. The generator
+							guarantees at least one character from every selected pool.
+						</p>
+					</article>
+					<article>
+						<h3>Memorable for typing</h3>
+						<p>
+							Passphrases combine unrelated words so they are easier to type while still
+							being hard to brute-force at scale.
+						</p>
+					</article>
+				</div>
+			</section>
+
+			<section class="faq-section" aria-labelledby="faq-title">
+				<p class="eyebrow">FAQ</p>
+				<h2 id="faq-title">Password generator questions</h2>
+				<div class="faq-list">
+					<details>
+						<summary>Is it safe to use an online password generator?</summary>
+						<p>
+							It is safer when the generator runs locally in your browser and never sends
+							the password to a server. This tool keeps generation and testing client-side.
+						</p>
+					</details>
+					<details>
+						<summary>How long should a password be?</summary>
+						<p>
+							A 12-character random password is a practical starting point. Increase the
+							length for highly sensitive accounts, or use a multi-word passphrase when the
+							password must be typed manually.
+						</p>
+					</details>
+					<details>
+						<summary>Should I use symbols in passwords?</summary>
+						<p>
+							Symbols increase the search space when attackers do not know your pattern.
+							Length is still the most reliable improvement, especially for random passwords.
+						</p>
+					</details>
+					<details>
+						<summary>Does the cracking-time estimate guarantee safety?</summary>
+						<p>
+							No estimate can guarantee safety. The displayed time is a comparative model
+							based on length and complexity, assuming a powerful bcrypt-10 attack setup.
+						</p>
+					</details>
+				</div>
+			</section>
+		</main>
+
+		<footer class="footer">
+			<span>NUC7 Studios</span>
+			<a href="/privacy-policies/">Privacy policies</a>
+			<a href="/contact/">Contact</a>
+		</footer>
+
+		<script src="./script.js" defer></script>
+	</body>
+</html>
