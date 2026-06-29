@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.6.0",
-    "astro": "^6.4.4"
+    "astro": "^7.0.3"
   },
   "devDependencies": {
     "decap-server": "^3.8.0"
